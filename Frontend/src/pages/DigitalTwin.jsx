@@ -1,0 +1,449 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import SkillGraph3D from '../components/SkillGraph3D';
+import {
+  Sparkles,
+  Copy,
+  Check,
+  ExternalLink,
+  Bot,
+  ArrowLeft,
+  ShieldCheck,
+  Zap,
+  Globe,
+  Radio,
+  User,
+  FileText,
+  Sliders,
+  CheckCircle2,
+  RefreshCw,
+  AlertCircle,
+  MessageSquare,
+  Clock,
+  Inbox
+} from 'lucide-react';
+
+export default function DigitalTwin() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract resume data passed via state, or provide fallback
+  const resumeData = location.state?.resumeData || {
+    id: 'res-default-01',
+    name: 'Alex Mercer',
+    summary: 'Lead Software Architect & AI Systems Specialist with 8+ years building enterprise distributed platforms and intelligent applications.',
+    tone: 'Professional'
+  };
+
+  const [twinProfile, setTwinProfile] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const fetchAnalytics = async (targetResumeId) => {
+    const idToUse = targetResumeId || resumeData.id;
+    if (!idToUse) return;
+    setIsLoadingHistory(true);
+    try {
+      const res = await api.get(`/twins/analytics/${idToUse}`);
+      if (res.data?.success) {
+        setChatHistory(res.data.conversations || res.data.analytics || []);
+      }
+    } catch (err) {
+      console.warn('Could not load chat history:', err.message);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeTwinAndHistory = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const payload = {
+          resumeId: resumeData.resumeId || resumeData.id || `res-${Date.now()}`,
+          name: resumeData.name || 'Candidate',
+          bio: resumeData.bio || resumeData.summary || 'Professional candidate resume profile.',
+          tone: resumeData.tone || 'Professional',
+        };
+
+        const response = await api.post('/twins/create', payload);
+
+        if (isMounted && response.data?.success) {
+          const profile = response.data.twin;
+          setTwinProfile(profile);
+
+          // Fetch chat history analytics
+          try {
+            const analyticsRes = await api.get(`/twins/analytics/${profile.resumeId || resumeData.id}`);
+            if (isMounted && analyticsRes.data?.success) {
+              setChatHistory(analyticsRes.data.conversations || analyticsRes.data.analytics || []);
+            }
+          } catch (analyticsErr) {
+            console.warn('Error fetching initial analytics:', analyticsErr);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to create/fetch digital twin:', err);
+        if (isMounted) {
+          setError(err.response?.data?.message || err.message || 'Unable to connect to Twin service');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initializeTwinAndHistory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [resumeData.id, resumeData.name, resumeData.summary]);
+
+  const publicLink =
+    twinProfile?.publicSlug || twinProfile?.slug
+      ? `${window.location.origin}/twin/${twinProfile.publicSlug || twinProfile.slug}`
+      : 'Generating public twin link...';
+
+  const handleCopyLink = () => {
+    if (!twinProfile?.publicSlug && !twinProfile?.slug) return;
+    navigator.clipboard.writeText(publicLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F3EFE9] text-[#1D2B3A] flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
+      {/* Top Editorial Navigation Bar */}
+      <header className="border-b border-[#E5E1D8] bg-[#FCFAF6]/90 backdrop-blur sticky top-0 z-50 px-6 py-4 transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-sm text-[#1D2B3A] hover:bg-[#E5E1D8] transition-colors bg-[#FCFAF6] px-3.5 py-1.5 rounded-lg border border-[#E5E1D8] shadow-xs"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Resume
+          </button>
+
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+            </span>
+            <span className="text-xs font-serif text-[#1D2B3A] font-medium tracking-wide uppercase">
+              Gemini AI Synchronized
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Header with Organic Sand Aesthetic */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FCFAF6] via-[#F3EFE9] to-[#F3EFE9] border-b border-[#E5E1D8] px-6 py-12">
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-[#FCFAF6] border border-[#E5E1D8] px-4 py-1.5 rounded-full text-xs font-serif font-bold text-[#B25B3E] mb-4 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5" />
+            AI Persona Control Center
+          </div>
+
+          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-[#1D2B3A] mb-3">
+            Your Digital Twin Control Center
+          </h1>
+          <p className="text-[#5C5751] max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+            An interactive, AI-grounded avatar that answers recruiter questions, illustrates your STAR-method achievements, and pitches your career 24/7.
+          </p>
+        </div>
+      </section>
+
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-6 py-10 flex-1 w-full">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="relative">
+              <div className="w-14 h-14 rounded-full border-2 border-[#E5E1D8] border-t-[#B25B3E] animate-spin"></div>
+              <Bot className="w-6 h-6 text-[#1D2B3A] absolute inset-0 m-auto" />
+            </div>
+            <p className="text-[#1D2B3A] font-serif font-semibold">Initializing your Digital Twin in MySQL database...</p>
+            <p className="text-xs text-[#5C5751]">Syncing resume embeddings and persona parameters</p>
+          </div>
+        ) : error ? (
+          <div className="max-w-lg mx-auto bg-[#FCFAF6] border border-[#B25B3E]/40 rounded-2xl p-6 text-center space-y-3 shadow-sm">
+            <AlertCircle className="w-10 h-10 text-[#B25B3E] mx-auto" />
+            <h3 className="text-lg font-serif font-bold text-[#1D2B3A]">Connection Error</h3>
+            <p className="text-sm text-[#5C5751]">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-sm font-semibold rounded-xl shadow-xs transition-all"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retry Sync
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Public Link Share Bar */}
+            <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 shadow-sm relative overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-[#B25B3E]" />
+                    <span className="text-xs font-serif font-bold text-[#B25B3E] uppercase tracking-wider">
+                      Public Recruiter Access Link
+                    </span>
+                  </div>
+                  <h2 className="text-lg font-serif font-bold text-[#1D2B3A]">
+                    Share your Twin with hiring managers & recruiters
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2 bg-[#F3EFE9] border border-[#E5E1D8] rounded-xl px-4 py-2.5 max-w-xl flex-1">
+                  <span className="text-[#1D2B3A] font-mono text-xs select-all truncate font-semibold">
+                    {publicLink}
+                  </span>
+                  <div className="ml-auto flex items-center gap-2">
+                    <button
+                      onClick={handleCopyLink}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-semibold rounded-lg transition-all active:scale-95 border border-[#E5E1D8] shadow-2xs"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          Copy Link
+                        </>
+                      )}
+                    </button>
+                    <button
+                      id="open-terminal-btn"
+                      onClick={() => navigate(`/twin/${twinProfile?.publicSlug}`)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-lg transition-all active:scale-95 shadow-sm"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-[#EFE8DD]" />
+                      Open Terminal
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive 3D Skill Architecture Card */}
+            <div className="bg-[#FCFAF6] border border-[#E5E1D8] shadow-sm rounded-xl overflow-hidden">
+              <h2 className="font-serif text-[#1D2B3A] text-xl p-4 border-b border-[#E5E1D8]">
+                Interactive 3D Skill Architecture
+              </h2>
+              <SkillGraph3D resumeData={twinProfile || resumeData} />
+            </div>
+
+            {/* Recent Recruiter Activity Section */}
+            <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 space-y-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-[#F3EFE9] border border-[#E5E1D8] flex items-center justify-center text-[#B25B3E]">
+                    <MessageSquare className="w-4.5 h-4.5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-serif font-bold text-[#1D2B3A] flex items-center gap-2">
+                      Recent Recruiter Activity
+                      <span className="text-xs font-sans font-medium bg-[#F3EFE9] text-[#B25B3E] border border-[#E5E1D8] px-2.5 py-0.5 rounded-full">
+                        {chatHistory.length} {chatHistory.length === 1 ? 'Inquiry' : 'Inquiries'}
+                      </span>
+                    </h2>
+                    <p className="text-xs text-[#5C5751]">
+                      Real-time feed of questions asked by visiting hiring managers and recruiters
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => fetchAnalytics(twinProfile?.resumeId || resumeData.id)}
+                  disabled={isLoadingHistory}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F3EFE9] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-medium rounded-lg border border-[#E5E1D8] transition-colors disabled:opacity-50 shadow-2xs"
+                  title="Refresh activity feed"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#B25B3E] ${isLoadingHistory ? 'animate-spin' : ''}`} />
+                  Refresh Feed
+                </button>
+              </div>
+
+              {/* Chat History List */}
+              {chatHistory.length === 0 ? (
+                <div className="py-12 px-4 text-center space-y-3 bg-[#F3EFE9]/50 rounded-xl border border-[#E5E1D8]">
+                  <div className="w-10 h-10 rounded-full bg-[#FCFAF6] border border-[#E5E1D8] flex items-center justify-center text-[#5C5751] mx-auto shadow-2xs">
+                    <Inbox className="w-5 h-5 text-[#B25B3E]" />
+                  </div>
+                  <h3 className="text-sm font-serif font-bold text-[#1D2B3A]">No Recruiter Inquiries Recorded Yet</h3>
+                  <p className="text-xs text-[#5C5751] max-w-sm mx-auto">
+                    Share your public link with hiring teams or test it yourself. All questions and STAR responses will automatically stream here!
+                  </p>
+                  <button
+                    onClick={() => navigate(`/twin/${twinProfile?.publicSlug}`)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-lg transition-all shadow-xs"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Test Terminal Now
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                  {chatHistory.map((item, index) => (
+                    <div
+                      key={item.id || index}
+                      className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-xl p-5 space-y-3 shadow-xs transition-all hover:border-[#1D2B3A]/40"
+                    >
+                      <div className="flex items-center justify-between text-xs text-[#5C5751]">
+                        <span className="font-semibold text-[#B25B3E] flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5" />
+                          {item.visitorName || 'Anonymous Recruiter'}
+                        </span>
+                        <span className="flex items-center gap-1 font-mono text-[11px] text-[#5C5751]">
+                          <Clock className="w-3 h-3 text-[#5C5751]" />
+                          {item.createdAt
+                            ? new Date(item.createdAt).toLocaleString([], {
+                                dateStyle: 'short',
+                                timeStyle: 'short',
+                              })
+                            : 'Just now'}
+                        </span>
+                      </div>
+
+                      {/* Question */}
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-serif font-bold text-[#5C5751] uppercase tracking-wider block">
+                          Visitor asked:
+                        </span>
+                        <p className="text-sm font-medium text-[#1D2B3A] bg-[#F3EFE9] p-3 rounded-lg border border-[#E5E1D8]">
+                          {item.question}
+                        </p>
+                      </div>
+
+                      {/* Answer */}
+                      <div className="space-y-1 pt-1">
+                        <span className="text-[11px] font-serif font-bold text-[#1D2B3A] uppercase tracking-wider flex items-center gap-1 block">
+                          <Bot className="w-3.5 h-3.5 text-[#B25B3E]" />
+                          AI Answered:
+                        </span>
+                        <div className="text-xs text-[#FCFAF6] leading-relaxed bg-[#1D2B3A] p-4 rounded-xl shadow-sm whitespace-pre-wrap">
+                          {item.aiResponse}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Twin Attributes & Status Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Persona Profile Card */}
+              <div className="md:col-span-2 bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 space-y-5 shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#1D2B3A] text-[#FCFAF6] flex items-center justify-center font-serif font-bold text-sm shadow-xs">
+                      {twinProfile?.name ? twinProfile.name.charAt(0) : 'T'}
+                    </div>
+                    <div>
+                      <h3 className="text-base font-serif font-bold text-[#1D2B3A]">{twinProfile?.name}</h3>
+                      <p className="text-xs text-[#5C5751]">Resume ID: {twinProfile?.resumeId}</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-serif font-medium bg-[#F3EFE9] text-[#1D2B3A] border border-[#E5E1D8]">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    MySQL Synced
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-serif font-bold text-[#5C5751] uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                      <FileText className="w-3.5 h-3.5 text-[#B25B3E]" />
+                      Executive Persona Bio
+                    </label>
+                    <p className="text-sm text-[#5C5751] bg-[#F3EFE9] p-4 rounded-xl border border-[#E5E1D8] leading-relaxed">
+                      {twinProfile?.bio || 'No bio provided.'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="bg-[#F3EFE9] p-3.5 rounded-xl border border-[#E5E1D8]">
+                      <span className="text-xs text-[#5C5751] block mb-1 flex items-center gap-1">
+                        <Sliders className="w-3.5 h-3.5 text-[#B25B3E]" />
+                        Speaking Tone
+                      </span>
+                      <span className="text-sm font-semibold text-[#1D2B3A]">
+                        {twinProfile?.tone || 'Professional'}
+                      </span>
+                    </div>
+
+                    <div className="bg-[#F3EFE9] p-3.5 rounded-xl border border-[#E5E1D8]">
+                      <span className="text-xs text-[#5C5751] block mb-1 flex items-center gap-1">
+                        <Radio className="w-3.5 h-3.5 text-[#B25B3E]" />
+                        Public Slug
+                      </span>
+                      <span className="text-sm font-mono text-[#B25B3E] font-semibold truncate block">
+                        {twinProfile?.publicSlug}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status and Engine Telemetry */}
+              <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 space-y-5 flex flex-col justify-between shadow-sm">
+                <div>
+                  <h3 className="text-sm font-serif font-bold text-[#1D2B3A] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-[#B25B3E]" />
+                    Twin Telemetry
+                  </h3>
+
+                  <div className="space-y-3.5">
+                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8]">
+                      <span className="text-[#5C5751]">Total Inquiries</span>
+                      <span className="text-[#B25B3E] font-bold font-mono text-sm">{chatHistory.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8]">
+                      <span className="text-[#5C5751]">AI Engine</span>
+                      <span className="text-[#1D2B3A] font-medium">Gemini 1.5 / 3.5 Flash</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8]">
+                      <span className="text-[#5C5751]">Max Output Cap</span>
+                      <span className="text-[#1D2B3A] font-medium">500 tokens</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8]">
+                      <span className="text-[#5C5751]">Database</span>
+                      <span className="text-[#1D2B3A] font-medium">MySQL (Sequelize)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#5C5751]">Status</span>
+                      <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                        Active & Live
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#F3EFE9] border border-[#E5E1D8] flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-[#B25B3E] shrink-0 mt-0.5" />
+                  <p className="text-xs text-[#5C5751] leading-relaxed">
+                    All candidate interview responses are strictly grounded in your validated resume facts.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
