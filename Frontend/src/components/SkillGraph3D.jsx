@@ -51,7 +51,10 @@ const DEFAULT_SKILLS = [
 export default function SkillGraph3D({ resumeData }) {
   const containerRef = useRef(null);
   const fgRef = useRef();
-  const [dimensions, setDimensions] = useState({ width: 0, height: 420 });
+  const [dimensions, setDimensions] = useState(() => ({
+    width: 0,
+    height: typeof window !== 'undefined' && window.innerWidth < 640 ? 280 : 420
+  }));
 
   // Handle container resizing for responsive 3D canvas
   useEffect(() => {
@@ -60,9 +63,11 @@ export default function SkillGraph3D({ resumeData }) {
     const handleResize = () => {
       if (containerRef.current) {
         const clientWidth = containerRef.current.clientWidth;
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+        const clientHeight = containerRef.current.clientHeight || (isMobile ? 280 : 420);
         setDimensions({
           width: clientWidth > 0 ? clientWidth : 700,
-          height: 420
+          height: clientHeight
         });
       }
     };
@@ -155,7 +160,7 @@ export default function SkillGraph3D({ resumeData }) {
   };
 
   return (
-    <div className="relative w-full overflow-hidden select-none" ref={containerRef}>
+    <div className="relative w-full h-[280px] sm:h-[420px] overflow-hidden rounded-xl select-none" ref={containerRef}>
       {/* 3D Force Graph Render */}
       {dimensions.width > 0 ? (
         <ForceGraph3D
@@ -167,16 +172,6 @@ export default function SkillGraph3D({ resumeData }) {
           nodeColor={(node) => node.color}
           nodeVal={(node) => node.val}
           nodeResolution={24}
-          nodeLabel={(node) => `
-            <div style="background:#1D2B3A; color:#FCFAF6; padding:6px 10px; border-radius:8px; font-family:'DM Sans', sans-serif; font-size:12px; box-shadow:0 4px 12px rgba(0,0,0,0.15); border:1px solid #E5E1D8;">
-              <span style="font-weight:700; color:${node.color === '#B25B3E' ? '#E59B82' : '#FCFAF6'}; display:block;">
-                ${node.name}
-              </span>
-              <span style="font-size:10px; color:#A7A196;">
-                ${node.id === 'Me' ? 'Digital Twin Core' : 'Skill Node'}
-              </span>
-            </div>
-          `}
           linkColor={() => '#E5E1D8'} // Subtle organic border color
           linkWidth={1.5}
           linkOpacity={0.8}
@@ -214,7 +209,7 @@ export default function SkillGraph3D({ resumeData }) {
           enableNavigationControls={true}
         />
       ) : (
-        <div className="h-[420px] flex items-center justify-center bg-[#F3EFE9] text-[#5C5751] text-xs font-serif">
+        <div className="w-full h-full flex items-center justify-center bg-[#F3EFE9] text-[#5C5751] text-xs font-serif">
           Initializing 3D spatial canvas...
         </div>
       )}

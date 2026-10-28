@@ -5,11 +5,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const FALLBACK_MODELS = [
-  process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite', 
-  'gemini-3.8-flash',                                  
-  'gemini-3.1-flash-lite',                             
-  'gemini-flash-latest',                               
-  'gemini-1.5-flash',                                  
+  process.env.GEMINI_MODEL || 'gemini-3.5-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-flash-latest',
 ];
 
 // Fast Chat Model: Best for fast, low-latency recruiter chat replies
@@ -49,10 +48,36 @@ const generateWithFallback = async (prompt, systemInstruction) => {
   throw lastError;
 };
 
+// Resilient multi-model multi-turn chat with automatic fallback
+const chatWithFallback = async (prompt, systemInstruction, formattedHistory = []) => {
+  let lastError = null;
+  for (const modelName of FALLBACK_MODELS) {
+    try {
+      const modelConfig = { model: modelName };
+      if (systemInstruction) {
+        modelConfig.systemInstruction = systemInstruction;
+      }
+      const model = genAI.getGenerativeModel(modelConfig);
+      const chat = model.startChat({
+        history: formattedHistory,
+      });
+      const result = await chat.sendMessage(prompt);
+      return result.response.text();
+    } catch (err) {
+      console.warn(
+        `Model ${modelName} unavailable in chat (${err.status || err.message}), attempting fallback...`
+      );
+      lastError = err;
+    }
+  }
+  throw lastError;
+};
+
 module.exports = {
   fastChatModel,
   proReasoningModel,
   ultraFastModel,
   generateWithFallback,
+  chatWithFallback,
   genAI,
 };

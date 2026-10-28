@@ -83,6 +83,14 @@ export default function PublicTwinChat() {
     const query = inputMessage.trim();
     if (!query || isTyping) return;
 
+    // Map existing UI messages state into history array for multi-turn context
+    const chatHistory = messages
+      .filter((m) => !m.isError)
+      .map((m) => ({
+        role: m.sender === 'user' ? 'user' : 'model',
+        text: m.text,
+      }));
+
     const userMsg = {
       id: `user-${Date.now()}`,
       sender: 'user',
@@ -95,7 +103,10 @@ export default function PublicTwinChat() {
     setIsTyping(true);
 
     try {
-      const response = await api.post(`/twins/${slug}/chat`, { message: query });
+      const response = await api.post(`/twins/${slug}/chat`, {
+        message: query,
+        history: chatHistory,
+      });
       const aiReply = response.data?.reply || 'I apologize, I could not generate a response at this moment.';
 
       const twinMsg = {
@@ -212,19 +223,16 @@ export default function PublicTwinChat() {
           <div className="flex-1 flex flex-col justify-between overflow-hidden">
             {/* Messages Scroll Area */}
             <div className="flex-1 overflow-y-auto space-y-5 pr-2 pb-4 scrollbar-thin scrollbar-thumb-[#E5E1D8]">
-              {/* Persona Bio Editorial Callout */}
+              {/* Collapsible Candidate Resume Data Accordion */}
               {twinData?.bio && (
-                <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-4.5 text-xs text-[#5C5751] shadow-xs flex items-start gap-3.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#F3EFE9] flex items-center justify-center shrink-0 text-[#B25B3E]">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div className="leading-relaxed">
-                    <span className="font-serif font-bold text-[#1D2B3A] text-xs block mb-0.5 tracking-wide uppercase">
-                      Candidate Bio & Grounding
-                    </span>
+                <details className="mb-6 p-4 border border-[#E5E1D8] bg-[#FCFAF6] rounded-xl cursor-pointer group">
+                  <summary className="font-bold text-[#1D2B3A] font-sans outline-none">
+                    View Candidate Resume Data
+                  </summary>
+                  <div className="mt-3 text-sm text-[#1D2B3A]/80 whitespace-pre-wrap max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                     {twinData.bio}
                   </div>
-                </div>
+                </details>
               )}
 
               {/* Message Items */}
@@ -336,7 +344,7 @@ export default function PublicTwinChat() {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder={`Ask ${twinData?.name?.split(' ')[0] || 'Manav'} about his experience...`}
+                  placeholder={`Ask ${twinData?.name ? twinData.name.split(' ')[0] : 'the candidate'} about their experience...`}
                   disabled={isTyping}
                   className="flex-1 bg-transparent px-4 py-2 text-sm text-[#1D2B3A] placeholder-[#5C5751]/60 focus:outline-none"
                 />

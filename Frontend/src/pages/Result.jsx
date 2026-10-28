@@ -120,12 +120,31 @@ export default function Result() {
       } else {
         throw new Error(response.data?.message || 'Failed to activate twin');
       }
-    } catch (err) {
-      console.error('Error activating Digital Twin:', err);
-      setErrorMsg(
-        err.response?.data?.message || err.message || 'Error uploading and parsing PDF resume.'
-      );
+    } catch (error) {
+      console.error('Upload Error:', error);
+      let errorMessage = 'An error occurred during upload. Please try again.';
+
+      // Check if error comes from backend response
+      if (error.response && error.response.data) {
+        const backendError = error.response.data.error || error.response.data.message;
+
+        if (backendError && typeof backendError === 'string') {
+          // Detect if backend failed to extract text (Scanned PDF scenario)
+          const lowerErr = backendError.toLowerCase();
+          if (lowerErr.includes('text') || lowerErr.includes('parse') || lowerErr.includes('empty')) {
+            errorMessage = "We couldn't extract text from this PDF. Please ensure it's a digital text PDF, not a scanned image.";
+          } else {
+            errorMessage = backendError;
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      // Update error state
+      setErrorMsg(errorMessage);
     } finally {
+      // Stop the loading spinner
       setIsSubmitting(false);
     }
   };
