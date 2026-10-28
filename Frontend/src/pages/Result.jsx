@@ -104,7 +104,7 @@ export default function Result() {
       submitData.append('resumePdf', file);
 
       const response = await axios.post(
-        'http://localhost:5000/api/twins/create',
+        `${import.meta.env.VITE_API_BASE_URL}/api/twins/create`,
         submitData,
         {
           headers: {
@@ -114,7 +114,9 @@ export default function Result() {
       );
 
       if (response.data?.success && response.data?.twin) {
-        navigate('/digital-twin', { state: { resumeData: response.data.twin } });
+        const twinData = response.data.twin;
+        localStorage.setItem('activeTwinSlug', twinData.publicSlug || twinData.id);
+        navigate('/digital-twin', { state: { resumeData: twinData } });
       } else {
         throw new Error(response.data?.message || 'Failed to activate twin');
       }

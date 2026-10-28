@@ -3,6 +3,9 @@ import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import { RotateCcw } from 'lucide-react';
 
+// WebGL Texture & SpriteText cache to prevent GPU VRAM exhaustion during render loops
+const spriteCache = new Map();
+
 // Comprehensive dictionary of technical skills & architectural concepts to search for
 const RECOGNIZED_SKILLS = [
   'React',
@@ -179,6 +182,11 @@ export default function SkillGraph3D({ resumeData }) {
           linkOpacity={0.8}
           nodeThreeObjectExtend={true}
           nodeThreeObject={(node) => {
+            const cacheKey = `${node.id}_${node.name || ''}`;
+            if (spriteCache.has(cacheKey)) {
+              return spriteCache.get(cacheKey);
+            }
+
             const sprite = new SpriteText(node.name || node.id);
 
             // Slate Navy text color
@@ -198,6 +206,7 @@ export default function SkillGraph3D({ resumeData }) {
             // Push the text further down so it doesn't overlap with the node sphere
             sprite.position.y = node.id === 'Me' ? -15 : -10;
 
+            spriteCache.set(cacheKey, sprite);
             return sprite;
           }}
           showNavInfo={false}

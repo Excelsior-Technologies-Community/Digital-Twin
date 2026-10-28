@@ -28,23 +28,18 @@ export default function DigitalTwin() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extract resume data passed via state, or provide fallback
-  const resumeData = location.state?.resumeData || {
-    id: 'res-default-01',
-    name: 'Alex Mercer',
-    summary: 'Lead Software Architect & AI Systems Specialist with 8+ years building enterprise distributed platforms and intelligent applications.',
-    tone: 'Professional'
-  };
+  // Extract resume data passed via state if available
+  const stateResumeData = location.state?.resumeData;
 
-  const [twinProfile, setTwinProfile] = useState(null);
+  const [twinProfile, setTwinProfile] = useState(stateResumeData || null);
   const [chatHistory, setChatHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!stateResumeData);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  const fetchAnalytics = async (targetResumeId) => {
-    const idToUse = targetResumeId || resumeData.id;
+  const fetchAnalytics = async (targetId) => {
+    const idToUse = targetId || twinProfile?.resumeId || twinProfile?.publicSlug;
     if (!idToUse) return;
     setIsLoadingHistory(true);
     try {
@@ -62,51 +57,54 @@ export default function DigitalTwin() {
   useEffect(() => {
     let isMounted = true;
 
-    const initializeTwinAndHistory = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const payload = {
-          resumeId: resumeData.resumeId || resumeData.id || `res-${Date.now()}`,
-          name: resumeData.name || 'Candidate',
-          bio: resumeData.bio || resumeData.summary || 'Professional candidate resume profile.',
-          tone: resumeData.tone || 'Professional',
-        };
+    const loadTwinProfile = async () => {
+      // 1. If passed via router state from Result.jsx, use and persist it
+      if (stateResumeData) {
+        setTwinProfile(stateResumeData);
+        localStorage.setItem('activeTwinSlug', stateResumeData.publicSlug || stateResumeData.id);
+        setIsLoading(false);
+        fetchAnalytics(stateResumeData.resumeId || stateResumeData.publicSlug || stateResumeData.id);
+        return;
+      }
 
-        const response = await api.post('/twins/create', payload);
-
-        if (isMounted && response.data?.success) {
-          const profile = response.data.twin;
-          setTwinProfile(profile);
-
-          // Fetch chat history analytics
-          try {
-            const analyticsRes = await api.get(`/twins/analytics/${profile.resumeId || resumeData.id}`);
-            if (isMounted && analyticsRes.data?.success) {
-              setChatHistory(analyticsRes.data.conversations || analyticsRes.data.analytics || []);
-            }
-          } catch (analyticsErr) {
-            console.warn('Error fetching initial analytics:', analyticsErr);
+      // 2. Check localStorage for previously active twin
+      const storedSlug = localStorage.getItem('activeTwinSlug');
+      if (storedSlug) {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const res = await api.get(`/twins/${storedSlug}`);
+          if (isMounted && res.data?.success && res.data?.twin) {
+            const profile = res.data.twin;
+            setTwinProfile(profile);
+            fetchAnalytics(profile.resumeId || profile.publicSlug || profile.id);
+          } else {
+            throw new Error('Digital Twin profile not found');
           }
+        } catch (err) {
+          console.error('Error fetching stored twin profile:', err);
+          if (isMounted) {
+            setError(err.response?.data?.message || 'Unable to load your saved Digital Twin profile.');
+          }
+        } finally {
+          if (isMounted) setIsLoading(false);
         }
-      } catch (err) {
-        console.error('Failed to create/fetch digital twin:', err);
-        if (isMounted) {
-          setError(err.response?.data?.message || err.message || 'Unable to connect to Twin service');
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        return;
+      }
+
+      // 3. Neither state nor localStorage found
+      if (isMounted) {
+        setError('No active Digital Twin found. Please upload a PDF resume to initialize your persona.');
+        setIsLoading(false);
       }
     };
 
-    initializeTwinAndHistory();
+    loadTwinProfile();
 
     return () => {
       isMounted = false;
     };
-  }, [resumeData.id, resumeData.name, resumeData.summary]);
+  }, [stateResumeData]);
 
   const publicLink =
     twinProfile?.publicSlug || twinProfile?.slug
@@ -176,15 +174,24 @@ export default function DigitalTwin() {
         ) : error ? (
           <div className="max-w-lg mx-auto bg-[#FCFAF6] border border-[#B25B3E]/40 rounded-2xl p-6 text-center space-y-3 shadow-sm">
             <AlertCircle className="w-10 h-10 text-[#B25B3E] mx-auto" />
-            <h3 className="text-lg font-serif font-bold text-[#1D2B3A]">Connection Error</h3>
+            <h3 className="text-lg font-serif font-bold text-[#1D2B3A]">Digital Twin Profile</h3>
             <p className="text-sm text-[#5C5751]">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-sm font-semibold rounded-xl shadow-xs transition-all"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Retry Sync
-            </button>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                onClick={() => navigate('/')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-xl shadow-xs transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Upload Resume
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-semibold rounded-xl border border-[#E5E1D8] shadow-2xs transition-all"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-[#B25B3E]" />
+                Retry
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-8">
@@ -242,7 +249,7 @@ export default function DigitalTwin() {
               <h2 className="font-serif text-[#1D2B3A] text-xl p-4 border-b border-[#E5E1D8]">
                 Interactive 3D Skill Architecture
               </h2>
-              <SkillGraph3D resumeData={twinProfile || resumeData} />
+              <SkillGraph3D resumeData={twinProfile || stateResumeData} />
             </div>
 
             {/* Recent Recruiter Activity Section */}
@@ -266,7 +273,7 @@ export default function DigitalTwin() {
                 </div>
 
                 <button
-                  onClick={() => fetchAnalytics(twinProfile?.resumeId || resumeData.id)}
+                  onClick={() => fetchAnalytics(twinProfile?.resumeId || twinProfile?.publicSlug)}
                   disabled={isLoadingHistory}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F3EFE9] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-medium rounded-lg border border-[#E5E1D8] transition-colors disabled:opacity-50 shadow-2xs"
                   title="Refresh activity feed"
