@@ -13,6 +13,27 @@ const Twin = sequelize.define('Twin', {
   bio: {
     type: DataTypes.TEXT('long'),
   },
+  title: {
+    type: DataTypes.STRING,
+  },
+  email: {
+    type: DataTypes.STRING,
+  },
+  phone: {
+    type: DataTypes.STRING,
+  },
+  skills: {
+    type: DataTypes.JSON,
+  },
+  experience: {
+    type: DataTypes.JSON,
+  },
+  education: {
+    type: DataTypes.JSON,
+  },
+  rawResumeText: {
+    type: DataTypes.TEXT('long'),
+  },
   tone: {
     type: DataTypes.STRING,
     defaultValue: 'Professional',

@@ -15,12 +15,12 @@ const createTwin = async (req, res) => {
       });
     }
 
-    let parsedBio = bio;
+    let pdfText = bio ? bio.trim() : '';
 
     if (req.file) {
       try {
         const pdfData = await pdfParse(req.file.buffer);
-        parsedBio = pdfData.text ? pdfData.text.trim() : '';
+        pdfText = pdfData.text ? pdfData.text.trim() : '';
       } catch (pdfErr) {
         console.error('Error parsing PDF buffer:', pdfErr);
         return res.status(400).json({
@@ -30,31 +30,95 @@ const createTwin = async (req, res) => {
       }
     }
 
-    if (!parsedBio || !parsedBio.trim()) {
+    if (!pdfText) {
       return res.status(400).json({
         success: false,
         message: 'Please upload a PDF resume',
       });
     }
 
+    const prompt = `
+You are an expert ATS resume parser. Extract the information from the provided resume text and return it STRICTLY as a valid JSON object. Do not include markdown formatting like \`\`\`json. 
+
+Expected JSON Structure:
+{
+  "name": "Full Name",
+  "title": "Professional Title (e.g., Frontend Engineer)",
+  "email": "Email Address",
+  "phone": "Phone Number",
+  "bio": "A concise professional summary (3-4 sentences)",
+  "skills": ["React.js", "Node.js", "Tailwind CSS"],
+  "experience": [
+    {
+      "role": "Job Title",
+      "company": "Company Name",
+      "duration": "E.g., June 2025 - Present",
+      "description": "Short paragraph or bullet points describing responsibilities"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Degree Name (e.g., B.Tech in ICT)",
+      "institution": "University Name",
+      "year": "Graduation Year"
+    }
+  ]
+}
+
+Resume Text to parse:
+${pdfText}
+`;
+
+    let parsedResume = {};
+    try {
+      const model = genAI.getGenerativeModel({
+        model: process.env.GEMINI_MODEL || 'gemini-3.5-flash',
+        generationConfig: { responseMimeType: 'application/json' },
+      });
+      const result = await model.generateContent(prompt);
+      const rawText = result.response.text().trim();
+      const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+      parsedResume = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.warn('Primary model JSON resume parse failed, attempting fallback:', parseErr.message);
+      try {
+        const rawFallback = await generateWithFallback(prompt);
+        const cleaned = rawFallback.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+        parsedResume = JSON.parse(cleaned);
+      } catch (fallbackErr) {
+        console.error('All fallback models failed to parse structured resume:', fallbackErr.message);
+      }
+    }
+
     const activeResumeId = resumeId || Date.now().toString();
 
     // Generate initial slug
-    let publicSlug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+    let publicSlug = (parsedResume.name || name).toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
 
     // Collision-resolution loop: keep generating if it already exists
     let slugExists = await Twin.findOne({ where: { publicSlug } });
     while (slugExists) {
-      publicSlug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(10000 + Math.random() * 90000);
+      publicSlug = (parsedResume.name || name).toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(10000 + Math.random() * 90000);
       slugExists = await Twin.findOne({ where: { publicSlug } });
     }
+
+    const twinDataToSave = {
+      name: parsedResume.name || name,
+      title: parsedResume.title || null,
+      email: parsedResume.email || null,
+      phone: parsedResume.phone || null,
+      bio: parsedResume.bio || pdfText,
+      skills: Array.isArray(parsedResume.skills) ? parsedResume.skills : [],
+      experience: Array.isArray(parsedResume.experience) ? parsedResume.experience : (parsedResume.experience || []),
+      education: Array.isArray(parsedResume.education) ? parsedResume.education : (parsedResume.education || []),
+      rawResumeText: pdfText,
+      tone: tone || 'Professional',
+    };
 
     let twin = await Twin.findOne({ where: { resumeId: activeResumeId } });
 
     if (twin) {
-      twin.name = name;
-      twin.bio = parsedBio;
-      if (tone !== undefined) twin.tone = tone;
+      Object.assign(twin, twinDataToSave);
       if (!twin.publicSlug) {
         twin.publicSlug = publicSlug;
       }
@@ -62,10 +126,8 @@ const createTwin = async (req, res) => {
     } else {
       twin = await Twin.create({
         resumeId: activeResumeId,
-        name,
-        bio: parsedBio,
-        tone: tone || 'Professional',
         publicSlug,
+        ...twinDataToSave,
       });
     }
 

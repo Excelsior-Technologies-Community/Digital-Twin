@@ -233,6 +233,14 @@ export default function DigitalTwin() {
                       )}
                     </button>
                     <button
+                      onClick={() => navigate(`/digital-twin/${twinProfile?.publicSlug}/resume-builder`)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-lg transition-all active:scale-95 shadow-sm"
+                      title="Open PDF Resume Builder"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-[#EFE8DD]" />
+                      Resume Builder
+                    </button>
+                    <button
                       id="open-terminal-btn"
                       onClick={() => navigate(`/twin/${twinProfile?.publicSlug}`)}
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-lg transition-all active:scale-95 shadow-sm"
