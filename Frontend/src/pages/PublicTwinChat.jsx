@@ -3,9 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import {
   Send,
-  Bot,
-  User,
-  Sparkles,
   ArrowLeft,
   ShieldCheck,
   CheckCircle2,

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import SkillGraph3D from '../components/SkillGraph3D';
+
+const SkillGraph3D = React.lazy(() => import('../components/SkillGraph3D'));
 import {
   Sparkles,
   Copy,
@@ -249,7 +250,18 @@ export default function DigitalTwin() {
               <h2 className="font-serif text-[#1D2B3A] text-xl p-4 border-b border-[#E5E1D8]">
                 Interactive 3D Skill Architecture
               </h2>
-              <SkillGraph3D resumeData={twinProfile || stateResumeData} />
+              <Suspense
+                fallback={
+                  <div className="h-[280px] sm:h-[420px] flex items-center justify-center bg-[#F3EFE9] text-[#5C5751] text-xs font-serif">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-8 h-8 rounded-full border-2 border-[#1D2B3A]/20 border-t-[#B25B3E] animate-spin"></div>
+                      <span>Loading 3D Skill Architecture...</span>
+                    </div>
+                  </div>
+                }
+              >
+                <SkillGraph3D resumeData={twinProfile || stateResumeData} />
+              </Suspense>
             </div>
 
             {/* Recent Recruiter Activity Section */}

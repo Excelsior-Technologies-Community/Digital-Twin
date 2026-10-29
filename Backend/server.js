@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/db');
 const twinRoutes = require('./routes/twinRoutes');
+const { errorHandler } = require('./middlewares/errorMiddleware');
 require('./models/Twin');
 require('./models/TwinConversation');
 
@@ -18,6 +19,9 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/twins', twinRoutes);
+
+// Global Error Handling Middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

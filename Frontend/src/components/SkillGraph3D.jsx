@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import { RotateCcw } from 'lucide-react';
@@ -48,7 +48,7 @@ const DEFAULT_SKILLS = [
   'TailwindCSS'
 ];
 
-export default function SkillGraph3D({ resumeData }) {
+function SkillGraph3D({ resumeData }) {
   const containerRef = useRef(null);
   const fgRef = useRef();
   const [dimensions, setDimensions] = useState(() => ({
@@ -251,3 +251,5 @@ export default function SkillGraph3D({ resumeData }) {
     </div>
   );
 }
+
+export default memo(SkillGraph3D);
