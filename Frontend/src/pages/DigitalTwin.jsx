@@ -145,9 +145,9 @@ export default function DigitalTwin() {
       </header>
 
       {/* Hero Header with Organic Sand Aesthetic */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#FCFAF6] via-[#F3EFE9] to-[#F3EFE9] border-b border-[#E5E1D8] px-6 py-12">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FCFAF6] via-[#F3EFE9] to-[#F3EFE9] border-b border-[#E5E1D8] px-4 sm:px-6 py-8 sm:py-12">
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-[#FCFAF6] border border-[#E5E1D8] px-4 py-1.5 rounded-full text-xs font-serif font-bold text-[#B25B3E] mb-4 shadow-xs">
+          <div className="inline-flex items-center gap-2 bg-[#FCFAF6] border border-[#E5E1D8] px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-serif font-bold text-[#B25B3E] mb-3 sm:mb-4 shadow-xs">
             <Sparkles className="w-3.5 h-3.5" />
             AI Persona Control Center
           </div>
@@ -155,14 +155,14 @@ export default function DigitalTwin() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-bold tracking-tight text-[#1D2B3A] mb-2 sm:mb-3">
             Your Digital Twin Control Center
           </h1>
-          <p className="text-[#5C5751] max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+          <p className="text-[#5C5751] max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed">
             An interactive, AI-grounded avatar that answers recruiter questions, illustrates your STAR-method achievements, and pitches your career 24/7.
           </p>
         </div>
       </section>
 
       {/* Main Content Area */}
-      <main className="max-w-6xl mx-auto px-6 py-10 flex-1 w-full">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 w-full">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <div className="relative">
@@ -180,14 +180,14 @@ export default function DigitalTwin() {
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={() => navigate('/')}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-xl shadow-xs transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-xl shadow-xs transition-all min-h-[40px]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Upload Resume
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-semibold rounded-xl border border-[#E5E1D8] shadow-2xs transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-semibold rounded-xl border border-[#E5E1D8] shadow-2xs transition-all min-h-[40px]"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Retry
@@ -195,10 +195,10 @@ export default function DigitalTwin() {
             </div>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Public Link Share Bar */}
-            <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 shadow-sm relative overflow-hidden">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+            <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-4 sm:p-6 shadow-sm relative overflow-hidden">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4 text-[#B25B3E]" />
@@ -206,7 +206,7 @@ export default function DigitalTwin() {
                       Public Recruiter Access Link
                     </span>
                   </div>
-                  <h2 className="text-lg font-serif font-bold text-[#1D2B3A]">
+                  <h2 className="text-base sm:text-lg font-serif font-bold text-[#1D2B3A]">
                     Share your Twin with hiring managers & recruiters
                   </h2>
                 </div>
@@ -219,7 +219,7 @@ export default function DigitalTwin() {
                     </span>
                     <button
                       onClick={handleCopyLink}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-semibold rounded-lg transition-all active:scale-95 border border-[#E5E1D8] shadow-2xs shrink-0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-semibold rounded-lg transition-all active:scale-95 border border-[#E5E1D8] shadow-2xs shrink-0 min-h-[36px]"
                     >
                       {copied ? (
                         <>
@@ -236,10 +236,10 @@ export default function DigitalTwin() {
                   </div>
 
                   {/* Responsive Action Buttons with Expanded Mobile Touch Targets */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
                     <button
                       onClick={() => navigate(`/digital-twin/${twinProfile?.publicSlug}/resume-builder`)}
-                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm"
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm min-h-[42px]"
                       title="Open PDF Resume Builder"
                     >
                       <FileText className="w-3.5 h-3.5 text-[#EFE8DD]" />
@@ -248,7 +248,7 @@ export default function DigitalTwin() {
                     <button
                       id="open-terminal-btn"
                       onClick={() => navigate(`/twin/${twinProfile?.publicSlug}`)}
-                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm"
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm min-h-[42px]"
                     >
                       <ExternalLink className="w-3.5 h-3.5 text-[#EFE8DD]" />
                       <span>Open Terminal</span>
@@ -282,14 +282,14 @@ export default function DigitalTwin() {
             </div>
 
             {/* Recent Recruiter Activity Section */}
-            <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 space-y-5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-4">
+            <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E1D8] pb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#F3EFE9] border border-[#E5E1D8] flex items-center justify-center text-[#B25B3E]">
+                  <div className="w-9 h-9 rounded-xl bg-[#F3EFE9] border border-[#E5E1D8] flex items-center justify-center text-[#B25B3E] shrink-0">
                     <MessageSquare className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-serif font-bold text-[#1D2B3A] flex items-center gap-2">
+                    <h2 className="text-base font-serif font-bold text-[#1D2B3A] flex items-center gap-2 flex-wrap">
                       Recent Recruiter Activity
                       <span className="text-xs font-sans font-medium bg-[#F3EFE9] text-[#B25B3E] border border-[#E5E1D8] px-2.5 py-0.5 rounded-full">
                         {chatHistory.length} {chatHistory.length === 1 ? 'Inquiry' : 'Inquiries'}
@@ -304,7 +304,7 @@ export default function DigitalTwin() {
                 <button
                   onClick={() => fetchAnalytics(twinProfile?.resumeId || twinProfile?.publicSlug)}
                   disabled={isLoadingHistory}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F3EFE9] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-medium rounded-lg border border-[#E5E1D8] transition-colors disabled:opacity-50 shadow-2xs"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#F3EFE9] hover:bg-[#E5E1D8] text-[#1D2B3A] text-xs font-medium rounded-lg border border-[#E5E1D8] transition-colors disabled:opacity-50 shadow-2xs self-start sm:self-auto min-h-[36px]"
                   title="Refresh activity feed"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 text-[#B25B3E] ${isLoadingHistory ? 'animate-spin' : ''}`} />
@@ -382,7 +382,7 @@ export default function DigitalTwin() {
             {/* Twin Attributes & Status Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
               {/* Persona Profile Card */}
-              <div className="md:col-span-2 bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 shadow-sm h-full flex flex-col justify-between">
+              <div className="md:col-span-2 bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-4 sm:p-6 shadow-sm h-full flex flex-col justify-between">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-4">
                     <div className="flex items-center gap-3">
@@ -411,7 +411,7 @@ export default function DigitalTwin() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 pt-4">
                   <div className="bg-[#F3EFE9] p-3.5 rounded-xl border border-[#E5E1D8]">
                     <span className="text-xs text-[#5C5751] block mb-1 flex items-center gap-1">
                       <Sliders className="w-3.5 h-3.5 text-[#B25B3E]" />
@@ -435,7 +435,7 @@ export default function DigitalTwin() {
               </div>
 
               {/* Status and Engine Telemetry */}
-              <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-6 space-y-5 flex flex-col justify-between shadow-sm h-full">
+              <div className="bg-[#FCFAF6] border border-[#E5E1D8] rounded-2xl p-4 sm:p-6 space-y-5 flex flex-col justify-between shadow-sm h-full">
                 <div>
                   <h3 className="text-sm font-serif font-bold text-[#1D2B3A] uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Zap className="w-4 h-4 text-[#B25B3E]" />

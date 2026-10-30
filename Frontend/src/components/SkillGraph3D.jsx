@@ -215,10 +215,10 @@ function SkillGraph3D({ resumeData }) {
       )}
 
       {/* Interactive Overlay & Controls */}
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-10 pointer-events-auto">
+      <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-2 z-10 pointer-events-auto">
         <button
           onClick={handleResetCamera}
-          className="p-2 rounded-lg bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] border border-[#E5E1D8] shadow-xs transition-colors flex items-center gap-1.5 text-xs font-serif font-medium"
+          className="min-w-[38px] min-h-[38px] p-2 sm:px-3 sm:py-2 rounded-lg bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] border border-[#E5E1D8] shadow-xs transition-colors flex items-center justify-center gap-1.5 text-xs font-serif font-medium shrink-0"
           title="Reset Camera View"
         >
           <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E]" />
@@ -227,8 +227,8 @@ function SkillGraph3D({ resumeData }) {
       </div>
 
       {/* Bottom Floating Legend Bar */}
-      <div className="absolute bottom-3 left-4 right-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pointer-events-none text-[11px] font-sans">
-        <div className="flex items-center gap-3 bg-[#FCFAF6]/90 backdrop-blur px-3 py-1.5 rounded-lg border border-[#E5E1D8] shadow-2xs pointer-events-auto">
+      <div className="absolute bottom-3 left-3 sm:left-4 right-3 sm:right-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pointer-events-none text-[10px] sm:text-[11px] font-sans">
+        <div className="flex items-center gap-2.5 sm:gap-3 bg-[#FCFAF6]/90 backdrop-blur px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#E5E1D8] shadow-2xs pointer-events-auto">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#B25B3E]"></span>
             <span className="text-[#1D2B3A] font-semibold">{resumeData?.name || 'Me'}</span>

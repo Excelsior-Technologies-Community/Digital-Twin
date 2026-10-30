@@ -157,45 +157,45 @@ export default function Result() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F3EFE9] text-[#1D2B3A] p-4 sm:p-8 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
+    <div className="min-h-screen bg-[#F3EFE9] text-[#1D2B3A] px-3 sm:px-6 py-4 sm:py-8 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
       {/* Top Brand Bar */}
-      <header className="max-w-3xl w-full mx-auto mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#1D2B3A] text-[#FCFAF6] flex items-center justify-center font-serif font-bold text-sm shadow-xs select-none">
+      <header className="max-w-3xl w-full mx-auto mb-6 sm:mb-8 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1D2B3A] text-[#FCFAF6] flex items-center justify-center font-serif font-bold text-xs sm:text-sm shadow-xs select-none shrink-0">
             DT
           </div>
-          <div>
-            <span className="font-serif font-bold text-base text-[#1D2B3A] tracking-tight block">
+          <div className="min-w-0">
+            <span className="font-serif font-bold text-sm sm:text-base text-[#1D2B3A] tracking-tight block truncate">
               Digital Twin Studio
             </span>
-            <span className="text-xs text-[#5C5751] block -mt-0.5">
-              Organic Editorial Edition &bull; PDF Grounded
+            <span className="text-[11px] sm:text-xs text-[#5C5751] block -mt-0.5 truncate">
+              <span className="hidden sm:inline">Organic Editorial Edition &bull; </span>PDF Grounded
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-serif text-[#1D2B3A] bg-[#FCFAF6] border border-[#E5E1D8] px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs font-serif text-[#1D2B3A] bg-[#FCFAF6] border border-[#E5E1D8] px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs">
             <ShieldCheck className="w-3.5 h-3.5 text-[#B25B3E]" />
-            PDF Ingestion Engine
+            <span><span className="hidden sm:inline">PDF </span>Ingestion<span className="hidden md:inline"> Engine</span></span>
           </span>
         </div>
       </header>
 
       {/* Main Dynamic PDF Setup Card */}
       <main className="max-w-3xl w-full mx-auto flex-1 flex flex-col justify-center">
-        <div className="bg-[#FCFAF6] border border-[#E5E1D8] shadow-sm p-8 md:p-12 rounded-2xl relative overflow-hidden">
+        <div className="bg-[#FCFAF6] border border-[#E5E1D8] shadow-sm p-5 sm:p-8 md:p-12 rounded-2xl relative overflow-hidden">
           {/* Decorative Corner Pill */}
-          <div className="inline-flex items-center gap-2 bg-[#F3EFE9] border border-[#E5E1D8] px-3.5 py-1 rounded-full text-xs font-serif font-bold text-[#B25B3E] mb-5">
+          <div className="inline-flex items-center gap-2 bg-[#F3EFE9] border border-[#E5E1D8] px-3.5 py-1 rounded-full text-xs font-serif font-bold text-[#B25B3E] mb-4 sm:mb-5">
             <Sparkles className="w-3.5 h-3.5" />
             Resume-to-AI Parser
           </div>
 
           {/* Editorial Header */}
-          <h1 className="font-serif text-3xl md:text-4xl text-[#1D2B3A] font-bold tracking-tight mb-2">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#1D2B3A] font-bold tracking-tight mb-2">
             Initialize Your Digital Proxy
           </h1>
-          <p className="text-sm md:text-base text-[#5C5751] leading-relaxed mb-8">
+          <p className="text-xs sm:text-sm md:text-base text-[#5C5751] leading-relaxed mb-6 sm:mb-8">
             Upload your PDF resume. Our ingestion engine will automatically extract your achievements, project metrics, and technical expertise to ground your 24/7 AI persona.
           </p>
 
@@ -254,7 +254,7 @@ export default function Result() {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
+                  className={`border-2 border-dashed rounded-2xl p-5 sm:p-8 text-center cursor-pointer transition-all ${
                     isDragging
                       ? 'border-[#1D2B3A] bg-[#F3EFE9]'
                       : 'border-[#E5E1D8] bg-[#FCFAF6] hover:border-[#1D2B3A]/60 hover:bg-[#F3EFE9]/50'
@@ -274,8 +274,8 @@ export default function Result() {
                   </span>
                 </div>
               ) : (
-                <div className="bg-[#F3EFE9] border border-[#E5E1D8] rounded-2xl p-5 flex items-center justify-between gap-4 transition-all shadow-2xs">
-                  <div className="flex items-center gap-3.5 min-w-0">
+                <div className="bg-[#F3EFE9] border border-[#E5E1D8] rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all shadow-2xs">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-10 h-10 rounded-xl bg-[#1D2B3A] flex items-center justify-center text-[#FCFAF6] shrink-0 shadow-xs">
                       <FileCheck className="w-5 h-5 text-[#EFE8DD]" />
                     </div>
@@ -293,12 +293,12 @@ export default function Result() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSubmitting}
-                      className="text-xs font-serif font-semibold text-[#1D2B3A] hover:text-[#B25B3E] px-3 py-1.5 bg-[#FCFAF6] border border-[#E5E1D8] rounded-lg transition-colors shadow-2xs"
+                      className="text-xs font-serif font-semibold text-[#1D2B3A] hover:text-[#B25B3E] px-3 py-2 min-h-[44px] bg-[#FCFAF6] border border-[#E5E1D8] rounded-lg transition-colors shadow-2xs flex items-center justify-center"
                     >
                       Change
                     </button>
@@ -329,13 +329,13 @@ export default function Result() {
                     type="button"
                     disabled={isSubmitting}
                     onClick={() => setFormData((prev) => ({ ...prev, tone: tone.label }))}
-                    className={`text-left p-3.5 rounded-xl border transition-all text-xs ${
+                    className={`text-left p-3.5 rounded-xl border transition-all text-xs h-full flex flex-col justify-between min-h-[76px] ${
                       formData.tone === tone.label
                         ? 'bg-[#1D2B3A] text-[#FCFAF6] border-[#1D2B3A] shadow-xs'
                         : 'bg-[#F3EFE9] text-[#1D2B3A] border-[#E5E1D8] hover:border-[#1D2B3A]/40'
                     }`}
                   >
-                    <div className="font-serif font-bold text-sm mb-0.5 flex items-center justify-between">
+                    <div className="font-serif font-bold text-sm mb-1 flex items-center justify-between">
                       <span>{tone.label}</span>
                       {formData.tone === tone.label && (
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#B25B3E]" />
@@ -354,7 +354,7 @@ export default function Result() {
               id="activate-twin-btn"
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#1D2B3A] hover:bg-[#2A3F54] disabled:bg-[#1D2B3A]/70 text-[#FCFAF6] font-medium font-sans py-3.5 rounded-xl transition-all active:scale-95 shadow-sm flex items-center justify-center gap-2 cursor-pointer text-sm"
+              className="w-full bg-[#1D2B3A] hover:bg-[#2A3F54] disabled:bg-[#1D2B3A]/70 text-[#FCFAF6] font-medium font-sans py-3.5 sm:py-4 min-h-[48px] rounded-xl transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2 cursor-pointer text-sm"
             >
               {isSubmitting ? (
                 <>
@@ -371,7 +371,7 @@ export default function Result() {
           </form>
 
           {/* Grounding Telemetry Callout */}
-          <div className="mt-8 pt-6 border-t border-[#E5E1D8] flex items-center justify-between text-xs text-[#5C5751]">
+          <div className="mt-8 pt-6 border-t border-[#E5E1D8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-0 text-xs text-[#5C5751]">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#B25B3E]" />
               <span>Grounded in Google Gemini AI & MySQL</span>

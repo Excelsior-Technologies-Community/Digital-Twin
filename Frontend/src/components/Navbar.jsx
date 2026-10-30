@@ -41,7 +41,7 @@ export default function Navbar({ showBack = false, title, subtitle }) {
         <nav className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={() => navigate('/')}
-            className={`text-xs font-medium px-2.5 sm:px-3 py-1.5 rounded-full transition-colors ${
+            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] rounded-full transition-colors flex items-center justify-center ${
               location.pathname === '/' || location.pathname === '/result'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6]'
                 : 'text-[#5C5751] hover:text-[#1D2B3A] hover:bg-[#F3EFE9]'
@@ -52,9 +52,9 @@ export default function Navbar({ showBack = false, title, subtitle }) {
 
           <button
             onClick={() => navigate('/digital-twin')}
-            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
+            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] rounded-full transition-all flex items-center justify-center gap-1.5 ${
               location.pathname === '/digital-twin'
-                ? 'bg-[#B25B3E] text-white shadow-sm'
+                ? 'bg-[#B25B3E] text-[#FCFAF6] shadow-sm'
                 : 'bg-[#FCFAF6] text-[#1D2B3A] border border-[#E5E1D8] hover:border-[#1D2B3A]'
             }`}
           >

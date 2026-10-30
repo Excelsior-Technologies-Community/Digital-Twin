@@ -23,24 +23,71 @@ export default function PublicTwinChat() {
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
-  const carouselRef = useRef(null);
-  const [scrollState, setScrollState] = useState({ canScrollLeft: false, canScrollRight: true });
+  const scrollRef = useRef(null);
+  const [fade, setFade] = useState({ left: false, right: true });
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startScrollLeft, setStartScrollLeft] = useState(0);
+  const hasDraggedRef = useRef(false);
 
-  const updateScrollState = () => {
-    if (carouselRef.current) {
-      const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
-      setScrollState({
-        canScrollLeft: scrollLeft > 2,
-        canScrollRight: scrollLeft + clientWidth < scrollWidth - 2,
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setFade({
+        left: scrollLeft > 1,
+        right: scrollLeft < scrollWidth - clientWidth - 1,
       });
     }
   };
 
   useEffect(() => {
-    updateScrollState();
-    window.addEventListener('resize', updateScrollState);
-    return () => window.removeEventListener('resize', updateScrollState);
+    handleScroll();
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onWheel = (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+        handleScroll();
+      }
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
+
+  const handleMouseDown = (e) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    hasDraggedRef.current = false;
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setStartScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    if (Math.abs(walk) > 5) {
+      hasDraggedRef.current = true;
+    }
+    scrollRef.current.scrollLeft = startScrollLeft - walk;
+    handleScroll();
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -164,9 +211,9 @@ export default function PublicTwinChat() {
   return (
     <div className="min-h-[100dvh] h-[100dvh] bg-[#F3EFE9] text-[#1D2B3A] font-sans flex flex-col selection:bg-[#B25B3E] selection:text-[#FCFAF6] overflow-hidden">
       {/* Editorial Header */}
-      <header className="border-b border-[#E5E1D8] bg-[#FCFAF6]/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5 transition-colors">
+      <header className="border-b border-[#E5E1D8] bg-[#FCFAF6]/80 backdrop-blur sticky top-0 z-50 px-4 sm:px-6 py-3 sm:py-3.5 transition-colors">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <button
               onClick={() => navigate('/')}
               className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] transition-colors border border-[#E5E1D8] shadow-xs flex items-center justify-center shrink-0"
@@ -175,34 +222,34 @@ export default function PublicTwinChat() {
               <ArrowLeft className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#1D2B3A] text-[#FCFAF6] flex items-center justify-center font-serif font-bold text-sm shadow-sm select-none">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1D2B3A] text-[#FCFAF6] flex items-center justify-center font-serif font-bold text-xs sm:text-sm shadow-sm select-none shrink-0">
                 {getInitials(twinData?.name)}
               </div>
-              <div>
-                <h1 className="font-serif font-bold text-base md:text-lg text-[#1D2B3A] tracking-wider uppercase flex items-center gap-2">
+              <div className="min-w-0">
+                <h1 className="font-serif font-bold text-sm sm:text-base md:text-lg text-[#1D2B3A] tracking-wider uppercase flex items-center gap-1.5 sm:gap-2 truncate">
                   {isLoadingTwin ? (
                     'Connecting...'
                   ) : (
                     <>
-                      <span>{twinData?.name || 'MANAV PATEL'}</span>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 inline" />
+                      <span className="truncate">{twinData?.name || 'MANAV PATEL'}</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 inline shrink-0" />
                     </>
                   )}
                 </h1>
-                <p className="text-xs text-[#5C5751] flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                <p className="text-[11px] sm:text-xs text-[#5C5751] flex items-center gap-1.5 sm:gap-2 truncate">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0"></span>
                   <span>Active Persona</span>
                   <span className="text-[#E5E1D8]">&bull;</span>
                   <span>Gemini AI</span>
-                  <span className="text-[#E5E1D8]">&bull;</span>
-                  <span>{twinData?.tone || 'Professional'} Tone</span>
+                  <span className="text-[#E5E1D8] hidden xs:inline">&bull;</span>
+                  <span className="hidden xs:inline">{twinData?.tone || 'Professional'} Tone</span>
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <span className="text-xs font-serif text-[#1D2B3A] bg-[#FCFAF6] border border-[#E5E1D8] px-3.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-[#B25B3E]" />
               Verified Persona
@@ -212,7 +259,7 @@ export default function PublicTwinChat() {
       </header>
 
       {/* Main Chat Terminal Window */}
-      <main className="flex-1 max-w-4xl w-full mx-auto flex flex-col p-4 md:p-6 overflow-hidden">
+      <main className="flex-1 max-w-4xl w-full mx-auto flex flex-col p-3 sm:p-4 md:p-6 overflow-hidden">
         {isLoadingTwin ? (
           <div className="flex-1 flex flex-col items-center justify-center space-y-3">
             <div className="w-12 h-12 rounded-full border-2 border-[#1D2B3A]/20 border-t-[#B25B3E] animate-spin"></div>
@@ -339,37 +386,44 @@ export default function PublicTwinChat() {
 
               {/* Scrollable Carousel Wrapper with Dynamic Dual-Sided Gradient Fade Masks */}
               <div className="relative w-full">
-                {/* Left Edge Gradient Fade Overlay */}
+                {/* Left Fade */}
                 <div
-                  className={`absolute top-0 left-0 bottom-1 w-10 sm:w-14 bg-gradient-to-r from-[#F3EFE9] via-[#F3EFE9]/85 to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
-                    scrollState.canScrollLeft ? 'opacity-100' : 'opacity-0'
+                  className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
+                    fade.left ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
 
-                {/* Horizontal Scroll Track */}
+                {/* Horizontal Scroll Track with Drag-to-Scroll Support */}
                 <div
-                  ref={carouselRef}
-                  onScroll={updateScrollState}
-                  className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 pl-1 pr-12 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+                  className={`flex flex-nowrap overflow-x-auto w-full gap-2 items-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] py-1 ${
+                    isDragging ? 'cursor-grabbing select-none scroll-auto' : 'cursor-grab scroll-smooth'
+                  }`}
                 >
                   {sampleQuestions.map((q, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => {
+                        if (hasDraggedRef.current) return;
                         setInputMessage(q);
                       }}
-                      className="bg-[#FCFAF6] text-[#1D2B3A] hover:bg-[#1D2B3A] hover:text-[#FCFAF6] border border-[#E5E1D8] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs whitespace-nowrap shrink-0 active:scale-95"
+                      className="shrink-0 whitespace-nowrap bg-[#FCFAF6] text-[#1D2B3A] hover:bg-[#1D2B3A] hover:text-[#FCFAF6] border border-[#E5E1D8] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs active:scale-95 cursor-pointer select-none"
                     >
                       {q}
                     </button>
                   ))}
                 </div>
 
-                {/* Right Edge Gradient Fade Overlay */}
+                {/* Right Fade */}
                 <div
-                  className={`absolute top-0 right-0 bottom-1 w-12 sm:w-16 bg-gradient-to-l from-[#F3EFE9] via-[#F3EFE9]/85 to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
-                    scrollState.canScrollRight ? 'opacity-100' : 'opacity-0'
+                  className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
+                    fade.right ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
               </div>
@@ -384,7 +438,7 @@ export default function PublicTwinChat() {
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder={`Ask ${twinData?.name ? twinData.name.split(' ')[0] : 'the candidate'} about their experience...`}
                   disabled={isTyping}
-                  className="flex-1 bg-transparent px-4 py-2 text-sm text-[#1D2B3A] placeholder-[#5C5751]/60 focus:outline-none"
+                  className="flex-1 bg-transparent px-3 sm:px-4 py-2 text-sm text-[#1D2B3A] placeholder-[#5C5751]/60 focus:outline-none min-w-0"
                 />
                 <button
                   type="submit"

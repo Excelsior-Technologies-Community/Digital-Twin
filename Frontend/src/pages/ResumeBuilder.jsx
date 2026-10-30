@@ -46,6 +46,19 @@ const ResumeBuilder = () => {
 
   return (
     <div className="min-h-[100dvh] bg-[#E5E1D8] flex flex-col md:flex-row font-sans text-[#1D2B3A] overflow-x-hidden pb-24 md:pb-0 relative">
+      {/* Mobile Top Navigation Header */}
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#FCFAF6]/95 backdrop-blur border-b border-[#D4CFC4] sticky top-0 z-30">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] hover:text-[#1D2B3A] transition-colors min-h-[36px]"
+        >
+          &larr; Back to Dashboard
+        </button>
+        <span className="font-serif font-bold text-xs text-[#1D2B3A] uppercase tracking-wider">
+          Resume Builder
+        </span>
+      </div>
+
       {/* Sidebar Controls */}
       <div className="hidden md:flex w-full md:w-1/4 bg-[#FCFAF6] p-6 border-r border-[#D4CFC4] shadow-sm flex-col">
         <button
@@ -93,7 +106,7 @@ const ResumeBuilder = () => {
       </div>
 
       {/* Live Preview Area */}
-      <div className="w-full md:w-3/4 p-4 md:p-8 overflow-x-auto overflow-y-auto flex justify-center items-start bg-[#E5E1D8]">
+      <div className="w-full md:w-3/4 p-3 sm:p-4 md:p-8 overflow-x-auto overflow-y-auto flex justify-center items-start bg-[#E5E1D8]">
         <div className="origin-top transform transition-transform duration-200 scale-[0.44] sm:scale-[0.65] md:scale-[0.85] lg:scale-100 -mb-[600px] xs:-mb-[550px] sm:-mb-[350px] md:-mb-0">
           <div className="shadow-2xl bg-white overflow-hidden transition-all duration-300" style={{ width: '210mm', minHeight: '297mm' }}>
             {template === 'modern' ? (
@@ -111,7 +124,7 @@ const ResumeBuilder = () => {
           <button
             type="button"
             onClick={() => setTemplate('modern')}
-            className={`px-3 py-2 rounded-lg text-xs font-sans font-medium transition-all ${
+            className={`min-h-[38px] px-3.5 py-2 rounded-lg text-xs font-sans font-medium transition-all ${
               template === 'modern'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] shadow-xs'
                 : 'text-[#5C5751] hover:text-[#1D2B3A]'
@@ -122,7 +135,7 @@ const ResumeBuilder = () => {
           <button
             type="button"
             onClick={() => setTemplate('classic')}
-            className={`px-3 py-2 rounded-lg text-xs font-sans font-medium transition-all ${
+            className={`min-h-[38px] px-3.5 py-2 rounded-lg text-xs font-sans font-medium transition-all ${
               template === 'classic'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] shadow-xs'
                 : 'text-[#5C5751] hover:text-[#1D2B3A]'
@@ -135,7 +148,7 @@ const ResumeBuilder = () => {
         <button
           type="button"
           onClick={handlePrint}
-          className="flex-1 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+          className="flex-1 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer min-h-[42px]"
         >
           Download PDF
         </button>
