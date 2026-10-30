@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import SpriteText from 'three-spritetext';
 import { RotateCcw } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 // WebGL Texture & SpriteText cache to prevent GPU VRAM exhaustion during render loops
 const spriteCache = new Map();
@@ -49,6 +50,7 @@ const DEFAULT_SKILLS = [
 ];
 
 function SkillGraph3D({ resumeData }) {
+  const { isDarkMode } = useTheme();
   const containerRef = useRef(null);
   const fgRef = useRef();
   const [dimensions, setDimensions] = useState(() => ({
@@ -117,7 +119,7 @@ function SkillGraph3D({ resumeData }) {
         id: skill,
         name: skill,
         role: 'Verified Technical Competency',
-        color: '#1D2B3A', // Slate Navy
+        color: isDarkMode ? '#38BDF8' : '#1D2B3A', // Sky blue for dark mode, Slate Navy for light mode
         val: 11
       });
     });
@@ -151,7 +153,7 @@ function SkillGraph3D({ resumeData }) {
     });
 
     return { nodes, links };
-  }, [resumeData?.name, resumeData?.bio, resumeData?.summary]);
+  }, [resumeData?.name, resumeData?.bio, resumeData?.summary, isDarkMode]);
 
   const handleResetCamera = () => {
     if (fgRef.current) {
@@ -168,28 +170,28 @@ function SkillGraph3D({ resumeData }) {
           width={dimensions.width}
           height={dimensions.height}
           graphData={graphData}
-          backgroundColor="#F3EFE9" // Sand Canvas Theme
-          nodeColor={(node) => node.color}
+          backgroundColor={isDarkMode ? '#0F172A' : '#F3EFE9'}
+          nodeColor={(node) => (node.id === 'Me' ? '#B25B3E' : (isDarkMode ? '#38BDF8' : '#1D2B3A'))}
           nodeVal={(node) => node.val}
           nodeResolution={24}
-          linkColor={() => '#E5E1D8'} // Subtle organic border color
+          linkColor={() => (isDarkMode ? '#334155' : '#E5E1D8')}
           linkWidth={1.5}
-          linkOpacity={0.8}
+          linkOpacity={isDarkMode ? 0.9 : 0.8}
           nodeThreeObjectExtend={true}
           nodeThreeObject={(node) => {
-            const cacheKey = `${node.id}_${node.name || ''}`;
+            const cacheKey = `${node.id}_${node.name || ''}_${isDarkMode ? 'dark' : 'light'}`;
             if (spriteCache.has(cacheKey)) {
               return spriteCache.get(cacheKey);
             }
 
             const sprite = new SpriteText(node.name || node.id);
 
-            // Slate Navy text color
-            sprite.color = '#1D2B3A';
+            // Slate Navy in light mode, crisp white in dark mode
+            sprite.color = isDarkMode ? '#F8FAFC' : '#1D2B3A';
 
-            // Add Paper White background box for clear visibility
-            sprite.backgroundColor = '#FCFAF6';
-            sprite.borderColor = '#E5E1D8';
+            // Adaptive card backgrounds matching dark/light mode
+            sprite.backgroundColor = isDarkMode ? '#1E293B' : '#FCFAF6';
+            sprite.borderColor = isDarkMode ? '#334155' : '#E5E1D8';
             sprite.borderWidth = 1;
             sprite.padding = [4, 2];
             sprite.borderRadius = 4;
@@ -209,7 +211,7 @@ function SkillGraph3D({ resumeData }) {
           enableNavigationControls={true}
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-[#F3EFE9] text-[#5C5751] text-xs font-serif">
+        <div className="w-full h-full flex items-center justify-center bg-[#F3EFE9] dark:bg-[#0F172A] text-[#5C5751] dark:text-gray-400 text-xs font-serif">
           Initializing 3D spatial canvas...
         </div>
       )}
@@ -218,33 +220,33 @@ function SkillGraph3D({ resumeData }) {
       <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-2 z-10 pointer-events-auto">
         <button
           onClick={handleResetCamera}
-          className="min-w-[38px] min-h-[38px] p-2 sm:px-3 sm:py-2 rounded-lg bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] border border-[#E5E1D8] shadow-xs transition-colors flex items-center justify-center gap-1.5 text-xs font-serif font-medium shrink-0"
+          className="min-w-[38px] min-h-[38px] p-2 sm:px-3 sm:py-2 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-white border border-[#E5E1D8] dark:border-[#334155] shadow-xs transition-colors flex items-center justify-center gap-1.5 text-xs font-serif font-medium shrink-0"
           title="Reset Camera View"
         >
-          <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E]" />
+          <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E] dark:text-amber-500" />
           <span className="hidden sm:inline">Reset View</span>
         </button>
       </div>
 
       {/* Bottom Floating Legend Bar */}
       <div className="absolute bottom-3 left-3 sm:left-4 right-3 sm:right-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pointer-events-none text-[10px] sm:text-[11px] font-sans">
-        <div className="flex items-center gap-2.5 sm:gap-3 bg-[#FCFAF6]/90 backdrop-blur px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#E5E1D8] shadow-2xs pointer-events-auto">
+        <div className="flex items-center gap-2.5 sm:gap-3 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#E5E1D8] dark:border-[#334155] shadow-2xs pointer-events-auto">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#B25B3E]"></span>
-            <span className="text-[#1D2B3A] font-semibold">{resumeData?.name || 'Me'}</span>
+            <span className="text-[#1D2B3A] dark:text-white font-semibold">{resumeData?.name || 'Me'}</span>
           </div>
-          <span className="text-[#E5E1D8]">&bull;</span>
+          <span className="text-[#E5E1D8] dark:text-[#334155]">&bull;</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1D2B3A]"></span>
-            <span className="text-[#5C5751]">Skills & Systems ({graphData.nodes.length - 1})</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#1D2B3A] dark:bg-[#38BDF8]"></span>
+            <span className="text-[#5C5751] dark:text-gray-300">Skills & Systems ({graphData.nodes.length - 1})</span>
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 bg-[#FCFAF6]/80 backdrop-blur px-3 py-1.5 rounded-lg border border-[#E5E1D8] text-[#5C5751] shadow-2xs">
+        <div className="hidden md:flex items-center gap-2 bg-[#FCFAF6]/80 dark:bg-[#1E293B]/80 backdrop-blur px-3 py-1.5 rounded-lg border border-[#E5E1D8] dark:border-[#334155] text-[#5C5751] dark:text-gray-400 shadow-2xs">
           <span>Rotate: Left Click + Drag</span>
-          <span className="text-[#E5E1D8]">&bull;</span>
+          <span className="text-[#E5E1D8] dark:text-[#334155]">&bull;</span>
           <span>Zoom: Scroll</span>
-          <span className="text-[#E5E1D8]">&bull;</span>
+          <span className="text-[#E5E1D8] dark:text-[#334155]">&bull;</span>
           <span>Pan: Right Click</span>
         </div>
       </div>
