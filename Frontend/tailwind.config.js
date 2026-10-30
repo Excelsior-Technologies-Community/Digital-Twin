@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: '480px',
+      },
       fontFamily: {
         sans: ['"DM Sans"', 'sans-serif'],
         serif: ['"Playfair Display"', 'serif'],

@@ -53,7 +53,7 @@ function SkillGraph3D({ resumeData }) {
   const fgRef = useRef();
   const [dimensions, setDimensions] = useState(() => ({
     width: 0,
-    height: typeof window !== 'undefined' && window.innerWidth < 640 ? 280 : 420
+    height: typeof window !== 'undefined' && window.innerWidth < 640 ? 350 : 450
   }));
 
   // Handle container resizing for responsive 3D canvas
@@ -64,7 +64,7 @@ function SkillGraph3D({ resumeData }) {
       if (containerRef.current) {
         const clientWidth = containerRef.current.clientWidth;
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-        const clientHeight = containerRef.current.clientHeight || (isMobile ? 280 : 420);
+        const clientHeight = containerRef.current.clientHeight || (isMobile ? 350 : 450);
         setDimensions({
           width: clientWidth > 0 ? clientWidth : 700,
           height: clientHeight
@@ -160,7 +160,7 @@ function SkillGraph3D({ resumeData }) {
   };
 
   return (
-    <div className="relative w-full h-[280px] sm:h-[420px] overflow-hidden rounded-xl select-none" ref={containerRef}>
+    <div className="relative w-full h-full overflow-hidden select-none" ref={containerRef}>
       {/* 3D Force Graph Render */}
       {dimensions.width > 0 ? (
         <ForceGraph3D

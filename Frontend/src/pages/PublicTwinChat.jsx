@@ -23,6 +23,24 @@ export default function PublicTwinChat() {
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const carouselRef = useRef(null);
+  const [scrollState, setScrollState] = useState({ canScrollLeft: false, canScrollRight: true });
+
+  const updateScrollState = () => {
+    if (carouselRef.current) {
+      const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
+      setScrollState({
+        canScrollLeft: scrollLeft > 2,
+        canScrollRight: scrollLeft + clientWidth < scrollWidth - 2,
+      });
+    }
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    window.addEventListener('resize', updateScrollState);
+    return () => window.removeEventListener('resize', updateScrollState);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -144,14 +162,14 @@ export default function PublicTwinChat() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F3EFE9] text-[#1D2B3A] font-sans flex flex-col selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
+    <div className="min-h-[100dvh] h-[100dvh] bg-[#F3EFE9] text-[#1D2B3A] font-sans flex flex-col selection:bg-[#B25B3E] selection:text-[#FCFAF6] overflow-hidden">
       {/* Editorial Header */}
       <header className="border-b border-[#E5E1D8] bg-[#FCFAF6]/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5 transition-colors">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <button
               onClick={() => navigate('/')}
-              className="p-1.5 rounded-lg bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] transition-colors border border-[#E5E1D8] shadow-xs"
+              className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg bg-[#FCFAF6] hover:bg-[#E5E1D8] text-[#1D2B3A] transition-colors border border-[#E5E1D8] shadow-xs flex items-center justify-center shrink-0"
               title="Return to resume"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -242,12 +260,12 @@ export default function PublicTwinChat() {
                 >
                   {/* Visitor Messages: Inbound on Left */}
                   {msg.sender === 'user' && (
-                    <div className="bg-[#FCFAF6] border border-[#E5E1D8] text-[#1D2B3A] rounded-2xl rounded-tl-sm p-4 shadow-sm max-w-2xl w-full sm:w-auto">
+                    <div className="bg-[#FCFAF6] border border-[#E5E1D8] text-[#1D2B3A] rounded-2xl rounded-tl-sm p-3.5 sm:p-4 shadow-sm max-w-[88%] sm:max-w-xl md:max-w-2xl">
                       <div className="flex items-center justify-between gap-4 mb-1">
                         <span className="text-[#B25B3E] font-medium text-xs">
                           Recruiter (visitor)
                         </span>
-                        <span className="text-[10px] text-[#5C5751]/80 font-mono">
+                        <span className="text-[10px] text-[#4A453F] font-mono">
                           {msg.timestamp}
                         </span>
                       </div>
@@ -260,7 +278,7 @@ export default function PublicTwinChat() {
                   {/* Proxy Answers: Outbound on Right */}
                   {msg.sender === 'twin' && (
                     <div
-                      className={`bg-[#1D2B3A] text-[#FCFAF6] rounded-2xl rounded-tr-sm p-5 shadow-md max-w-2xl w-full sm:w-auto ${
+                      className={`bg-[#1D2B3A] text-[#FCFAF6] rounded-2xl rounded-tr-sm p-4 sm:p-5 shadow-md max-w-[88%] sm:max-w-xl md:max-w-2xl ${
                         msg.isError ? 'border-2 border-[#B25B3E]' : ''
                       }`}
                     >
@@ -286,7 +304,7 @@ export default function PublicTwinChat() {
               {/* Typing indicator */}
               {isTyping && (
                 <div className="flex flex-col items-end">
-                  <div className="bg-[#1D2B3A] text-[#FCFAF6] rounded-2xl rounded-tr-sm p-4 shadow-md max-w-md">
+                  <div className="bg-[#1D2B3A] text-[#FCFAF6] rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-md max-w-[88%] sm:max-w-md">
                     <div className="flex items-center justify-between gap-3 mb-1.5 pb-1.5 border-b border-[#FCFAF6]/15">
                       <span className="text-xs font-serif font-semibold text-[#FCFAF6]/90">
                         {twinData?.name || 'Candidate'}'s Proxy
@@ -313,24 +331,47 @@ export default function PublicTwinChat() {
             </div>
 
             {/* Dynamic Prompt Pills */}
-            <div className="pt-2 pb-3 border-t border-[#E5E1D8]/60">
-              <span className="text-[11px] font-serif font-bold text-[#5C5751] uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+            <div className="pt-2 pb-2.5 border-t border-[#E5E1D8]/60 relative">
+              <span className="text-[11px] font-serif font-bold text-[#5C5751] uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
                 <HelpCircle className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Suggested Recruiter Inquiries
               </span>
-              <div className="flex flex-wrap gap-2">
-                {sampleQuestions.map((q, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setInputMessage(q);
-                    }}
-                    className="bg-[#FCFAF6] text-[#1D2B3A] hover:bg-[#1D2B3A] hover:text-[#FCFAF6] border border-[#E5E1D8] transition-all rounded-full px-3 py-1 text-xs shadow-xs"
-                  >
-                    {q}
-                  </button>
-                ))}
+
+              {/* Scrollable Carousel Wrapper with Dynamic Dual-Sided Gradient Fade Masks */}
+              <div className="relative w-full">
+                {/* Left Edge Gradient Fade Overlay */}
+                <div
+                  className={`absolute top-0 left-0 bottom-1 w-10 sm:w-14 bg-gradient-to-r from-[#F3EFE9] via-[#F3EFE9]/85 to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
+                    scrollState.canScrollLeft ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+
+                {/* Horizontal Scroll Track */}
+                <div
+                  ref={carouselRef}
+                  onScroll={updateScrollState}
+                  className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 pl-1 pr-12 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                >
+                  {sampleQuestions.map((q, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        setInputMessage(q);
+                      }}
+                      className="bg-[#FCFAF6] text-[#1D2B3A] hover:bg-[#1D2B3A] hover:text-[#FCFAF6] border border-[#E5E1D8] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs whitespace-nowrap shrink-0 active:scale-95"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Right Edge Gradient Fade Overlay */}
+                <div
+                  className={`absolute top-0 right-0 bottom-1 w-12 sm:w-16 bg-gradient-to-l from-[#F3EFE9] via-[#F3EFE9]/85 to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
+                    scrollState.canScrollRight ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
               </div>
             </div>
 
@@ -348,7 +389,8 @@ export default function PublicTwinChat() {
                 <button
                   type="submit"
                   disabled={!inputMessage.trim() || isTyping}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#B25B3E] hover:bg-[#9C4E34] disabled:bg-[#E5E1D8] disabled:text-[#5C5751] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-xs disabled:shadow-none"
+                  aria-label="Send question to Digital Twin"
+                  className="inline-flex items-center justify-center gap-1.5 min-h-[42px] min-w-[42px] sm:min-w-fit px-3.5 sm:px-4 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] disabled:bg-[#E5E1D8] disabled:text-[#5C5751] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-xs disabled:shadow-none shrink-0"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Send</span>

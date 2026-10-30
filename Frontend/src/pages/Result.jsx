@@ -306,7 +306,7 @@ export default function Result() {
                       type="button"
                       onClick={handleRemoveFile}
                       disabled={isSubmitting}
-                      className="p-1.5 rounded-lg text-[#5C5751] hover:text-[#B25B3E] hover:bg-[#E5E1D8] transition-colors"
+                      className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg text-[#5C5751] hover:text-[#B25B3E] hover:bg-[#E5E1D8] transition-colors flex items-center justify-center shrink-0"
                       title="Remove file"
                     >
                       <X className="w-4 h-4" />

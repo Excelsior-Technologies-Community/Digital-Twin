@@ -41,9 +41,9 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
       : null;
 
   return (
-    <div ref={ref} className="w-[210mm] min-h-[297mm] bg-white p-12 mx-auto shadow-sm font-serif text-[#1D2B3A] box-border">
+    <div ref={ref} className="w-[210mm] min-h-[297mm] bg-white p-10 print:p-0 print:m-0 print:w-full print:shadow-none mx-auto shadow-sm font-serif text-[#1D2B3A] box-border">
       {/* Classic Editorial Centered Header */}
-      <div className="text-center pb-6 border-b-2 border-[#1D2B3A] mb-8">
+      <div className="text-center pb-6 border-b-2 border-[#1D2B3A] mb-6">
         <h1 className="text-4xl font-bold tracking-tight text-[#1D2B3A] uppercase font-serif">
           {data.name || 'Candidate Name'}
         </h1>

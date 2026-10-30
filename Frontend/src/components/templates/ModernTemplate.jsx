@@ -43,7 +43,7 @@ const ModernTemplate = forwardRef(({ data }, ref) => {
   return (
     <div ref={ref} className="w-[210mm] min-h-[297mm] bg-white p-10 print:p-0 print:m-0 print:w-full print:shadow-none mx-auto shadow-sm font-sans text-[#1D2B3A] box-border">
       {/* Header */}
-      <div className="bg-[#1D2B3A] text-[#FCFAF6] p-8 rounded-xl mb-8">
+      <div className="bg-[#1D2B3A] text-[#FCFAF6] p-8 rounded-xl mb-6">
         <h1 className="text-4xl font-bold uppercase tracking-wide">{data.name || 'Candidate Name'}</h1>
         <p className="text-lg mt-2 opacity-90">{data.title || 'Professional Title'}</p>
         <div className="flex flex-wrap gap-4 mt-4 text-sm opacity-80">
