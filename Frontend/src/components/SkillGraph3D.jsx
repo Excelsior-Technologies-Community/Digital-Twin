@@ -58,29 +58,48 @@ function SkillGraph3D({ resumeData }) {
     height: typeof window !== 'undefined' && window.innerWidth < 640 ? 350 : 450
   }));
 
-  // Handle container resizing for responsive 3D canvas
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    const handleResize = () => {
-      if (containerRef.current) {
-        const clientWidth = containerRef.current.clientWidth;
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-        const clientHeight = containerRef.current.clientHeight || (isMobile ? 350 : 450);
-        setDimensions({
-          width: clientWidth > 0 ? clientWidth : 700,
-          height: clientHeight
-        });
-      }
+    let debounceTimer = null;
+
+    const updateDimensions = () => {
+      if (!containerRef.current) return;
+      const clientWidth = containerRef.current.clientWidth;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+      const clientHeight = containerRef.current.clientHeight || (isMobile ? 350 : 450);
+      setDimensions({
+        width: clientWidth > 0 ? clientWidth : 700,
+        height: clientHeight
+      });
     };
 
-    handleResize();
+    const handleResize = () => {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+      debounceTimer = setTimeout(updateDimensions, 150);
+    };
 
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(containerRef.current);
+    updateDimensions();
+
+    let resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(handleResize);
+      resizeObserver.observe(container);
+    }
+
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      resizeObserver.disconnect();
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -223,7 +242,7 @@ function SkillGraph3D({ resumeData }) {
           className="min-w-[38px] min-h-[38px] p-2 sm:px-3 sm:py-2 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-white border border-[#E5E1D8] dark:border-[#334155] shadow-xs transition-colors flex items-center justify-center gap-1.5 text-xs font-serif font-medium shrink-0"
           title="Reset Camera View"
         >
-          <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E] dark:text-amber-500" />
+          <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
           <span className="hidden sm:inline">Reset View</span>
         </button>
       </div>

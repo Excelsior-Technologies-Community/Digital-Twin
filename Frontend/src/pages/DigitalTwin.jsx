@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ThemeToggle from '../components/ThemeToggle';
+import { useToast } from '../context/ToastContext';
 
 const SkillGraph3D = React.lazy(() => import('../components/SkillGraph3D'));
 import {
@@ -39,6 +40,7 @@ export default function DigitalTwin() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const fetchAnalytics = async (targetId) => {
     const idToUse = targetId || twinProfile?.resumeId || twinProfile?.publicSlug;
@@ -51,6 +53,7 @@ export default function DigitalTwin() {
       }
     } catch (err) {
       console.warn('Could not load chat history:', err.message);
+      toast.error('Failed to load analytics data. Please try again.');
     } finally {
       setIsLoadingHistory(false);
     }
@@ -113,21 +116,26 @@ export default function DigitalTwin() {
       ? `${window.location.origin}/twin/${twinProfile.publicSlug || twinProfile.slug}`
       : 'Generating public twin link...';
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (!twinProfile?.publicSlug && !twinProfile?.slug) return;
-    navigator.clipboard.writeText(publicLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(publicLink);
+      setCopied(true);
+      toast.success('Share link copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast.error('Failed to copy link to clipboard');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
-      {/* Top Editorial Navigation Bar */}
+    <div className="min-h-screen overflow-x-hidden bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
       <header className="border-b border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur sticky top-0 z-50 px-4 sm:px-6 py-3 sm:py-4 transition-colors">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-[#1D2B3A] dark:text-gray-200 hover:bg-[#E5E1D8] dark:hover:bg-[#334155] transition-colors bg-[#FCFAF6] dark:bg-[#1E293B] px-3 sm:px-3.5 py-1.5 rounded-lg border border-[#E5E1D8] dark:border-[#334155] shadow-xs shrink-0"
+            aria-label="Back to Resume"
+            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-[#1D2B3A] dark:text-gray-100 hover:bg-[#E5E1D8] dark:hover:bg-[#334155] transition-colors bg-[#FCFAF6] dark:bg-[#1E293B] px-3 sm:px-3.5 py-1.5 rounded-lg border border-[#E5E1D8] dark:border-[#334155] shadow-xs shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back<span className="hidden sm:inline"> to Resume</span></span>
@@ -139,7 +147,7 @@ export default function DigitalTwin() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
               </span>
-              <span className="text-xs font-serif text-[#1D2B3A] dark:text-gray-200 font-medium tracking-wide uppercase truncate">
+              <span className="text-xs font-serif text-[#1D2B3A] dark:text-gray-100 font-medium tracking-wide uppercase truncate">
                 Gemini <span className="hidden sm:inline">AI </span>Synchronized
               </span>
             </div>
@@ -148,7 +156,6 @@ export default function DigitalTwin() {
         </div>
       </header>
 
-      {/* Hero Header with Organic Sand Aesthetic */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#FCFAF6] via-[#F3EFE9] to-[#F3EFE9] dark:from-[#1E293B] dark:via-[#0F172A] dark:to-[#0F172A] border-b border-[#E5E1D8] dark:border-[#334155] px-4 sm:px-6 py-8 sm:py-12">
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-serif font-bold text-[#B25B3E] dark:text-[#E07A5F] mb-3 sm:mb-4 shadow-xs">
@@ -156,12 +163,14 @@ export default function DigitalTwin() {
             AI Persona Control Center
           </div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-bold tracking-tight text-[#1D2B3A] dark:text-white mb-2 sm:mb-3">
-            Your Digital Twin Control Center
-          </h1>
-          <p className="text-[#5C5751] dark:text-gray-300 max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed">
-            An interactive, AI-grounded avatar that answers recruiter questions, illustrates your STAR-method achievements, and pitches your career 24/7.
-          </p>
+          <div className="max-w-lg md:max-w-2xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-[#1D2B3A] dark:text-white mb-2 sm:mb-3">
+              Your Digital Twin Control Center
+            </h1>
+            <p className="text-[#5C5751] dark:text-gray-300 text-sm sm:text-base md:text-lg leading-relaxed">
+              An interactive, AI-grounded avatar that answers recruiter questions, illustrates your STAR-method achievements, and pitches your career 24/7.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -171,27 +180,27 @@ export default function DigitalTwin() {
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <div className="relative">
               <div className="w-14 h-14 rounded-full border-2 border-[#E5E1D8] dark:border-[#334155] border-t-[#B25B3E] animate-spin"></div>
-              <Bot className="w-6 h-6 text-[#1D2B3A] dark:text-gray-200 absolute inset-0 m-auto" />
+              <Bot className="w-6 h-6 text-[#1D2B3A] dark:text-gray-100 absolute inset-0 m-auto" />
             </div>
             <p className="text-[#1D2B3A] dark:text-white font-serif font-semibold">Initializing your Digital Twin in MySQL database...</p>
             <p className="text-xs text-[#5C5751] dark:text-gray-400">Syncing resume embeddings and persona parameters</p>
           </div>
         ) : error ? (
-          <div className="max-w-lg mx-auto bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#B25B3E]/40 dark:border-[#B25B3E]/60 rounded-2xl p-6 text-center space-y-3 shadow-sm">
+          <div className="max-w-lg mx-auto bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#B25B3E]/40 dark:border-[#B25B3E]/60 rounded-2xl p-6 text-center space-y-3 shadow-md">
             <AlertCircle className="w-10 h-10 text-[#B25B3E] mx-auto" />
             <h3 className="text-lg font-serif font-bold text-[#1D2B3A] dark:text-white">Digital Twin Profile</h3>
             <p className="text-sm text-[#5C5751] dark:text-gray-300">{error}</p>
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={() => navigate('/')}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl shadow-xs transition-all min-h-[40px]"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl shadow-xs transition-all min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Upload Resume
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-200 text-xs font-semibold rounded-xl border border-[#E5E1D8] dark:border-[#334155] shadow-2xs transition-all min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-100 text-xs font-semibold rounded-xl border border-[#E5E1D8] dark:border-[#334155] shadow-2xs transition-all min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Retry
@@ -201,7 +210,7 @@ export default function DigitalTwin() {
         ) : (
           <div className="space-y-6 sm:space-y-8">
             {/* Public Link Share Bar */}
-            <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 shadow-sm relative overflow-hidden">
+            <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 shadow-md relative overflow-hidden">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -210,32 +219,61 @@ export default function DigitalTwin() {
                       Public Recruiter Access Link
                     </span>
                   </div>
-                  <h2 className="text-base sm:text-lg font-serif font-bold text-[#1D2B3A] dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#1D2B3A] dark:text-white">
                     Share your Twin with hiring managers & recruiters
                   </h2>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:max-w-2xl">
-                  {/* Readonly URL Field with Embedded Copy Button */}
-                  <div className="flex items-center justify-between gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3.5 py-2 flex-1 min-w-0">
-                    <span className="text-[#1D2B3A] dark:text-gray-200 font-mono text-xs select-all truncate font-medium">
-                      {publicLink}
-                    </span>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleCopyLink}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCopyLink();
+                      }
+                    }}
+                    aria-label="Copy share link to clipboard"
+                    title="Click to copy link"
+                    className="group relative flex items-center justify-between gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#EFEAE2] dark:hover:bg-[#151F32] border border-[#E5E1D8] dark:border-[#334155] hover:border-[#B25B3E]/60 dark:hover:border-[#B25B3E]/60 rounded-xl px-3.5 py-2 flex-1 min-w-0 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+                      <span className="text-[#1D2B3A] dark:text-gray-100 font-mono text-xs select-all truncate font-medium">
+                        {publicLink}
+                      </span>
+                      <span className="shrink-0 transition-opacity duration-200">
+                        {copied ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 opacity-100" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        )}
+                      </span>
+                    </div>
+
                     <button
-                      onClick={handleCopyLink}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-200 text-xs font-semibold rounded-lg transition-all active:scale-95 border border-[#E5E1D8] dark:border-[#334155] shadow-2xs shrink-0 min-h-[36px]"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyLink();
+                      }}
+                      aria-label={copied ? 'Share link copied' : 'Copy share link to clipboard'}
+                      className="inline-flex items-center justify-center gap-1.5 min-w-[84px] px-3 py-1.5 bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-100 text-xs font-semibold rounded-lg transition-all active:scale-95 border border-[#E5E1D8] dark:border-[#334155] shadow-2xs shrink-0 min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                     >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-700">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copy</span>
-                        </>
-                      )}
+                      <span aria-live="polite" className="inline-flex items-center gap-1.5 transition-opacity duration-200">
+                        {copied ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-emerald-700 dark:text-emerald-400 font-medium">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </span>
                     </button>
                   </div>
 
@@ -243,18 +281,18 @@ export default function DigitalTwin() {
                   <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
                     <button
                       onClick={() => navigate(`/digital-twin/${twinProfile?.publicSlug}/resume-builder`)}
-                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm min-h-[42px]"
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm min-h-[42px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                       title="Open PDF Resume Builder"
                     >
-                      <FileText className="w-3.5 h-3.5 text-[#EFE8DD]" />
+                      <FileText className="w-3.5 h-3.5 text-[#FCFAF6]" />
                       <span>Resume Builder</span>
                     </button>
                     <button
                       id="open-terminal-btn"
                       onClick={() => navigate(`/twin/${twinProfile?.publicSlug}`)}
-                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm min-h-[42px]"
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-sm min-h-[42px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                     >
-                      <ExternalLink className="w-3.5 h-3.5 text-[#EFE8DD]" />
+                      <ExternalLink className="w-3.5 h-3.5 text-[#FCFAF6]" />
                       <span>Open Terminal</span>
                     </button>
                   </div>
@@ -263,13 +301,13 @@ export default function DigitalTwin() {
             </div>
 
             {/* Interactive 3D Skill Architecture Card */}
-            <div className="w-full bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-[#D4CFC4] dark:border-[#334155] overflow-hidden mb-8">
+            <div className="w-full bg-white dark:bg-[#1E293B] rounded-2xl shadow-md border border-[#D4CFC4] dark:border-[#334155] overflow-hidden mb-8">
               <div className="w-full bg-[#FCFAF6] dark:bg-[#1E293B] border-b border-[#E5E1D8] dark:border-[#334155] px-4 py-4 md:px-6 flex justify-between items-center">
-                <h2 className="font-serif text-[#1D2B3A] dark:text-white text-xl font-bold">
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#1D2B3A] dark:text-white">
                   Interactive 3D Skill Architecture
                 </h2>
               </div>
-              <div className="w-full relative h-[350px] sm:h-[450px] lg:h-[550px] bg-white dark:bg-[#0F172A]">
+              <div className="w-full relative h-[55vh] min-h-[280px] max-h-[550px] bg-white dark:bg-[#0F172A]">
                 <Suspense
                   fallback={
                     <div className="w-full h-full flex items-center justify-center bg-[#F3EFE9] dark:bg-[#0F172A] text-[#5C5751] dark:text-gray-400 text-xs font-serif">
@@ -286,14 +324,14 @@ export default function DigitalTwin() {
             </div>
 
             {/* Recent Recruiter Activity Section */}
-            <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-sm">
+            <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-md">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E1D8] dark:border-[#334155] pb-4">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] flex items-center justify-center text-[#B25B3E] shrink-0">
                     <MessageSquare className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-serif font-bold text-[#1D2B3A] dark:text-white flex items-center gap-2 flex-wrap">
+                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#1D2B3A] dark:text-white flex items-center gap-2 flex-wrap">
                       Recent Recruiter Activity
                       <span className="text-xs font-sans font-medium bg-[#F3EFE9] dark:bg-[#0F172A] text-[#B25B3E] dark:text-[#E07A5F] border border-[#E5E1D8] dark:border-[#334155] px-2.5 py-0.5 rounded-full">
                         {chatHistory.length} {chatHistory.length === 1 ? 'Inquiry' : 'Inquiries'}
@@ -308,7 +346,8 @@ export default function DigitalTwin() {
                 <button
                   onClick={() => fetchAnalytics(twinProfile?.resumeId || twinProfile?.publicSlug)}
                   disabled={isLoadingHistory}
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-200 text-xs font-medium rounded-lg border border-[#E5E1D8] dark:border-[#334155] transition-colors disabled:opacity-50 shadow-2xs self-start sm:self-auto min-h-[36px]"
+                  aria-label="Refresh activity feed"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-100 text-xs font-medium rounded-lg border border-[#E5E1D8] dark:border-[#334155] transition-colors disabled:opacity-50 shadow-2xs self-start sm:self-auto min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                   title="Refresh activity feed"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 text-[#B25B3E] ${isLoadingHistory ? 'animate-spin' : ''}`} />
@@ -328,7 +367,7 @@ export default function DigitalTwin() {
                   </p>
                   <button
                     onClick={() => navigate(`/twin/${twinProfile?.publicSlug}`)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-lg transition-all shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#B25B3E] hover:bg-[#9C4E34] text-[#FCFAF6] text-xs font-semibold rounded-lg transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Test Terminal Now
@@ -369,7 +408,7 @@ export default function DigitalTwin() {
 
                       {/* Answer */}
                       <div className="space-y-1 pt-1">
-                        <span className="text-[11px] font-serif font-bold text-[#1D2B3A] dark:text-gray-200 uppercase tracking-wider flex items-center gap-1 block">
+                        <span className="text-[11px] font-serif font-bold text-[#1D2B3A] dark:text-gray-100 uppercase tracking-wider flex items-center gap-1 block">
                           <Bot className="w-3.5 h-3.5 text-[#B25B3E]" />
                           AI Answered:
                         </span>
@@ -386,7 +425,7 @@ export default function DigitalTwin() {
             {/* Twin Attributes & Status Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
               {/* Persona Profile Card */}
-              <div className="md:col-span-2 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 shadow-sm h-full flex flex-col justify-between">
+              <div className="md:col-span-2 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 shadow-md h-full flex flex-col justify-between">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[#E5E1D8] dark:border-[#334155] pb-4">
                     <div className="flex items-center gap-3">
@@ -398,7 +437,7 @@ export default function DigitalTwin() {
                         <p className="text-xs text-[#5C5751] dark:text-gray-400">Resume ID: {twinProfile?.resumeId}</p>
                       </div>
                     </div>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-serif font-medium bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-200 border border-[#E5E1D8] dark:border-[#334155]">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-serif font-medium bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 border border-[#E5E1D8] dark:border-[#334155]">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                       MySQL Synced
                     </span>
@@ -439,7 +478,7 @@ export default function DigitalTwin() {
               </div>
 
               {/* Status and Engine Telemetry */}
-              <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 space-y-5 flex flex-col justify-between shadow-sm h-full">
+              <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-6 space-y-5 flex flex-col justify-between shadow-md h-full">
                 <div>
                   <h3 className="text-sm font-serif font-bold text-[#1D2B3A] dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Zap className="w-4 h-4 text-[#B25B3E]" />
@@ -453,15 +492,15 @@ export default function DigitalTwin() {
                     </div>
                     <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
                       <span className="text-[#5C5751] dark:text-gray-400">AI Engine</span>
-                      <span className="text-[#1D2B3A] dark:text-gray-200 font-medium">Gemini 1.5 / 3.5 Flash</span>
+                      <span className="text-[#1D2B3A] dark:text-gray-100 font-medium">Gemini 1.5 / 3.5 Flash</span>
                     </div>
                     <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
                       <span className="text-[#5C5751] dark:text-gray-400">Max Output Cap</span>
-                      <span className="text-[#1D2B3A] dark:text-gray-200 font-medium">500 tokens</span>
+                      <span className="text-[#1D2B3A] dark:text-gray-100 font-medium">500 tokens</span>
                     </div>
                     <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
                       <span className="text-[#5C5751] dark:text-gray-400">Database</span>
-                      <span className="text-[#1D2B3A] dark:text-gray-200 font-medium">MySQL (Sequelize)</span>
+                      <span className="text-[#1D2B3A] dark:text-gray-100 font-medium">MySQL (Sequelize)</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-[#5C5751] dark:text-gray-400">Status</span>

@@ -2,18 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ThemeToggle from '../components/ThemeToggle';
+import { useToast } from '../context/ToastContext';
 import {
   Send,
   ArrowLeft,
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  HelpCircle
+  HelpCircle,
+  Loader2
 } from 'lucide-react';
 
 export default function PublicTwinChat() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [twinData, setTwinData] = useState(null);
   const [isLoadingTwin, setIsLoadingTwin] = useState(true);
@@ -47,7 +50,7 @@ export default function PublicTwinChat() {
     if (!el) return;
 
     const onWheel = (e) => {
-      if (e.deltaY !== 0) {
+      if (el.scrollWidth > el.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
         el.scrollLeft += e.deltaY;
         handleScroll();
@@ -122,9 +125,11 @@ export default function PublicTwinChat() {
         }
       } catch (err) {
         console.error('Error fetching twin data:', err);
+        const errMsg = err.response?.data?.message || 'Digital Twin not found or offline';
         if (isMounted) {
-          setTwinError(err.response?.data?.message || 'Digital Twin not found or offline');
+          setTwinError(errMsg);
         }
+        toast.error(errMsg);
       } finally {
         if (isMounted) {
           setIsLoadingTwin(false);
@@ -141,12 +146,20 @@ export default function PublicTwinChat() {
     };
   }, [slug]);
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (isTyping || !inputMessage.trim()) return;
+      handleSendMessage(e);
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e?.preventDefault();
+    if (isTyping) return;
     const query = inputMessage.trim();
-    if (!query || isTyping) return;
+    if (!query) return;
 
-    // Map existing UI messages state into history array for multi-turn context
     const chatHistory = messages
       .filter((m) => !m.isError)
       .map((m) => ({
@@ -182,6 +195,7 @@ export default function PublicTwinChat() {
       setMessages((prev) => [...prev, twinMsg]);
     } catch (err) {
       console.error('Error sending message to twin:', err);
+      toast.error('Failed to reach AI reasoning engine. Please try asking again.');
       const errorMsg = {
         id: `err-${Date.now()}`,
         sender: 'twin',
@@ -217,7 +231,8 @@ export default function PublicTwinChat() {
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <button
               onClick={() => navigate('/')}
-              className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-200 transition-colors border border-[#E5E1D8] dark:border-[#334155] shadow-xs flex items-center justify-center shrink-0"
+              aria-label="Go back"
+              className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-gray-200 transition-colors border border-[#E5E1D8] dark:border-[#334155] shadow-xs flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
               title="Return to resume"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -278,7 +293,8 @@ export default function PublicTwinChat() {
             </div>
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl border border-[#1D2B3A] dark:border-[#334155] transition-colors shadow-xs"
+              aria-label="Back to Resume Studio"
+              className="px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl border border-[#1D2B3A] dark:border-[#334155] transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
             >
               Back to Resume Studio
             </button>
@@ -290,7 +306,7 @@ export default function PublicTwinChat() {
               {/* Collapsible Candidate Resume Data Accordion */}
               {twinData?.bio && (
                 <details className="mb-6 p-4 border border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6] dark:bg-[#1E293B] rounded-xl cursor-pointer group">
-                  <summary className="font-bold text-[#1D2B3A] dark:text-white font-sans outline-none">
+                  <summary className="font-bold text-[#1D2B3A] dark:text-white font-sans outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-lg">
                     View Candidate Resume Data
                   </summary>
                   <div className="mt-3 text-sm text-[#1D2B3A]/80 dark:text-gray-300 whitespace-pre-wrap max-h-48 overflow-y-auto pr-2 custom-scrollbar">
@@ -403,19 +419,20 @@ export default function PublicTwinChat() {
                   onMouseLeave={handleMouseLeave}
                   onMouseUp={handleMouseUp}
                   onMouseMove={handleMouseMove}
-                  className={`flex flex-nowrap overflow-x-auto w-full gap-2 items-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] py-1 ${
-                    isDragging ? 'cursor-grabbing select-none scroll-auto' : 'cursor-grab scroll-smooth'
+                  className={`flex flex-nowrap overflow-x-auto scroll-smooth snap-x snap-mandatory w-full gap-2 items-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] py-1 ${
+                    isDragging ? 'cursor-grabbing select-none scroll-auto' : 'cursor-grab'
                   }`}
                 >
                   {sampleQuestions.map((q, idx) => (
                     <button
                       key={idx}
                       type="button"
+                      disabled={isTyping}
                       onClick={() => {
-                        if (hasDraggedRef.current) return;
+                        if (hasDraggedRef.current || isTyping) return;
                         setInputMessage(q);
                       }}
-                      className="shrink-0 whitespace-nowrap bg-[#FCFAF6] dark:bg-[#1E293B] text-[#1D2B3A] dark:text-gray-200 hover:bg-[#1D2B3A] dark:hover:bg-[#334155] hover:text-[#FCFAF6] dark:hover:text-white border border-[#E5E1D8] dark:border-[#334155] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs active:scale-95 cursor-pointer select-none"
+                      className="shrink-0 snap-start whitespace-nowrap bg-[#FCFAF6] dark:bg-[#1E293B] text-[#1D2B3A] dark:text-gray-200 hover:bg-[#1D2B3A] dark:hover:bg-[#334155] hover:text-[#FCFAF6] dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed border border-[#E5E1D8] dark:border-[#334155] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs active:scale-95 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                     >
                       {q}
                     </button>
@@ -431,25 +448,30 @@ export default function PublicTwinChat() {
               </div>
             </div>
 
-            {/* Chat Input Box */}
-            <form onSubmit={handleSendMessage} className="relative mt-1">
-              <div className="flex items-center bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] focus-within:border-[#1D2B3A] focus-within:dark:border-gray-400 focus-within:ring-1 focus-within:ring-[#1D2B3A]/20 focus-within:dark:ring-white/20 rounded-2xl p-2 shadow-sm transition-all">
+            <form onSubmit={handleSendMessage} aria-busy={isTyping} className="relative mt-1">
+              <div className="flex items-center bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] focus-within:border-[#B25B3E] focus-within:dark:border-[#B25B3E] focus-within:ring-2 focus-within:ring-[#B25B3E]/20 rounded-2xl p-2 shadow-sm transition-all">
                 <input
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder={`Ask ${twinData?.name ? twinData.name.split(' ')[0] : 'the candidate'} about their experience...`}
+                  onKeyDown={handleKeyDown}
+                  placeholder={isTyping ? 'Twin is thinking...' : 'Ask your Twin...'}
                   disabled={isTyping}
-                  className="flex-1 bg-transparent px-3 sm:px-4 py-2 text-sm text-[#1D2B3A] dark:text-white placeholder-[#5C5751]/60 dark:placeholder-gray-500 focus:outline-none min-w-0"
+                  className="flex-1 bg-transparent px-3 sm:px-4 py-2 text-sm text-[#1D2B3A] dark:text-white placeholder-[#5C5751]/60 dark:placeholder-gray-500 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-xl disabled:opacity-60 disabled:cursor-not-allowed min-w-0 transition-all"
                 />
                 <button
                   type="submit"
-                  disabled={!inputMessage.trim() || isTyping}
+                  disabled={isTyping || !inputMessage.trim()}
+                  aria-busy={isTyping}
                   aria-label="Send question to Digital Twin"
-                  className="inline-flex items-center justify-center gap-1.5 min-h-[42px] min-w-[42px] sm:min-w-fit px-3.5 sm:px-4 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] disabled:bg-[#E5E1D8] dark:disabled:bg-[#334155] disabled:text-[#5C5751] dark:disabled:text-gray-500 text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-xs disabled:shadow-none shrink-0"
+                  className="inline-flex items-center justify-center gap-1.5 min-h-[42px] min-w-[42px] sm:min-w-fit px-3.5 sm:px-4 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] disabled:bg-[#E5E1D8] dark:disabled:bg-[#334155] disabled:text-[#5C5751] dark:disabled:text-gray-500 disabled:opacity-60 disabled:cursor-not-allowed text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-xs disabled:shadow-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Send</span>
+                  {isTyping ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Send className="w-3.5 h-3.5" />
+                  )}
+                  <span className="hidden sm:inline">{isTyping ? 'Thinking...' : 'Send'}</span>
                 </button>
               </div>
             </form>

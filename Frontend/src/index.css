@@ -24,7 +24,11 @@
     flex-direction: column;
   }
 
-  /* Dark mode global scrollbars */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
   .dark ::-webkit-scrollbar-thumb {
     background-color: #334155;
     border-radius: 4px;
@@ -34,7 +38,6 @@
     background-color: #0F172A;
   }
 
-  /* Firefox scrollbar support */
   .dark * {
     scrollbar-color: #334155 #0F172A;
   }
@@ -44,6 +47,15 @@
   .dark textarea,
   .dark select {
     color-scheme: dark;
+  }
+
+  /* Global accessible focus-visible indicator */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  button:focus-visible {
+    outline: 2px solid #B25B3E;
+    outline-offset: 2px;
   }
 }
 
