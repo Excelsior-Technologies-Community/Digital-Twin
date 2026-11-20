@@ -49,7 +49,7 @@ export default function Navbar({ showBack = false, title, subtitle }) {
           <button
             onClick={() => navigate('/')}
             aria-current={isResumeActive ? 'page' : undefined}
-            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] rounded-full transition-all flex items-center justify-center border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] rounded-full transition-all duration-200 ease-out flex items-center justify-center border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               isResumeActive
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#FCFAF6] dark:text-[#1D2B3A] border-[#B25B3E]'
                 : 'text-[#5C5751] dark:text-gray-400 hover:text-[#1D2B3A] dark:hover:text-[#FCFAF6] hover:bg-[#F3EFE9] dark:hover:bg-[#334155] border-transparent'
@@ -61,7 +61,7 @@ export default function Navbar({ showBack = false, title, subtitle }) {
           <button
             onClick={() => navigate('/digital-twin')}
             aria-current={isControlActive ? 'page' : undefined}
-            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] rounded-full transition-all flex items-center justify-center gap-1.5 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`text-xs font-medium px-3 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] rounded-full transition-all duration-200 ease-out flex items-center justify-center gap-1.5 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               isControlActive
                 ? 'bg-[#B25B3E] text-[#FCFAF6] shadow-sm border-[#B25B3E]'
                 : 'bg-[#FCFAF6] dark:bg-[#1E293B] text-[#1D2B3A] dark:text-[#FCFAF6] border border-[#E5E1D8] dark:border-[#334155] hover:border-[#1D2B3A] dark:hover:border-[#FCFAF6] border-transparent'

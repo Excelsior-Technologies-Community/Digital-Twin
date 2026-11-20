@@ -68,12 +68,11 @@ const ResumeBuilder = () => {
 
   return (
     <div className="min-h-[100dvh] bg-[#E5E1D8] dark:bg-[#0F172A] flex flex-col md:flex-row font-sans text-[#1D2B3A] dark:text-gray-100 overflow-x-hidden pb-24 md:pb-0 relative transition-colors">
-      {/* Mobile Top Navigation Header */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur border-b border-[#D4CFC4] dark:border-[#334155] sticky top-0 z-30">
         <button
           onClick={() => navigate(-1)}
           aria-label="Back to Dashboard"
-          className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] dark:text-gray-300 hover:text-[#1D2B3A] dark:hover:text-white transition-colors min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] rounded-lg"
+          className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] dark:text-gray-300 hover:text-[#1D2B3A] dark:hover:white transition-colors min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] rounded-lg"
         >
           &larr; Back to Dashboard
         </button>
@@ -85,7 +84,6 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      {/* Sidebar Controls */}
       <div className="hidden md:flex w-full md:w-1/4 bg-[#FCFAF6] dark:bg-[#1E293B] p-6 border-r border-[#D4CFC4] dark:border-[#334155] shadow-md flex-col">
         <div className="flex items-center justify-between mb-6">
           <button
@@ -108,7 +106,7 @@ const ResumeBuilder = () => {
               type="button"
               onClick={() => setTemplate('modern')}
               aria-pressed={template === 'modern'}
-              className={`py-3 px-4 rounded-xl border text-left font-sans font-medium text-sm transition-all duration-150 hover:scale-[1.03] flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+              className={`py-3 px-4 rounded-xl border text-left font-sans font-medium text-sm transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
                 template === 'modern'
                   ? 'border-[#B25B3E] ring-2 ring-[#B25B3E]/60 bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] shadow-sm'
                   : 'border-[#E5E1D8] bg-[#FCFAF6] text-[#1D2B3A] dark:border-[#334155] dark:bg-[#0F172A] dark:text-gray-100 hover:bg-[#F3EFE9] dark:hover:bg-[#1E293B]'
@@ -121,7 +119,7 @@ const ResumeBuilder = () => {
               type="button"
               onClick={() => setTemplate('classic')}
               aria-pressed={template === 'classic'}
-              className={`py-3 px-4 rounded-xl border text-left font-sans font-medium text-sm transition-all duration-150 hover:scale-[1.03] flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+              className={`py-3 px-4 rounded-xl border text-left font-sans font-medium text-sm transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
                 template === 'classic'
                   ? 'border-[#B25B3E] ring-2 ring-[#B25B3E]/60 bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] shadow-sm'
                   : 'border-[#E5E1D8] bg-[#FCFAF6] text-[#1D2B3A] dark:border-[#334155] dark:bg-[#0F172A] dark:text-gray-100 hover:bg-[#F3EFE9] dark:hover:bg-[#1E293B]'
@@ -135,13 +133,12 @@ const ResumeBuilder = () => {
 
         <button
           onClick={onDownloadClick}
-          className="mt-auto bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] dark:hover:bg-gray-100 py-3.5 px-4 rounded-xl font-sans font-semibold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+          className="mt-auto bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] dark:hover:bg-gray-100 py-3.5 px-4 rounded-xl font-sans font-semibold text-sm shadow-md transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
         >
           Download PDF
         </button>
       </div>
 
-      {/* Live Preview Area */}
       <div className="w-full md:w-3/4 p-4 sm:p-6 md:p-8 overflow-x-auto overflow-y-auto flex justify-center items-start bg-[#E5E1D8] dark:bg-[#0F172A]">
         <div className="origin-top transform transition-transform duration-200 scale-[0.44] sm:scale-[0.65] md:scale-[0.85] lg:scale-100 -mb-[600px] xs:-mb-[550px] sm:-mb-[350px] md:-mb-0">
           <div className="shadow-2xl bg-white text-gray-900 overflow-hidden transition-all duration-300" style={{ width: '210mm', minHeight: '297mm' }}>
@@ -154,14 +151,13 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      {/* Mobile Sticky Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-3 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur border-t border-[#D4CFC4] dark:border-[#334155] flex items-center justify-between gap-3 md:hidden z-40 shadow-lg print:hidden">
         <div className="flex items-center gap-1.5 bg-[#F3EFE9] dark:bg-[#0F172A] p-1 rounded-xl border border-[#E5E1D8] dark:border-[#334155]">
           <button
             type="button"
             onClick={() => setTemplate('modern')}
             aria-pressed={template === 'modern'}
-            className={`min-h-[38px] px-3.5 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-150 hover:scale-[1.03] flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`min-h-[38px] px-3.5 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               template === 'modern'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] ring-2 ring-[#B25B3E]/60 shadow-xs'
                 : 'text-[#5C5751] dark:text-gray-400 hover:text-[#1D2B3A] dark:hover:text-white'
@@ -174,7 +170,7 @@ const ResumeBuilder = () => {
             type="button"
             onClick={() => setTemplate('classic')}
             aria-pressed={template === 'classic'}
-            className={`min-h-[38px] px-3.5 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-150 hover:scale-[1.03] flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`min-h-[38px] px-3.5 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               template === 'classic'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] ring-2 ring-[#B25B3E]/60 shadow-xs'
                 : 'text-[#5C5751] dark:text-gray-400 hover:text-[#1D2B3A] dark:hover:text-white'
@@ -188,7 +184,7 @@ const ResumeBuilder = () => {
         <button
           type="button"
           onClick={onDownloadClick}
-          className="flex-1 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] dark:hover:bg-gray-100 py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer min-h-[42px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+          className="flex-1 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] dark:hover:bg-gray-100 py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-md transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 flex items-center justify-center gap-2 cursor-pointer min-h-[42px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
         >
           Download PDF
         </button>
@@ -198,4 +194,3 @@ const ResumeBuilder = () => {
 };
 
 export default ResumeBuilder;
-

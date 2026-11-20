@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
@@ -10,6 +10,18 @@ export function ThemeProvider({ children }) {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
+  const toggleTheme = () => {
+    const next = !isDarkMode;
+    if (next) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+    setIsDarkMode(next);
+  };
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -19,10 +31,6 @@ export function ThemeProvider({ children }) {
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
-  };
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>

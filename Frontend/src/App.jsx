@@ -1,29 +1,88 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import ToastContainer from './components/ToastContainer';
+import PageTransition from './components/PageTransition';
 import Result from './pages/Result';
 import DigitalTwin from './pages/DigitalTwin';
 import PublicTwinChat from './pages/PublicTwinChat';
 import ResumeBuilder from './pages/ResumeBuilder';
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence
+      mode="wait"
+      initial={false}
+      onExitComplete={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+    >
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/"
+          element={
+            <PageTransition>
+              <Result />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/result"
+          element={
+            <PageTransition>
+              <Result />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/digital-twin"
+          element={
+            <PageTransition>
+              <DigitalTwin />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/digital-twin/:slug/resume-builder"
+          element={
+            <PageTransition>
+              <ResumeBuilder />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/resume-builder/:slug"
+          element={
+            <PageTransition>
+              <ResumeBuilder />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/twin/:slug"
+          element={
+            <PageTransition className="h-[100dvh] flex flex-col">
+              <PublicTwinChat />
+            </PageTransition>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
         <Router>
-          <Routes>
-            <Route path="/" element={<Result />} />
-            <Route path="/result" element={<Result />} />
-            <Route path="/digital-twin" element={<DigitalTwin />} />
-            <Route path="/digital-twin/:slug/resume-builder" element={<ResumeBuilder />} />
-            <Route path="/resume-builder/:slug" element={<ResumeBuilder />} />
-            <Route path="/twin/:slug" element={<PublicTwinChat />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <div className="min-h-screen bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 flex flex-col font-sans transition-colors">
+            <AnimatedRoutes />
+          </div>
+          <ToastContainer />
         </Router>
-        <ToastContainer />
       </ToastProvider>
     </ThemeProvider>
   );

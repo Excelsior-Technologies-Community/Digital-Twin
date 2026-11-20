@@ -172,7 +172,6 @@ export default function Result() {
 
   return (
     <div className="min-h-screen bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 px-4 sm:px-6 py-4 sm:py-8 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
-      {/* Top Brand Bar */}
       <header className="max-w-3xl w-full mx-auto mb-6 sm:mb-8 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1D2B3A] dark:bg-white text-[#FCFAF6] dark:text-[#0F172A] flex items-center justify-center font-serif font-bold text-xs sm:text-sm shadow-xs select-none shrink-0">
@@ -189,7 +188,7 @@ export default function Result() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs font-serif text-[#1D2B3A] dark:text-gray-100 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs">
+          <span className="text-[11px] font-sans font-semibold tracking-wide text-[#1D2B3A] dark:text-gray-100 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs">
             <ShieldCheck className="w-3.5 h-3.5 text-[#B25B3E]" />
             <span><span className="hidden sm:inline">PDF </span>Ingestion<span className="hidden md:inline"> Engine</span></span>
           </span>
@@ -197,16 +196,13 @@ export default function Result() {
         </div>
       </header>
 
-      {/* Main Dynamic PDF Setup Card */}
       <main className="max-w-3xl w-full mx-auto flex-1 flex flex-col justify-center">
-        <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-md p-5 sm:p-8 md:p-12 rounded-2xl relative overflow-hidden">
-          {/* Decorative Corner Pill */}
-          <div className="inline-flex items-center gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] px-3.5 py-1 rounded-full text-xs font-serif font-bold text-[#B25B3E] dark:text-[#E07A5F] mb-4 sm:mb-5">
+        <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-8 md:p-12 rounded-2xl relative overflow-hidden">
+          <div className="inline-flex items-center gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F] mb-4 sm:mb-5">
             <Sparkles className="w-3.5 h-3.5" />
             Resume-to-AI Parser
           </div>
 
-          {/* Editorial Header */}
           <h1 className="text-2xl sm:text-3xl font-serif text-[#1D2B3A] dark:text-white font-bold tracking-tight mb-2">
             Initialize Your Digital Proxy
           </h1>
@@ -214,7 +210,6 @@ export default function Result() {
             Upload your PDF resume. Our ingestion engine will automatically extract your achievements, project metrics, and technical expertise to ground your 24/7 AI persona.
           </p>
 
-          {/* Error Alert */}
           {errorMsg && (
             <div className="mb-6 p-4 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#B25B3E]/40 flex items-start gap-3 text-xs text-[#B25B3E] dark:text-rose-400 animate-shake">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -222,13 +217,11 @@ export default function Result() {
             </div>
           )}
 
-          {/* Setup Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Candidate Name Input */}
             <div>
               <label
                 htmlFor="name"
-                className="text-xs font-serif font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider block mb-1 flex items-center gap-1.5"
+                className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2 flex items-center gap-1.5"
               >
                 <User className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Full Candidate Name <span className="text-[#B25B3E]">*</span>
@@ -243,17 +236,16 @@ export default function Result() {
                 disabled={isSubmitting}
                 required
                 aria-invalid={!!(errorMsg && !formData.name.trim())}
-                className={`w-full border-b py-2 font-sans mb-6 transition-colors text-base placeholder-[#5C5751]/40 dark:placeholder-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md px-1.5 ${
+                className={`w-full rounded-xl px-4 py-3 text-base font-sans transition-all outline-none mb-6 ${
                   errorMsg && !formData.name.trim()
-                    ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20 text-red-900 dark:text-red-100'
-                    : 'bg-transparent border-[#E5E1D8] dark:border-[#334155] focus:border-[#1D2B3A] dark:focus:border-gray-300 text-[#1D2B3A] dark:text-white'
+                    ? 'border border-red-500 bg-red-50/60 dark:bg-red-950/20 text-red-900 dark:text-red-100 focus:ring-2 focus:ring-red-500/20'
+                    : 'bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] text-[#1D2B3A] dark:text-white placeholder-[#5C5751]/50 dark:placeholder-slate-400/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20'
                 }`}
               />
             </div>
 
-            {/* Sleek PDF File Upload Zone */}
             <div>
-              <label className="text-xs font-serif font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+              <label className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Upload PDF Resume <span className="text-[#B25B3E]">*</span>
               </label>
@@ -352,9 +344,8 @@ export default function Result() {
               )}
             </div>
 
-            {/* Speaking Tone Selector */}
             <div className="pt-2">
-              <label className="text-xs font-serif font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
+              <label className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2.5 flex items-center gap-1.5">
                 <Sliders className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Speaking Persona Tone
               </label>
@@ -386,12 +377,11 @@ export default function Result() {
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               id="activate-twin-btn"
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F54] dark:hover:bg-[#475569] disabled:bg-[#1D2B3A]/70 dark:disabled:bg-[#334155]/60 text-[#FCFAF6] dark:text-white font-medium font-sans py-3.5 sm:py-4 min-h-[48px] rounded-xl transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2 cursor-pointer text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+              className="w-full bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F54] dark:hover:bg-[#475569] disabled:bg-[#1D2B3A]/70 dark:disabled:bg-[#334155]/60 text-[#FCFAF6] dark:text-white font-medium font-sans py-3.5 sm:py-4 min-h-[48px] rounded-xl transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 shadow-md flex items-center justify-center gap-2 cursor-pointer text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
             >
               {isSubmitting ? (
                 <>
@@ -407,15 +397,14 @@ export default function Result() {
             </button>
           </form>
 
-          {/* Grounding Telemetry Callout */}
           <div className="mt-8 pt-6 border-t border-[#E5E1D8] dark:border-[#334155] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-0 text-xs text-[#5C5751] dark:text-gray-400">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#B25B3E]" />
-              <span>Grounded in Google Gemini AI & MySQL</span>
+              <span>AI-Grounded Executive Synthesis</span>
             </div>
-            <div className="flex items-center gap-1.5 font-mono text-[11px]">
+            <div className="flex items-center gap-1.5 font-sans font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span>pdf-parse Active</span>
+              <span>Semantic Extraction Ready</span>
             </div>
           </div>
         </div>

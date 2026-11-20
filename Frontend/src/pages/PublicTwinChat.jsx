@@ -10,13 +10,16 @@ import {
   CheckCircle2,
   AlertCircle,
   HelpCircle,
-  Loader2
+  Loader2,
+  ArrowDown
 } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 export default function PublicTwinChat() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const shouldReduceMotion = useReducedMotion();
 
   const [twinData, setTwinData] = useState(null);
   const [isLoadingTwin, setIsLoadingTwin] = useState(true);
@@ -25,8 +28,12 @@ export default function PublicTwinChat() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const isNearBottomRef = useRef(true);
+
   const scrollRef = useRef(null);
   const [fade, setFade] = useState({ left: false, right: true });
   const [isDragging, setIsDragging] = useState(false);
@@ -42,6 +49,15 @@ export default function PublicTwinChat() {
         right: scrollLeft < scrollWidth - clientWidth - 1,
       });
     }
+  };
+
+  const handleChatScroll = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isNear = scrollHeight - scrollTop - clientHeight < 120;
+    isNearBottomRef.current = isNear;
+    setShowScrollBottom(!isNear);
   };
 
   useEffect(() => {
@@ -93,15 +109,18 @@ export default function PublicTwinChat() {
     handleScroll();
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (force = false) => {
+    if (force || isNearBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (isNearBottomRef.current) {
+      scrollToBottom(true);
+    }
   }, [messages, isTyping]);
 
-  // Fetch twin data by public slug on mount
   useEffect(() => {
     let isMounted = true;
 
@@ -113,7 +132,6 @@ export default function PublicTwinChat() {
         if (isMounted && response.data?.success) {
           const twin = response.data.twin;
           setTwinData(twin);
-          // Initialize welcome message from the twin
           setMessages([
             {
               id: 'msg-welcome',
@@ -177,6 +195,8 @@ export default function PublicTwinChat() {
     setMessages((prev) => [...prev, userMsg]);
     setInputMessage('');
     setIsTyping(true);
+    isNearBottomRef.current = true;
+    setShowScrollBottom(false);
 
     try {
       const response = await api.post(`/twins/${slug}/chat`, {
@@ -225,7 +245,6 @@ export default function PublicTwinChat() {
 
   return (
     <div className="min-h-[100dvh] h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 font-sans flex flex-col selection:bg-[#B25B3E] selection:text-[#FCFAF6] overflow-hidden transition-colors">
-      {/* Editorial Header */}
       <header className="border-b border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6]/80 dark:bg-[#1E293B]/80 backdrop-blur sticky top-0 z-50 px-4 sm:px-6 py-3 sm:py-3.5 transition-colors">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
@@ -275,7 +294,6 @@ export default function PublicTwinChat() {
         </div>
       </header>
 
-      {/* Main Chat Terminal Window */}
       <main className="flex-1 max-w-4xl w-full mx-auto flex flex-col p-3 sm:p-4 md:p-6 overflow-hidden">
         {isLoadingTwin ? (
           <div className="flex-1 flex flex-col items-center justify-center space-y-3">
@@ -294,124 +312,215 @@ export default function PublicTwinChat() {
             <button
               onClick={() => navigate('/')}
               aria-label="Back to Resume Studio"
-              className="px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl border border-[#1D2B3A] dark:border-[#334155] transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+              className="px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl border border-[#1D2B3A] dark:border-[#334155] transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
             >
               Back to Resume Studio
             </button>
           </div>
         ) : (
           <div className="flex-1 flex flex-col justify-between overflow-hidden">
-            {/* Messages Scroll Area */}
-            <div className="flex-1 overflow-y-auto space-y-5 pr-2 pb-4 scrollbar-thin scrollbar-thumb-[#E5E1D8] dark:scrollbar-thumb-[#334155]">
-              {/* Collapsible Candidate Resume Data Accordion */}
-              {twinData?.bio && (
-                <details className="mb-6 p-4 border border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6] dark:bg-[#1E293B] rounded-xl cursor-pointer group">
-                  <summary className="font-bold text-[#1D2B3A] dark:text-white font-sans outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-lg">
-                    View Candidate Resume Data
-                  </summary>
-                  <div className="mt-3 text-sm text-[#1D2B3A]/80 dark:text-gray-300 whitespace-pre-wrap max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-                    {twinData.bio}
-                  </div>
-                </details>
-              )}
-
-              {/* Message Items */}
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${
-                    msg.sender === 'user' ? 'items-start' : 'items-end'
-                  }`}
-                >
-                  {/* Visitor Messages: Inbound on Left */}
-                  {msg.sender === 'user' && (
-                    <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] text-[#1D2B3A] dark:text-gray-100 rounded-2xl rounded-tl-sm p-3.5 sm:p-4 shadow-sm max-w-[88%] sm:max-w-xl md:max-w-2xl">
-                      <div className="flex items-center justify-between gap-4 mb-1">
-                        <span className="text-[#B25B3E] dark:text-amber-500 font-medium text-xs">
-                          Recruiter (visitor)
-                        </span>
-                        <span className="text-[10px] text-[#4A453F] dark:text-gray-400 font-mono">
-                          {msg.timestamp}
-                        </span>
-                      </div>
-                      <p className="text-sm text-[#1D2B3A] dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
-                        {msg.text}
-                      </p>
+            <div className="relative flex-1 min-h-0 flex flex-col">
+              <div
+                ref={messagesContainerRef}
+                onScroll={handleChatScroll}
+                className="flex-1 overflow-y-auto scroll-smooth space-y-5 pr-2 pb-4"
+              >
+                {twinData?.bio && (
+                  <details className="mb-6 p-4 border border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6] dark:bg-[#1E293B] rounded-xl cursor-pointer group">
+                    <summary className="font-bold text-[#1D2B3A] dark:text-white font-sans outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-lg">
+                      View Candidate Resume Data
+                    </summary>
+                    <div className="mt-3 text-sm text-[#1D2B3A]/80 dark:text-gray-300 whitespace-pre-wrap max-h-48 overflow-y-auto pr-2">
+                      {twinData.bio}
                     </div>
-                  )}
+                  </details>
+                )}
 
-                  {/* Proxy Answers: Outbound on Right */}
-                  {msg.sender === 'twin' && (
-                    <div
-                      className={`bg-[#1D2B3A] dark:bg-[#1E293B] text-[#FCFAF6] dark:text-gray-100 rounded-2xl rounded-tr-sm p-4 sm:p-5 shadow-md max-w-[88%] sm:max-w-xl md:max-w-2xl dark:border dark:border-[#334155] ${
-                        msg.isError ? 'border-2 border-[#B25B3E]' : ''
-                      }`}
+                <AnimatePresence initial={false}>
+                  {messages.map((msg) => {
+                    const isUser = msg.sender === 'user';
+                    return (
+                      <motion.div
+                        key={msg.id}
+                        initial={
+                          shouldReduceMotion
+                            ? { opacity: 0 }
+                            : {
+                                opacity: 0,
+                                x: isUser ? 10 : -10,
+                                y: 12,
+                                scale: 0.98
+                              }
+                        }
+                        animate={
+                          shouldReduceMotion
+                            ? { opacity: 1 }
+                            : {
+                                opacity: 1,
+                                x: 0,
+                                y: 0,
+                                scale: 1
+                              }
+                        }
+                        transition={
+                          shouldReduceMotion
+                            ? { duration: 0.15 }
+                            : {
+                                type: 'spring',
+                                stiffness: 380,
+                                damping: 30,
+                                mass: 0.8
+                              }
+                        }
+                        className={`flex flex-col ${
+                          isUser ? 'items-start' : 'items-end'
+                        }`}
+                      >
+                        {isUser && (
+                          <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] text-[#1D2B3A] dark:text-gray-100 rounded-2xl rounded-tl-sm p-3.5 sm:p-4 shadow-sm max-w-[88%] sm:max-w-xl md:max-w-2xl">
+                            <div className="flex items-center justify-between gap-4 mb-1">
+                              <span className="text-[#B25B3E] dark:text-amber-500 font-medium text-xs">
+                                Recruiter (visitor)
+                              </span>
+                              <span className="text-[10px] text-[#4A453F] dark:text-gray-400 font-mono">
+                                {msg.timestamp}
+                              </span>
+                            </div>
+                            <p className="text-sm text-[#1D2B3A] dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+                              {msg.text}
+                            </p>
+                          </div>
+                        )}
+
+                        {!isUser && (
+                          <div
+                            className={`bg-[#1D2B3A] dark:bg-[#1E293B] text-[#FCFAF6] dark:text-gray-100 rounded-2xl rounded-tr-sm p-4 sm:p-5 shadow-md max-w-[88%] sm:max-w-xl md:max-w-2xl dark:border dark:border-[#334155] ${
+                              msg.isError ? 'border-2 border-[#B25B3E]' : ''
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-4 mb-2 pb-2 border-b border-[#FCFAF6]/15 dark:border-[#334155]">
+                              <span className="text-xs font-serif font-semibold text-[#FCFAF6] dark:text-white tracking-wide">
+                                {twinData?.name || 'Candidate'}'s Proxy (candidate)
+                              </span>
+                              <span className="bg-[#FCFAF6]/15 dark:bg-[#334155] text-[#EFE8DD] dark:text-gray-200 border border-[#FCFAF6]/20 dark:border-[#475569] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full">
+                                PROXY ANSWER
+                              </span>
+                            </div>
+                            <p className="text-sm text-[#FCFAF6]/95 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+                              {msg.text}
+                            </p>
+                            <span className="text-[10px] text-[#FCFAF6]/60 dark:text-gray-400 font-mono block mt-2.5 text-right">
+                              {msg.timestamp}
+                            </span>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {isTyping && (
+                    <motion.div
+                      key="typing-indicator"
+                      initial={
+                        shouldReduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, x: -10, y: 12, scale: 0.98 }
+                      }
+                      animate={
+                        shouldReduceMotion
+                          ? { opacity: 1 }
+                          : { opacity: 1, x: 0, y: 0, scale: 1 }
+                      }
+                      exit={
+                        shouldReduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 0.95, transition: { duration: 0.15 } }
+                      }
+                      transition={
+                        shouldReduceMotion
+                          ? { duration: 0.15 }
+                          : {
+                              type: 'spring',
+                              stiffness: 380,
+                              damping: 30,
+                              mass: 0.8
+                            }
+                      }
+                      className="flex flex-col items-end"
                     >
-                      <div className="flex items-center justify-between gap-4 mb-2 pb-2 border-b border-[#FCFAF6]/15 dark:border-[#334155]">
-                        <span className="text-xs font-serif font-semibold text-[#FCFAF6] dark:text-white tracking-wide">
-                          {twinData?.name || 'Candidate'}'s Proxy (candidate)
-                        </span>
-                        <span className="bg-[#FCFAF6]/15 dark:bg-[#334155] text-[#EFE8DD] dark:text-gray-200 border border-[#FCFAF6]/20 dark:border-[#475569] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full">
-                          PROXY ANSWER
-                        </span>
+                      <div className="bg-[#1D2B3A] dark:bg-[#1E293B] text-[#FCFAF6] dark:text-gray-100 rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-md max-w-[88%] sm:max-w-md dark:border dark:border-[#334155]">
+                        <div className="flex items-center justify-between gap-3 mb-1.5 pb-1.5 border-b border-[#FCFAF6]/15 dark:border-[#334155]">
+                          <span className="text-xs font-serif font-semibold text-[#FCFAF6]/90 dark:text-white">
+                            {twinData?.name || 'Candidate'}'s Proxy
+                          </span>
+                          <span className="text-[9px] uppercase tracking-wider text-[#EFE8DD] dark:text-gray-200 bg-[#FCFAF6]/10 dark:bg-[#334155] px-1.5 py-0.5 rounded">
+                            REASONING
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-[#EFE8DD]/80 dark:text-gray-300">
+                          <div className="flex gap-1.5 items-center py-0.5">
+                            {[0, 1, 2].map((i) => (
+                              <motion.span
+                                key={i}
+                                className="w-1.5 h-1.5 rounded-full bg-[#B25B3E]"
+                                animate={{
+                                  y: [0, -4, 0],
+                                  opacity: [0.5, 1, 0.5]
+                                }}
+                                transition={{
+                                  duration: 0.8,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                  delay: i * 0.16
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <span className="font-serif italic text-xs text-[#FCFAF6]/80 dark:text-gray-300">
+                            Formulating STAR-method response...
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-sm text-[#FCFAF6]/95 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
-                        {msg.text}
-                      </p>
-                      <span className="text-[10px] text-[#FCFAF6]/60 dark:text-gray-400 font-mono block mt-2.5 text-right">
-                        {msg.timestamp}
-                      </span>
-                    </div>
+                    </motion.div>
                   )}
-                </div>
-              ))}
+                </AnimatePresence>
 
-              {/* Typing indicator */}
-              {isTyping && (
-                <div className="flex flex-col items-end">
-                  <div className="bg-[#1D2B3A] dark:bg-[#1E293B] text-[#FCFAF6] dark:text-gray-100 rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-md max-w-[88%] sm:max-w-md dark:border dark:border-[#334155]">
-                    <div className="flex items-center justify-between gap-3 mb-1.5 pb-1.5 border-b border-[#FCFAF6]/15 dark:border-[#334155]">
-                      <span className="text-xs font-serif font-semibold text-[#FCFAF6]/90 dark:text-white">
-                        {twinData?.name || 'Candidate'}'s Proxy
-                      </span>
-                      <span className="text-[9px] uppercase tracking-wider text-[#EFE8DD] dark:text-gray-200 bg-[#FCFAF6]/10 dark:bg-[#334155] px-1.5 py-0.5 rounded">
-                        REASONING
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-[#EFE8DD]/80 dark:text-gray-300">
-                      <span className="flex gap-1 items-center">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#B25B3E] animate-bounce"></span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#B25B3E] animate-bounce [animation-delay:0.2s]"></span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#B25B3E] animate-bounce [animation-delay:0.4s]"></span>
-                      </span>
-                      <span className="font-serif italic text-xs text-[#FCFAF6]/80 dark:text-gray-300">
-                        Formulating STAR-method response...
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
+                <div ref={messagesEndRef} />
+              </div>
 
-              <div ref={messagesEndRef} />
+              <AnimatePresence>
+                {showScrollBottom && (
+                  <motion.button
+                    type="button"
+                    onClick={() => scrollToBottom(true)}
+                    initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    aria-label="Scroll to latest messages"
+                    className="absolute right-3 bottom-3 z-20 w-9 h-9 rounded-full bg-white dark:bg-[#1E293B] text-[#B25B3E] border border-[#B25B3E]/40 shadow-md flex items-center justify-center hover:bg-[#F3EFE9] dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] cursor-pointer"
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Dynamic Prompt Pills */}
             <div className="pt-2 pb-2.5 border-t border-[#E5E1D8]/60 dark:border-[#334155]/60 relative">
               <span className="text-[11px] font-serif font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
                 <HelpCircle className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Suggested Recruiter Inquiries
               </span>
 
-              {/* Scrollable Carousel Wrapper with Dynamic Dual-Sided Gradient Fade Masks */}
               <div className="relative w-full">
-                {/* Left Fade */}
                 <div
                   className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#F3EFE9] dark:from-[#0F172A] to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
                     fade.left ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
 
-                {/* Horizontal Scroll Track with Drag-to-Scroll Support */}
                 <div
                   ref={scrollRef}
                   onScroll={handleScroll}
@@ -439,7 +548,6 @@ export default function PublicTwinChat() {
                   ))}
                 </div>
 
-                {/* Right Fade */}
                 <div
                   className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#F3EFE9] dark:from-[#0F172A] to-transparent pointer-events-none transition-opacity duration-300 z-10 ${
                     fade.right ? 'opacity-100' : 'opacity-0'
@@ -464,7 +572,7 @@ export default function PublicTwinChat() {
                   disabled={isTyping || !inputMessage.trim()}
                   aria-busy={isTyping}
                   aria-label="Send question to Digital Twin"
-                  className="inline-flex items-center justify-center gap-1.5 min-h-[42px] min-w-[42px] sm:min-w-fit px-3.5 sm:px-4 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] disabled:bg-[#E5E1D8] dark:disabled:bg-[#334155] disabled:text-[#5C5751] dark:disabled:text-gray-500 disabled:opacity-60 disabled:cursor-not-allowed text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all active:scale-95 shadow-xs disabled:shadow-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                  className="inline-flex items-center justify-center gap-1.5 min-h-[42px] min-w-[42px] sm:min-w-fit px-3.5 sm:px-4 py-2.5 bg-[#B25B3E] hover:bg-[#9C4E34] disabled:bg-[#E5E1D8] dark:disabled:bg-[#334155] disabled:text-[#5C5751] dark:disabled:text-gray-500 disabled:opacity-60 disabled:cursor-not-allowed text-[#FCFAF6] text-xs font-semibold rounded-xl transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 shadow-xs disabled:shadow-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                 >
                   {isTyping ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
