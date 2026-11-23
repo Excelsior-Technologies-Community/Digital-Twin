@@ -1,9 +1,8 @@
 import React, { forwardRef } from 'react';
 
-const ModernTemplate = forwardRef(({ data }, ref) => {
+const ModernTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
   if (!data) return null;
 
-  // Safe parsing & normalization for skills to prevent .map() crashes
   const skillsList = Array.isArray(data.skills)
     ? data.skills
     : typeof data.skills === 'string'
@@ -42,8 +41,14 @@ const ModernTemplate = forwardRef(({ data }, ref) => {
 
   return (
     <div ref={ref} className="w-[210mm] min-h-[297mm] bg-white p-10 print:p-0 print:m-0 print:w-full print:shadow-none mx-auto shadow-sm font-sans text-[#1D2B3A] box-border">
-      {/* Header */}
-      <div className="bg-[#1D2B3A] text-[#FCFAF6] p-8 rounded-xl mb-6">
+      <div
+        className="text-[#FCFAF6] p-8 rounded-xl mb-6"
+        style={{
+          backgroundColor: accentColor,
+          printColorAdjust: 'exact',
+          WebkitPrintColorAdjust: 'exact',
+        }}
+      >
         <h1 className="text-4xl font-bold uppercase tracking-wide">{data.name || 'Candidate Name'}</h1>
         <p className="text-lg mt-2 opacity-90">{data.title || 'Professional Title'}</p>
         <div className="flex flex-wrap gap-4 mt-4 text-sm opacity-80">
@@ -53,18 +58,36 @@ const ModernTemplate = forwardRef(({ data }, ref) => {
       </div>
 
       <div className="space-y-6">
-        {/* Summary Section */}
         {data.bio && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-xl font-bold border-b-2 border-[#1D2B3A] mb-4 pb-1 uppercase tracking-wider text-[#1D2B3A]">Professional Summary</h2>
+            <h2
+              className="text-xl font-bold border-b-2 mb-4 pb-1 uppercase tracking-wider"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
+              Professional Summary
+            </h2>
             <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{data.bio}</p>
           </section>
         )}
 
-        {/* Experience Section */}
         {experienceList && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-xl font-bold border-b-2 border-[#1D2B3A] mb-4 pb-1 uppercase tracking-wider text-[#1D2B3A]">Work Experience</h2>
+            <h2
+              className="text-xl font-bold border-b-2 mb-4 pb-1 uppercase tracking-wider"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
+              Work Experience
+            </h2>
             {Array.isArray(experienceList) ? (
               experienceList.map((exp, i) => (
                 <div key={i} className="mb-4 break-inside-avoid">
@@ -79,10 +102,19 @@ const ModernTemplate = forwardRef(({ data }, ref) => {
           </section>
         )}
 
-        {/* Education Section */}
         {educationList && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-xl font-bold border-b-2 border-[#1D2B3A] mb-4 pb-1 uppercase tracking-wider text-[#1D2B3A]">Education</h2>
+            <h2
+              className="text-xl font-bold border-b-2 mb-4 pb-1 uppercase tracking-wider"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
+              Education
+            </h2>
             {Array.isArray(educationList) ? (
               educationList.map((edu, i) => (
                 <div key={i} className="mb-3 break-inside-avoid">
@@ -96,10 +128,19 @@ const ModernTemplate = forwardRef(({ data }, ref) => {
           </section>
         )}
 
-        {/* Skills Section */}
         {skillsList.length > 0 && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-xl font-bold border-b-2 border-[#1D2B3A] mb-4 pb-1 uppercase tracking-wider text-[#1D2B3A]">Core Skills</h2>
+            <h2
+              className="text-xl font-bold border-b-2 mb-4 pb-1 uppercase tracking-wider"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
+              Core Skills
+            </h2>
             <div className="flex flex-wrap gap-2">
               {skillsList.map((skill, i) => (
                 <span key={i} className="bg-[#FCFAF6] border border-[#E5E1D8] text-[#1D2B3A] px-3 py-1.5 rounded-md text-sm font-medium">

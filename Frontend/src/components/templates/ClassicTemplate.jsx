@@ -1,9 +1,8 @@
 import React, { forwardRef } from 'react';
 
-const ClassicTemplate = forwardRef(({ data }, ref) => {
+const ClassicTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
   if (!data) return null;
 
-  // Safe parsing & normalization for skills to prevent .map() crashes
   const skillsList = Array.isArray(data.skills)
     ? data.skills
     : typeof data.skills === 'string'
@@ -42,12 +41,21 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
 
   return (
     <div ref={ref} className="w-[210mm] min-h-[297mm] bg-white p-10 print:p-0 print:m-0 print:w-full print:shadow-none mx-auto shadow-sm font-serif text-[#1D2B3A] box-border">
-      {/* Classic Editorial Centered Header */}
-      <div className="text-center pb-6 border-b-2 border-[#1D2B3A] mb-6">
+      <div
+        className="text-center pb-6 border-b-2 mb-6"
+        style={{
+          borderColor: accentColor,
+          printColorAdjust: 'exact',
+          WebkitPrintColorAdjust: 'exact',
+        }}
+      >
         <h1 className="text-4xl font-bold tracking-tight text-[#1D2B3A] uppercase font-serif">
           {data.name || 'Candidate Name'}
         </h1>
-        <p className="text-base font-sans font-medium text-[#B25B3E] tracking-widest uppercase mt-2">
+        <p
+          className="text-base font-sans font-medium tracking-widest uppercase mt-2"
+          style={{ color: accentColor }}
+        >
           {data.title || 'Professional Title'}
         </p>
         <div className="flex justify-center flex-wrap items-center gap-3 mt-4 text-xs font-sans text-gray-600">
@@ -60,10 +68,17 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
       </div>
 
       <div className="space-y-6">
-        {/* Professional Summary */}
         {data.bio && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-base font-bold uppercase tracking-wider text-[#1D2B3A] border-b border-[#1D2B3A] pb-1.5 mb-3 font-serif">
+            <h2
+              className="text-base font-bold uppercase tracking-wider border-b pb-1.5 mb-3 font-serif"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
               Professional Summary
             </h2>
             <p className="text-sm font-sans text-gray-700 leading-relaxed whitespace-pre-wrap">
@@ -72,10 +87,17 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
           </section>
         )}
 
-        {/* Experience Section */}
         {experienceList && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-base font-bold uppercase tracking-wider text-[#1D2B3A] border-b border-[#1D2B3A] pb-1.5 mb-3 font-serif">
+            <h2
+              className="text-base font-bold uppercase tracking-wider border-b pb-1.5 mb-3 font-serif"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
               Work Experience
             </h2>
             {Array.isArray(experienceList) ? (
@@ -85,7 +107,7 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
                     <h3 className="font-bold font-sans text-sm text-[#1D2B3A]">{exp.role || exp.title}</h3>
                     {exp.duration && <span className="text-xs font-sans text-gray-500">{exp.duration}</span>}
                   </div>
-                  <p className="text-xs font-sans text-[#B25B3E] font-medium mb-1.5">{exp.company}</p>
+                  <p className="text-xs font-sans font-medium mb-1.5" style={{ color: accentColor }}>{exp.company}</p>
                   <p className="text-sm font-sans text-gray-700 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
                 </div>
               ))
@@ -95,10 +117,17 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
           </section>
         )}
 
-        {/* Education Section */}
         {educationList && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-base font-bold uppercase tracking-wider text-[#1D2B3A] border-b border-[#1D2B3A] pb-1.5 mb-3 font-serif">
+            <h2
+              className="text-base font-bold uppercase tracking-wider border-b pb-1.5 mb-3 font-serif"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
               Education
             </h2>
             {Array.isArray(educationList) ? (
@@ -117,10 +146,17 @@ const ClassicTemplate = forwardRef(({ data }, ref) => {
           </section>
         )}
 
-        {/* Skills Section */}
         {skillsList.length > 0 && (
           <section className="break-inside-avoid mb-6">
-            <h2 className="text-base font-bold uppercase tracking-wider text-[#1D2B3A] border-b border-[#1D2B3A] pb-1.5 mb-3 font-serif">
+            <h2
+              className="text-base font-bold uppercase tracking-wider border-b pb-1.5 mb-3 font-serif"
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                printColorAdjust: 'exact',
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
               Key Expertise & Skills
             </h2>
             <div className="flex flex-wrap gap-2 pt-1 font-sans">

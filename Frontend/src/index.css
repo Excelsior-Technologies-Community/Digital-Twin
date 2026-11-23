@@ -86,12 +86,18 @@
     color-scheme: dark;
   }
 
-  input:focus-visible,
+  input:not(.composer-input):focus-visible,
   textarea:focus-visible,
   select:focus-visible,
   button:focus-visible {
     outline: 2px solid #B25B3E;
     outline-offset: 2px;
+  }
+
+  .composer-input:focus,
+  .composer-input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
   }
 }
 

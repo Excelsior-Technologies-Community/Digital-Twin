@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ThemeToggle from '../components/ThemeToggle';
@@ -14,13 +14,23 @@ import {
   CheckCircle2,
   AlertCircle,
   X,
-  FileCheck
+  FileCheck,
+  Loader2
 } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+
+const INGESTION_STAGES = [
+  'Reading Document Vector stream...',
+  'Extracting Career Achievements & STAR Metrics...',
+  'Generating 3D Spatial Competency Nodes...',
+  'Synchronizing Public Recruiter Persona...'
+];
 
 export default function Result() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const { toast } = useToast();
+  const shouldReduceMotion = useReducedMotion();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -31,6 +41,25 @@ export default function Result() {
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [activeStage, setActiveStage] = useState(0);
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      setActiveStage(0);
+      return;
+    }
+
+    setActiveStage(0);
+    const t1 = setTimeout(() => setActiveStage(1), 2000);
+    const t2 = setTimeout(() => setActiveStage(2), 4800);
+    const t3 = setTimeout(() => setActiveStage(3), 7500);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [isSubmitting]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -90,6 +119,14 @@ export default function Result() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '0 KB';
+    if (bytes >= 1048576) {
+      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    }
+    return `${(bytes / 1024).toFixed(1)} KB`;
   };
 
   const handleSubmit = async (e) => {
@@ -172,7 +209,7 @@ export default function Result() {
 
   return (
     <div className="min-h-screen bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 px-4 sm:px-6 py-4 sm:py-8 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
-      <header className="max-w-3xl w-full mx-auto mb-6 sm:mb-8 flex items-center justify-between gap-2">
+      <header className="max-w-6xl w-full mx-auto mb-6 sm:mb-8 flex items-center justify-between gap-3 px-1">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1D2B3A] dark:bg-white text-[#FCFAF6] dark:text-[#0F172A] flex items-center justify-center font-serif font-bold text-xs sm:text-sm shadow-xs select-none shrink-0">
             DT
@@ -188,64 +225,44 @@ export default function Result() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[11px] font-sans font-semibold tracking-wide text-[#1D2B3A] dark:text-gray-100 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#B25B3E]" />
-            <span><span className="hidden sm:inline">PDF </span>Ingestion<span className="hidden md:inline"> Engine</span></span>
+          <span
+            aria-label="PDF Ingestion Engine"
+            title="PDF Ingestion Engine"
+            className="text-[11px] font-sans font-semibold tracking-wide text-[#1D2B3A] dark:text-gray-100 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] p-2 sm:px-3.5 sm:py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs shrink-0"
+          >
+            <ShieldCheck className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#B25B3E]" />
+            <span className="hidden sm:inline">PDF Ingestion Engine</span>
           </span>
           <ThemeToggle />
         </div>
       </header>
 
-      <main className="max-w-3xl w-full mx-auto flex-1 flex flex-col justify-center">
-        <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-8 md:p-12 rounded-2xl relative overflow-hidden">
-          <div className="inline-flex items-center gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F] mb-4 sm:mb-5">
-            <Sparkles className="w-3.5 h-3.5" />
-            Resume-to-AI Parser
-          </div>
-
-          <h1 className="text-2xl sm:text-3xl font-serif text-[#1D2B3A] dark:text-white font-bold tracking-tight mb-2">
-            Initialize Your Digital Proxy
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-[#5C5751] dark:text-gray-300 leading-relaxed mb-6 sm:mb-8">
-            Upload your PDF resume. Our ingestion engine will automatically extract your achievements, project metrics, and technical expertise to ground your 24/7 AI persona.
-          </p>
-
-          {errorMsg && (
-            <div className="mb-6 p-4 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#B25B3E]/40 flex items-start gap-3 text-xs text-[#B25B3E] dark:text-rose-400 animate-shake">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <p className="font-medium leading-relaxed">{errorMsg}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="name"
-                className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2 flex items-center gap-1.5"
-              >
-                <User className="w-3.5 h-3.5 text-[#B25B3E]" />
-                Full Candidate Name <span className="text-[#B25B3E]">*</span>
-              </label>
-              <input
-                id="name"
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="e.g. Manav Patel"
-                disabled={isSubmitting}
-                required
-                aria-invalid={!!(errorMsg && !formData.name.trim())}
-                className={`w-full rounded-xl px-4 py-3 text-base font-sans transition-all outline-none mb-6 ${
-                  errorMsg && !formData.name.trim()
-                    ? 'border border-red-500 bg-red-50/60 dark:bg-red-950/20 text-red-900 dark:text-red-100 focus:ring-2 focus:ring-red-500/20'
-                    : 'bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] text-[#1D2B3A] dark:text-white placeholder-[#5C5751]/50 dark:placeholder-slate-400/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20'
-                }`}
-              />
+      <main className="max-w-6xl w-full mx-auto flex-1 flex flex-col justify-center">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start lg:items-stretch">
+          <div className="lg:col-span-7 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-6 md:p-8 rounded-2xl relative overflow-hidden flex flex-col h-full">
+            <div className="shrink-0">
+              <div className="inline-flex items-center gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F] mb-3 self-start">
+              <Sparkles className="w-3.5 h-3.5" />
+              Resume-to-AI Parser
             </div>
 
-            <div>
-              <label className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2 flex items-center gap-1.5">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#1D2B3A] dark:text-white font-bold tracking-tight mb-2">
+              Initialize Your Digital Proxy
+            </h1>
+            <p className="text-xs sm:text-sm text-[#5C5751] dark:text-gray-300 leading-relaxed mb-6">
+              Upload your PDF resume. Our ingestion engine will automatically extract your achievements, project metrics, and technical expertise to ground your 24/7 AI persona.
+            </p>
+
+            {errorMsg && (
+              <div className="mb-6 p-4 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#B25B3E]/40 flex items-start gap-3 text-xs text-[#B25B3E] dark:text-rose-400 animate-shake">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <p className="font-medium leading-relaxed">{errorMsg}</p>
+              </div>
+            )}
+            </div>
+
+            <div className="flex-1 flex flex-col justify-center min-h-[180px]">
+              <label className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2 flex items-center gap-1.5 shrink-0">
                 <FileText className="w-3.5 h-3.5 text-[#B25B3E]" />
                 Upload PDF Resume <span className="text-[#B25B3E]">*</span>
               </label>
@@ -276,7 +293,7 @@ export default function Result() {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-2xl p-5 sm:p-8 text-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+                  className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] min-h-[180px] ${
                     errorMsg && !file
                       ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20'
                       : isDragging
@@ -284,7 +301,7 @@ export default function Result() {
                       : 'border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6] dark:bg-[#0F172A]/60 hover:border-[#1D2B3A]/60 dark:hover:border-gray-400 hover:bg-[#F3EFE9]/50 dark:hover:bg-[#0F172A]'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-[#F3EFE9] dark:bg-[#1E293B] border flex items-center justify-center mx-auto mb-3 shadow-2xs transition-all duration-200 ${
+                  <div className={`w-12 h-12 rounded-xl bg-[#F3EFE9] dark:bg-[#1E293B] border flex items-center justify-center mx-auto mb-3 shadow-2xs transition-all duration-200 shrink-0 ${
                     isDragging ? 'border-[#B25B3E]' : 'border-[#E5E1D8] dark:border-[#334155]'
                   }`}>
                     <UploadCloud className={`w-6 h-6 text-[#B25B3E] transition-transform duration-200 ${isDragging ? 'scale-110' : ''}`} />
@@ -300,114 +317,212 @@ export default function Result() {
                   </span>
                 </div>
               ) : (
-                <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all shadow-2xs">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-xl bg-[#1D2B3A] flex items-center justify-center text-[#FCFAF6] shrink-0 shadow-xs">
-                      <FileCheck className="w-5 h-5 text-[#FCFAF6]" />
+                <div className="flex-1 flex flex-col justify-center min-h-[180px]">
+                  <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all shadow-2xs">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-10 h-10 rounded-xl bg-[#1D2B3A] flex items-center justify-center text-[#FCFAF6] shrink-0 shadow-xs">
+                        <FileCheck className="w-5 h-5 text-[#FCFAF6]" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-serif font-bold text-[#1D2B3A] dark:text-white truncate">
+                          {file.name}
+                        </h4>
+                        <p className="text-xs text-[#5C5751] dark:text-gray-400 flex items-center gap-2">
+                          <span>{formatFileSize(file.size)}</span>
+                          <span className="text-[#E5E1D8] dark:text-[#334155]">&bull;</span>
+                          <span className="text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Ready for Analysis
+                          </span>
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="text-sm font-serif font-bold text-[#1D2B3A] dark:text-white truncate">
-                        {file.name}
-                      </h4>
-                      <p className="text-xs text-[#5C5751] dark:text-gray-400 flex items-center gap-2">
-                        <span>{(file.size / 1024).toFixed(1)} KB</span>
-                        <span className="text-[#E5E1D8] dark:text-[#334155]">&bull;</span>
-                        <span className="text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Ready to parse
-                        </span>
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isSubmitting}
-                      aria-label="Change uploaded resume"
-                      className="text-xs font-serif font-semibold text-[#1D2B3A] dark:text-gray-100 hover:text-[#B25B3E] px-3 py-2 min-h-[44px] bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-lg transition-colors shadow-2xs flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-                    >
-                      Change
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleRemoveFile}
-                      disabled={isSubmitting}
-                      aria-label="Remove uploaded file"
-                      className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg text-[#5C5751] dark:text-gray-400 hover:text-[#B25B3E] hover:bg-[#E5E1D8] dark:hover:bg-[#1E293B] transition-colors flex items-center justify-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-                      title="Remove file"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isSubmitting}
+                        aria-label="Change uploaded resume"
+                        className="text-xs font-serif font-semibold text-[#1D2B3A] dark:text-gray-100 hover:text-[#B25B3E] px-3 py-2 min-h-[44px] bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-lg transition-colors shadow-2xs flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        disabled={isSubmitting}
+                        aria-label="Remove uploaded file"
+                        className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg text-[#5C5751] dark:text-gray-400 hover:text-[#B25B3E] hover:bg-[#E5E1D8] dark:hover:bg-[#1E293B] transition-colors flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                        title="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="pt-2">
-              <label className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2.5 flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-[#B25B3E]" />
-                Speaking Persona Tone
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-                {toneOptions.map((tone) => (
-                  <button
-                    key={tone.label}
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={() => setFormData((prev) => ({ ...prev, tone: tone.label }))}
-                    aria-pressed={formData.tone === tone.label}
-                    className={`text-left p-3.5 rounded-xl border transition-all text-xs h-full flex flex-col justify-between min-h-[76px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
-                      formData.tone === tone.label
-                        ? 'bg-[#1D2B3A] text-[#FCFAF6] border-[#1D2B3A] dark:bg-[#334155] dark:text-white dark:border-[#475569] shadow-xs'
-                        : 'bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 border-[#E5E1D8] dark:border-[#334155] hover:border-[#1D2B3A]/40 dark:hover:border-gray-500'
-                    }`}
-                  >
-                    <div className="font-serif font-bold text-sm mb-1 flex items-center justify-between">
-                      <span>{tone.label}</span>
-                      {formData.tone === tone.label && (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
-                      )}
-                    </div>
-                    <span className={formData.tone === tone.label ? 'text-[#FCFAF6]/70 dark:text-gray-300' : 'text-[#5C5751] dark:text-gray-400'}>
-                      {tone.desc}
-                    </span>
-                  </button>
-                ))}
+            <div className="mt-auto pt-4 border-t border-[#E5E1D8] dark:border-[#334155] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-0 text-xs text-[#5C5751] dark:text-gray-400 shrink-0">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#B25B3E]" />
+                <span>AI-Grounded Executive Synthesis</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-sans font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span>Semantic Extraction Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-6 md:p-8 rounded-2xl relative overflow-hidden flex flex-col h-full">
+            <div className="space-y-6 shrink-0">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2 flex items-center gap-1.5"
+                >
+                  <User className="w-3.5 h-3.5 text-[#B25B3E]" />
+                  Full Candidate Name <span className="text-[#B25B3E]">*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Manav Patel"
+                  disabled={isSubmitting}
+                  required
+                  aria-invalid={!!(errorMsg && !formData.name.trim())}
+                  className={`w-full rounded-xl px-4 py-3 text-sm sm:text-base font-sans transition-all outline-none ${
+                    errorMsg && !formData.name.trim()
+                      ? 'border border-red-500 bg-red-50/60 dark:bg-red-950/20 text-red-900 dark:text-red-100 focus:ring-2 focus:ring-red-500/20'
+                      : 'bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] text-[#1D2B3A] dark:text-white placeholder-[#5C5751]/50 dark:placeholder-slate-400/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="font-sans font-semibold text-[11px] uppercase tracking-widest text-[#5C5751] dark:text-slate-400 block mb-2.5 flex items-center gap-1.5">
+                  <Sliders className="w-3.5 h-3.5 text-[#B25B3E]" />
+                  Speaking Persona Tone
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {toneOptions.map((tone) => (
+                    <button
+                      key={tone.label}
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => setFormData((prev) => ({ ...prev, tone: tone.label }))}
+                      aria-pressed={formData.tone === tone.label}
+                      className={`text-left p-3 rounded-xl border transition-all text-xs h-full flex flex-col justify-between min-h-[72px] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+                        formData.tone === tone.label
+                          ? 'bg-[#1D2B3A] text-[#FCFAF6] border-[#1D2B3A] dark:bg-[#334155] dark:text-white dark:border-[#475569] shadow-xs'
+                          : 'bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 border-[#E5E1D8] dark:border-[#334155] hover:border-[#1D2B3A]/40 dark:hover:border-gray-500'
+                      }`}
+                    >
+                      <div className="font-serif font-bold text-xs sm:text-sm mb-0.5 flex items-center justify-between">
+                        <span>{tone.label}</span>
+                        {formData.tone === tone.label && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+                        )}
+                      </div>
+                      <span className={formData.tone === tone.label ? 'text-[#FCFAF6]/70 dark:text-gray-300 text-[11px]' : 'text-[#5C5751] dark:text-gray-400 text-[11px]'}>
+                        {tone.desc}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <button
-              id="activate-twin-btn"
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F54] dark:hover:bg-[#475569] disabled:bg-[#1D2B3A]/70 dark:disabled:bg-[#334155]/60 text-[#FCFAF6] dark:text-white font-medium font-sans py-3.5 sm:py-4 min-h-[48px] rounded-xl transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 shadow-md flex items-center justify-center gap-2 cursor-pointer text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                  <span>Parsing PDF & Activating Twin...</span>
-                </>
-              ) : (
-                <>
-                  <span>Activate Digital Twin</span>
-                  <ArrowRight className="w-4 h-4 text-[#B25B3E]" />
-                </>
-              )}
-            </button>
-          </form>
+            <div className="mt-auto pt-5 space-y-4 shrink-0">
+              <AnimatePresence>
+                {isSubmitting && (
+                  <motion.div
+                    initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, height: 'auto' }}
+                    exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-sans font-semibold text-[10px] uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F]">
+                          Ingestion Progress
+                        </span>
+                        <span className="font-mono text-[10px] text-[#5C5751] dark:text-slate-400">
+                          Stage {activeStage + 1} of {INGESTION_STAGES.length}
+                        </span>
+                      </div>
 
-          <div className="mt-8 pt-6 border-t border-[#E5E1D8] dark:border-[#334155] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-0 text-xs text-[#5C5751] dark:text-gray-400">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#B25B3E]" />
-              <span>AI-Grounded Executive Synthesis</span>
-            </div>
-            <div className="flex items-center gap-1.5 font-sans font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span>Semantic Extraction Ready</span>
+                      <div className="h-1.5 w-full bg-[#E5E1D8] dark:bg-[#334155] rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-[#B25B3E] dark:bg-[#E07A5F] rounded-full"
+                          initial={{ width: '0%' }}
+                          animate={{ width: `${((activeStage + 1) / INGESTION_STAGES.length) * 100}%` }}
+                          transition={shouldReduceMotion ? { duration: 0.1 } : { duration: 0.4, ease: 'easeOut' }}
+                        />
+                      </div>
+
+                      <div className="space-y-2 pt-1">
+                        {INGESTION_STAGES.map((stageText, idx) => {
+                          const isCompleted = idx < activeStage;
+                          const isActive = idx === activeStage;
+
+                          return (
+                            <div key={idx} className="flex items-center gap-2.5 text-xs transition-colors">
+                              {isCompleted ? (
+                                <CheckCircle2 className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
+                              ) : isActive ? (
+                                <Loader2 className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0 animate-spin" />
+                              ) : (
+                                <span className="w-4 h-4 rounded-full border border-[#E5E1D8] dark:border-[#334155] flex items-center justify-center shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#5C5751]/40 dark:bg-slate-600" />
+                                </span>
+                              )}
+                              <span
+                                className={
+                                  isActive
+                                    ? 'font-semibold text-[#1D2B3A] dark:text-white'
+                                    : isCompleted
+                                    ? 'font-medium text-[#1D2B3A] dark:text-slate-200'
+                                    : 'text-[#5C5751]/60 dark:text-slate-500'
+                                }
+                              >
+                                {stageText}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <button
+                id="activate-twin-btn"
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F54] dark:hover:bg-[#475569] disabled:bg-[#1D2B3A]/70 dark:disabled:bg-[#334155]/60 text-[#FCFAF6] dark:text-white font-medium font-sans py-3.5 sm:py-4 min-h-[48px] rounded-xl transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 shadow-md flex items-center justify-center gap-2 cursor-pointer text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Synthesizing Twin...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Activate Digital Twin</span>
+                    <ArrowRight className="w-4 h-4 text-[#B25B3E]" />
+                  </>
+                )}
+              </button>
             </div>
           </div>
-        </div>
+        </form>
       </main>
     </div>
   );
