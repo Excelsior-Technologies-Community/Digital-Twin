@@ -4,6 +4,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import PageTransition from './components/PageTransition';
+import Home from './pages/Home';
+import About from './pages/About';
+import HowItWorks from './pages/HowItWorks';
 import Result from './pages/Result';
 import DigitalTwin from './pages/DigitalTwin';
 import PublicTwinChat from './pages/PublicTwinChat';
@@ -23,6 +26,14 @@ function AnimatedRoutes() {
           path="/"
           element={
             <PageTransition>
+              <Home />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/studio"
+          element={
+            <PageTransition>
               <Result />
             </PageTransition>
           }
@@ -32,6 +43,22 @@ function AnimatedRoutes() {
           element={
             <PageTransition>
               <Result />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <PageTransition>
+              <About />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/how-it-works"
+          element={
+            <PageTransition>
+              <HowItWorks />
             </PageTransition>
           }
         />

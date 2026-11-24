@@ -210,7 +210,12 @@ export default function Result() {
   return (
     <div className="min-h-screen bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-gray-100 px-4 sm:px-6 py-4 sm:py-8 flex flex-col font-sans selection:bg-[#B25B3E] selection:text-[#FCFAF6]">
       <header className="max-w-6xl w-full mx-auto mb-6 sm:mb-8 flex items-center justify-between gap-3 px-1">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          aria-label="Go to Home"
+          className="flex items-center gap-2.5 sm:gap-3 min-w-0 cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-xl p-1 -m-1 transition-transform active:scale-[0.98]"
+        >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1D2B3A] dark:bg-white text-[#FCFAF6] dark:text-[#0F172A] flex items-center justify-center font-serif font-bold text-xs sm:text-sm shadow-xs select-none shrink-0">
             DT
           </div>
@@ -222,7 +227,7 @@ export default function Result() {
               <span className="hidden sm:inline">Organic Editorial Edition &bull; </span>PDF Grounded
             </span>
           </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-2 shrink-0">
           <span

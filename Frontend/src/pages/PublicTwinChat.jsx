@@ -354,7 +354,7 @@ export default function PublicTwinChat() {
               <p className="text-sm text-[#5C5751] dark:text-gray-400 mt-1">{twinError}</p>
             </div>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/studio')}
               aria-label="Back to Resume Studio"
               className="px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl border border-[#1D2B3A] dark:border-[#334155] transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
             >

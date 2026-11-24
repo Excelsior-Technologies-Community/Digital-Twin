@@ -182,7 +182,7 @@ export default function DigitalTwin() {
             <p className="text-sm text-[#5C5751] dark:text-gray-300">{error}</p>
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/studio')}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#1D2B3A] dark:bg-[#334155] hover:bg-[#2A3F55] dark:hover:bg-[#475569] text-[#FCFAF6] text-xs font-semibold rounded-xl shadow-xs transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
               >
                 <ArrowLeft className="w-4 h-4" />
