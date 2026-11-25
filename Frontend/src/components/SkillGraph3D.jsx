@@ -5,7 +5,7 @@ import { RotateCcw, X, Move3d, Lock } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
-const spriteCache = new Map();
+const MAX_GRAPH_SKILLS = 28;
 
 const RECOGNIZED_SKILLS = [
   'React',
@@ -47,69 +47,324 @@ const DEFAULT_SKILLS = [
   'TailwindCSS'
 ];
 
+const DOMAIN_RULES = [
+  {
+    category: 'Databases',
+    keywords: [
+      'sql',
+      'mysql',
+      'postgres',
+      'postgresql',
+      'mongo',
+      'mongodb',
+      'redis',
+      'sqlite',
+      'oracle',
+      'dynamodb',
+      'firestore',
+      'supabase',
+      'prisma',
+      'sequelize',
+      'mongoose',
+      'elasticsearch',
+      'database',
+      'nosql'
+    ]
+  },
+  {
+    category: 'Data & AI',
+    keywords: [
+      'gemini',
+      'openai',
+      'llm',
+      'genai',
+      'machine learning',
+      'deep learning',
+      'pytorch',
+      'tensorflow',
+      'scikit',
+      'pandas',
+      'numpy',
+      'langchain',
+      'rag',
+      'nlp',
+      'spark',
+      'tableau',
+      'power bi',
+      'analytics',
+      'data science',
+      'data engineering',
+      'python',
+      'vector',
+      'ml',
+      'ai'
+    ]
+  },
+  {
+    category: 'Frontend & UI',
+    keywords: [
+      'react',
+      'next',
+      'vue',
+      'angular',
+      'svelte',
+      'html',
+      'css',
+      'tailwind',
+      'sass',
+      'scss',
+      'three',
+      'webgl',
+      'gsap',
+      'framer',
+      'redux',
+      'zustand',
+      'typescript',
+      'javascript',
+      'front'
+    ]
+  },
+  {
+    category: 'Cloud & DevOps',
+    keywords: [
+      'aws',
+      'azure',
+      'gcp',
+      'google cloud',
+      'docker',
+      'kubernetes',
+      'k8s',
+      'terraform',
+      'ci/cd',
+      'jenkins',
+      'github actions',
+      'linux',
+      'nginx',
+      'devops',
+      'serverless',
+      'vercel',
+      'cloud',
+      'system design',
+      'architecture'
+    ]
+  },
+  {
+    category: 'Testing & Tools',
+    keywords: [
+      'jest',
+      'vitest',
+      'cypress',
+      'playwright',
+      'selenium',
+      'pytest',
+      'junit',
+      'testing',
+      'qa',
+      'git',
+      'github',
+      'gitlab',
+      'postman',
+      'vite',
+      'webpack',
+      'storybook',
+      'jira'
+    ]
+  },
+  {
+    category: 'Backend & API',
+    keywords: [
+      'node',
+      'express',
+      'fastapi',
+      'django',
+      'flask',
+      'spring',
+      'nest',
+      'graphql',
+      'rest',
+      'api',
+      'grpc',
+      'microservice',
+      'backend',
+      'java',
+      'golang',
+      'rust',
+      '.net',
+      'php',
+      'ruby',
+      'kafka',
+      'rabbitmq',
+      'security',
+      'oauth',
+      'jwt'
+    ]
+  },
+  {
+    category: 'Product & Design',
+    keywords: [
+      'figma',
+      'sketch',
+      'adobe',
+      'wireframe',
+      'prototype',
+      'user research',
+      'design system',
+      'ui/ux',
+      'ux',
+      'ui',
+      'product',
+      'roadmap',
+      'branding',
+      'copywriting'
+    ]
+  },
+  {
+    category: 'Leadership & Strategy',
+    keywords: [
+      'leadership',
+      'leader',
+      'management',
+      'manager',
+      'mentor',
+      'strategy',
+      'strategic',
+      'agile',
+      'scrum',
+      'stakeholder',
+      'executive',
+      'cross-functional',
+      'coaching',
+      'communication',
+      'hiring'
+    ]
+  },
+  {
+    category: 'Finance & Operations',
+    keywords: [
+      'finance',
+      'financial',
+      'accounting',
+      'budget',
+      'forecast',
+      'revenue',
+      'operations',
+      'supply chain',
+      'logistics',
+      'procurement',
+      'compliance',
+      'audit',
+      'risk',
+      'salesforce',
+      'crm',
+      'erp',
+      'excel',
+      'marketing',
+      'seo',
+      'sales'
+    ]
+  }
+];
+
 const categorizeSkill = (skillName) => {
   const s = skillName.toLowerCase();
-  if (
-    s.includes('react') ||
-    s.includes('html') ||
-    s.includes('css') ||
-    s.includes('tailwind') ||
-    s.includes('three') ||
-    s.includes('redux') ||
-    s.includes('next') ||
-    s.includes('front')
-  ) {
-    return 'Frontend';
+  for (const rule of DOMAIN_RULES) {
+    if (
+      rule.keywords.some((kw) => {
+        if (kw.length <= 2) {
+          return new RegExp(`(^|[^a-z0-9])${kw}([^a-z0-9]|$)`).test(s);
+        }
+        return s.includes(kw);
+      })
+    ) {
+      return rule.category;
+    }
   }
-  if (
-    s.includes('node') ||
-    s.includes('express') ||
-    s.includes('api') ||
-    s.includes('fastapi') ||
-    s.includes('graphql') ||
-    s.includes('sql') ||
-    s.includes('mongo') ||
-    s.includes('redis') ||
-    s.includes('sequelize') ||
-    s.includes('postgre')
-  ) {
-    return 'Backend & APIs';
+  return 'Core Domain';
+};
+
+const parseRawSkillsList = (rawSkills) => {
+  let candidateList = [];
+  if (Array.isArray(rawSkills)) {
+    candidateList = rawSkills;
+  } else if (typeof rawSkills === 'string') {
+    const trimmed = rawSkills.trim();
+    if (trimmed) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          candidateList = parsed;
+        } else {
+          candidateList = trimmed.split(',');
+        }
+      } catch {
+        candidateList = trimmed.split(',');
+      }
+    }
   }
-  if (
-    s.includes('docker') ||
-    s.includes('aws') ||
-    s.includes('ci/cd') ||
-    s.includes('git') ||
-    s.includes('cloud') ||
-    s.includes('devops')
-  ) {
-    return 'Cloud & DevOps';
+
+  const seenLower = new Set();
+  const cleaned = [];
+  for (const entry of candidateList) {
+    if (typeof entry !== 'string') continue;
+    const trimmed = entry.trim();
+    if (!trimmed) continue;
+    const lower = trimmed.toLowerCase();
+    if (seenLower.has(lower)) continue;
+    seenLower.add(lower);
+    cleaned.push(trimmed);
+    if (cleaned.length >= MAX_GRAPH_SKILLS) break;
   }
-  if (
-    s.includes('ai') ||
-    s.includes('gemini') ||
-    s.includes('python') ||
-    s.includes('data') ||
-    s.includes('ml')
-  ) {
-    return 'AI & Data';
+  return cleaned;
+};
+
+const extractVerifiedSkills = (data) => {
+  const parsedFromField = parseRawSkillsList(data?.skills);
+  if (parsedFromField.length > 0) {
+    return parsedFromField;
   }
-  if (
-    s.includes('security') ||
-    s.includes('auth') ||
-    s.includes('oauth') ||
-    s.includes('encrypt')
-  ) {
-    return 'Security';
+
+  const textToScan = `${data?.bio || ''} ${data?.summary || ''}`.toLowerCase();
+  const extractedSkills = RECOGNIZED_SKILLS.filter((skill) =>
+    textToScan.includes(skill.toLowerCase())
+  );
+
+  if (extractedSkills.length >= 4) {
+    return Array.from(new Set([...extractedSkills, 'Gemini AI'])).slice(0, MAX_GRAPH_SKILLS);
   }
-  if (
-    s.includes('system') ||
-    s.includes('microservice') ||
-    s.includes('architect')
-  ) {
-    return 'System Design';
+
+  return DEFAULT_SKILLS;
+};
+
+const parseExperienceList = (rawExperience) => {
+  if (Array.isArray(rawExperience)) return rawExperience;
+  if (typeof rawExperience === 'string') {
+    try {
+      const parsed = JSON.parse(rawExperience);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
   }
-  return 'Core Skills';
+  return [];
+};
+
+const disposeSprite = (sprite) => {
+  if (!sprite) return;
+  if (sprite.material) {
+    if (sprite.material.map && typeof sprite.material.map.dispose === 'function') {
+      sprite.material.map.dispose();
+    }
+    if (typeof sprite.material.dispose === 'function') {
+      sprite.material.dispose();
+    }
+  }
+  if (sprite.geometry && typeof sprite.geometry.dispose === 'function') {
+    sprite.geometry.dispose();
+  }
+};
+
+const disposeSpriteCache = (cache) => {
+  if (!cache) return;
+  cache.forEach((entry) => disposeSprite(entry?.sprite || entry));
+  cache.clear();
 };
 
 function SkillGraph3D({ resumeData }) {
@@ -117,15 +372,33 @@ function SkillGraph3D({ resumeData }) {
   const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef(null);
   const fgRef = useRef();
+  const spriteCacheRef = useRef(new Map());
 
   const [dimensions, setDimensions] = useState(() => ({
     width: 0,
     height: typeof window !== 'undefined' && window.innerWidth < 640 ? 350 : 450
   }));
 
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedNode, setSelectedNode] = useState(null);
   const [isTouchInteractive, setIsTouchInteractive] = useState(false);
+
+  useEffect(() => {
+    const cache = spriteCacheRef.current;
+    return () => {
+      disposeSpriteCache(cache);
+    };
+  }, []);
+
+  useEffect(() => {
+    const cache = spriteCacheRef.current;
+    for (const [key, entry] of cache.entries()) {
+      if (entry && entry.isDark !== isDarkMode) {
+        disposeSprite(entry.sprite);
+        cache.delete(key);
+      }
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -186,17 +459,7 @@ function SkillGraph3D({ resumeData }) {
   const candidateDisplayName = resumeData?.name?.trim() || 'Candidate';
 
   const graphData = useMemo(() => {
-    const textToScan = `${resumeData?.bio || ''} ${resumeData?.summary || ''}`.toLowerCase();
-
-    const extractedSkills = RECOGNIZED_SKILLS.filter((skill) => {
-      const lower = skill.toLowerCase();
-      return textToScan.includes(lower);
-    });
-
-    const finalSkillsList =
-      extractedSkills.length >= 4
-        ? Array.from(new Set([...extractedSkills, 'Gemini AI']))
-        : DEFAULT_SKILLS;
+    const finalSkillsList = extractVerifiedSkills(resumeData);
 
     const nodes = [
       {
@@ -227,6 +490,30 @@ function SkillGraph3D({ resumeData }) {
       target: skill
     }));
 
+    const linkSet = new Set(links.map((l) => `${l.source}=>${l.target}`));
+    const addLink = (a, b) => {
+      if (!a || !b || a === b) return;
+      const forward = `${a}=>${b}`;
+      const reverse = `${b}=>${a}`;
+      if (!linkSet.has(forward) && !linkSet.has(reverse)) {
+        linkSet.add(forward);
+        links.push({ source: a, target: b });
+      }
+    };
+
+    const byCategory = new Map();
+    nodes.forEach((n) => {
+      if (n.isCenter) return;
+      if (!byCategory.has(n.category)) byCategory.set(n.category, []);
+      byCategory.get(n.category).push(n.id);
+    });
+
+    byCategory.forEach((groupIds) => {
+      for (let i = 0; i < groupIds.length - 1; i++) {
+        addLink(groupIds[i], groupIds[i + 1]);
+      }
+    });
+
     const clusterPairs = [
       ['React', 'TailwindCSS'],
       ['React', 'Next.js'],
@@ -239,17 +526,17 @@ function SkillGraph3D({ resumeData }) {
       ['Docker', 'System Design']
     ];
 
+    const lowerLookup = new Map(finalSkillsList.map((s) => [s.toLowerCase(), s]));
     clusterPairs.forEach(([s1, s2]) => {
-      if (finalSkillsList.includes(s1) && finalSkillsList.includes(s2)) {
-        links.push({
-          source: s1,
-          target: s2
-        });
+      const m1 = lowerLookup.get(s1.toLowerCase());
+      const m2 = lowerLookup.get(s2.toLowerCase());
+      if (m1 && m2) {
+        addLink(m1, m2);
       }
     });
 
     return { nodes, links };
-  }, [candidateDisplayName, resumeData?.bio, resumeData?.summary, isDarkMode]);
+  }, [candidateDisplayName, resumeData, isDarkMode]);
 
   const categories = useMemo(() => {
     const cats = new Set();
@@ -260,6 +547,8 @@ function SkillGraph3D({ resumeData }) {
     });
     return ['All', ...Array.from(cats)];
   }, [graphData]);
+
+  const activeCategory = categories.includes(selectedCategory) ? selectedCategory : 'All';
 
   const focusNode = (node) => {
     if (!node || !fgRef.current || typeof fgRef.current.cameraPosition !== 'function') return;
@@ -284,7 +573,7 @@ function SkillGraph3D({ resumeData }) {
 
   const handleResetCamera = () => {
     setSelectedNode(null);
-    setActiveCategory('All');
+    setSelectedCategory('All');
     if (fgRef.current && typeof fgRef.current.cameraPosition === 'function') {
       fgRef.current.cameraPosition({ x: 0, y: 0, z: 240 }, { x: 0, y: 0, z: 0 }, 1000);
     }
@@ -299,20 +588,46 @@ function SkillGraph3D({ resumeData }) {
       );
     }
 
-    const fullText = `${resumeData?.bio || ''} ${resumeData?.summary || ''}`;
-    if (!fullText.trim()) {
-      return 'Verified competency extracted from candidate resume profile.';
+    const skillLower = (node.name || '').toLowerCase();
+    const altToken = skillLower.endsWith('.js') ? skillLower.slice(0, -3) : skillLower;
+    const matchesSkill = (text) => {
+      if (!text || typeof text !== 'string') return false;
+      const lower = text.toLowerCase();
+      if (lower.includes(skillLower)) return true;
+      return altToken.length >= 3 && lower.includes(altToken);
+    };
+
+    const experienceList = parseExperienceList(resumeData?.experience);
+    for (const exp of experienceList) {
+      if (!exp || typeof exp !== 'object') continue;
+      const roleTitle = exp.role || exp.title || '';
+      const company = exp.company ? ` @ ${exp.company}` : '';
+      const description = typeof exp.description === 'string' ? exp.description : '';
+
+      if (matchesSkill(description)) {
+        const sentences = description.split(/(?<=[.?!])\s+/);
+        const matchedSentence = sentences.find((s) => matchesSkill(s));
+        const excerpt = (matchedSentence || description).trim();
+        return roleTitle ? `${roleTitle}${company}: ${excerpt}` : excerpt;
+      }
+
+      if (matchesSkill(roleTitle)) {
+        return description
+          ? `${roleTitle}${company}: ${description.trim()}`
+          : `${roleTitle}${company}${exp.duration ? ` (${exp.duration})` : ''}`;
+      }
     }
 
-    const sentences = fullText.split(/(?<=[.?!])\s+/);
-    const skillLower = node.name.toLowerCase();
-    const matchingSentence = sentences.find((s) => s.toLowerCase().includes(skillLower));
-
-    if (matchingSentence && matchingSentence.trim()) {
-      return matchingSentence.trim();
+    const bioText = `${resumeData?.bio || ''} ${resumeData?.summary || ''}`.trim();
+    if (bioText && matchesSkill(bioText)) {
+      const sentences = bioText.split(/(?<=[.?!])\s+/);
+      const matchingSentence = sentences.find((s) => matchesSkill(s));
+      if (matchingSentence && matchingSentence.trim()) {
+        return matchingSentence.trim();
+      }
     }
 
-    return 'Verified competency extracted from candidate resume profile.';
+    return 'Verified competency extracted from uploaded resume.';
   };
 
   const siblingSkills = useMemo(() => {
@@ -448,8 +763,10 @@ function SkillGraph3D({ resumeData }) {
               const isMatch = activeCategory === 'All' || node.isCenter || node.category === activeCategory;
               const isSelected = selectedNode && selectedNode.id === node.id;
               const cacheKey = `${node.id}_${node.name || ''}_${isDarkMode ? 'dark' : 'light'}_${isMatch ? 'match' : 'dim'}_${isSelected ? 'sel' : 'norm'}`;
-              if (spriteCache.has(cacheKey)) {
-                return spriteCache.get(cacheKey);
+              const cache = spriteCacheRef.current;
+              const cachedEntry = cache.get(cacheKey);
+              if (cachedEntry) {
+                return cachedEntry.sprite;
               }
 
               const labelText = node.isCenter ? (node.name || 'Candidate') : (node.name || node.id);
@@ -477,7 +794,7 @@ function SkillGraph3D({ resumeData }) {
               sprite.fontWeight = 'bold';
               sprite.position.y = node.isCenter ? -16 : -11;
 
-              spriteCache.set(cacheKey, sprite);
+              cache.set(cacheKey, { sprite, isDark: isDarkMode });
               return sprite;
             }}
             showNavInfo={false}
@@ -497,7 +814,7 @@ function SkillGraph3D({ resumeData }) {
               key={cat}
               type="button"
               onClick={() => {
-                setActiveCategory(cat);
+                setSelectedCategory(cat);
                 setSelectedNode(null);
               }}
               aria-pressed={isActive}

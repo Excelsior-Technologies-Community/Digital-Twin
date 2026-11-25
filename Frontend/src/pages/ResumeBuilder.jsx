@@ -262,32 +262,32 @@ const ResumeBuilder = () => {
     setOpenAccordion((prev) => (prev === sectionId ? null : sectionId));
   };
 
-  if (!twinData) return <div className="min-h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] flex items-center justify-center p-10 text-center font-serif text-[#5C5751] dark:text-gray-400">Loading Resume Data...</div>;
+  if (!twinData) return <div className="min-h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] flex items-center justify-center p-10 text-center font-serif text-[#5C5751] dark:text-slate-400">Loading Resume Data...</div>;
 
   return (
-    <div className="min-h-[100dvh] bg-[#E5E1D8] dark:bg-[#0F172A] flex flex-col md:flex-row font-sans text-[#1D2B3A] dark:text-gray-100 overflow-x-hidden pb-28 md:pb-0 relative transition-colors">
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur border-b border-[#D4CFC4] dark:border-[#334155] sticky top-0 z-30">
+    <div className="min-h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] flex flex-col md:flex-row font-sans text-[#1D2B3A] dark:text-slate-100 overflow-x-hidden pb-28 md:pb-0 relative transition-colors">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border-b border-[#E5E1D8] dark:border-[#334155] sticky top-0 z-30">
         <button
           onClick={() => navigate(-1)}
           aria-label="Back to Dashboard"
-          className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] dark:text-gray-300 hover:text-[#1D2B3A] dark:hover:text-white transition-colors min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] rounded-lg shrink-0"
+          className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] dark:text-slate-300 hover:text-[#1D2B3A] dark:hover:text-white transition-colors min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] rounded-lg shrink-0"
         >
           &larr; Back to Dashboard
         </button>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="font-serif font-bold text-xs text-[#1D2B3A] dark:text-white uppercase tracking-wider hidden xs:inline">
+          <span className="font-mono font-bold text-[10px] text-[#1D2B3A] dark:text-white uppercase tracking-widest hidden xs:inline">
             Resume Builder
           </span>
           <ThemeToggle />
         </div>
       </div>
 
-      <div className="hidden md:flex w-full md:w-[320px] lg:w-[360px] bg-[#FCFAF6] dark:bg-[#1E293B] p-5 lg:p-6 border-r border-[#D4CFC4] dark:border-[#334155] shadow-md flex-col shrink-0 overflow-y-auto max-h-[100dvh]">
+      <div className="hidden md:flex w-full md:w-[320px] lg:w-[360px] bg-[#FCFAF6] dark:bg-[#1E293B] p-5 lg:p-6 border-r border-[#E5E1D8] dark:border-[#334155] shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] flex-col shrink-0 overflow-y-auto max-h-[100dvh]">
         <div className="flex items-center justify-between mb-5">
           <button
             onClick={() => navigate(-1)}
             aria-label="Back to Dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] dark:text-gray-300 hover:text-[#1D2B3A] dark:hover:text-white transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] rounded-lg"
+            className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-[#5C5751] dark:text-slate-300 hover:text-[#1D2B3A] dark:hover:text-white transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] rounded-lg"
           >
             &larr; Back to Dashboard
           </button>
@@ -302,7 +302,7 @@ const ResumeBuilder = () => {
               onClick={handleResetEdits}
               title="Reset to Original"
               aria-label="Reset to Original"
-              className="inline-flex items-center gap-1 text-xs font-sans font-medium text-[#B25B3E] hover:text-[#9A4E35] dark:text-[#E07A5F] dark:hover:text-[#F4A261] transition-colors py-1 px-2 rounded-lg hover:bg-[#F3EFE9] dark:hover:bg-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest font-bold text-[#B25B3E] hover:text-[#9E4D32] dark:text-[#E07A5F] dark:hover:text-[#F4A261] transition-colors py-1 px-2 rounded-lg hover:bg-[#F3EFE9] dark:hover:bg-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset</span>
@@ -311,7 +311,7 @@ const ResumeBuilder = () => {
         </div>
 
         <div className="mb-5">
-          <label className="block text-xs font-sans font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider mb-2.5">
+          <label className="block font-mono text-[10px] sm:text-[11px] font-bold text-[#8A847C] dark:text-slate-400 uppercase tracking-widest mb-2.5">
             Select Template
           </label>
           <div className="flex flex-col gap-2">
@@ -319,43 +319,43 @@ const ResumeBuilder = () => {
               type="button"
               onClick={() => setTemplate('modern')}
               aria-pressed={template === 'modern'}
-              className={`py-2.5 px-3.5 rounded-xl border text-left font-sans font-medium text-xs transition-all duration-150 ease-out hover:scale-[1.02] active:scale-95 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+              className={`py-2.5 px-3.5 rounded-xl border text-left font-sans font-medium text-xs transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
                 template === 'modern'
-                  ? 'border-[#B25B3E] ring-2 ring-[#B25B3E]/60 bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] shadow-sm'
-                  : 'border-[#E5E1D8] bg-[#FCFAF6] text-[#1D2B3A] dark:border-[#334155] dark:bg-[#0F172A] dark:text-gray-100 hover:bg-[#F3EFE9] dark:hover:bg-[#1E293B]'
+                  ? 'border-[#B25B3E] dark:border-[#E07A5F] ring-1 ring-[#B25B3E]/40 dark:ring-[#E07A5F]/40 bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#0F172A] dark:text-white shadow-sm'
+                  : 'border-[#E5E1D8] bg-[#FCFAF6] text-[#1D2B3A] dark:border-[#334155] dark:bg-[#0F172A]/60 dark:text-slate-200 hover:bg-[#F3EFE9] dark:hover:bg-[#334155]/60'
               }`}
             >
               <span>Modern (Executive Theme)</span>
-              {template === 'modern' && <Check className="w-4 h-4 text-[#B25B3E] shrink-0" />}
+              {template === 'modern' && <Check className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />}
             </button>
             <button
               type="button"
               onClick={() => setTemplate('classic')}
               aria-pressed={template === 'classic'}
-              className={`py-2.5 px-3.5 rounded-xl border text-left font-sans font-medium text-xs transition-all duration-150 ease-out hover:scale-[1.02] active:scale-95 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+              className={`py-2.5 px-3.5 rounded-xl border text-left font-sans font-medium text-xs transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
                 template === 'classic'
-                  ? 'border-[#B25B3E] ring-2 ring-[#B25B3E]/60 bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] shadow-sm'
-                  : 'border-[#E5E1D8] bg-[#FCFAF6] text-[#1D2B3A] dark:border-[#334155] dark:bg-[#0F172A] dark:text-gray-100 hover:bg-[#F3EFE9] dark:hover:bg-[#1E293B]'
+                  ? 'border-[#B25B3E] dark:border-[#E07A5F] ring-1 ring-[#B25B3E]/40 dark:ring-[#E07A5F]/40 bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#0F172A] dark:text-white shadow-sm'
+                  : 'border-[#E5E1D8] bg-[#FCFAF6] text-[#1D2B3A] dark:border-[#334155] dark:bg-[#0F172A]/60 dark:text-slate-200 hover:bg-[#F3EFE9] dark:hover:bg-[#334155]/60'
               }`}
             >
               <span>Classic (Minimalist)</span>
-              {template === 'classic' && <Check className="w-4 h-4 text-[#B25B3E] shrink-0" />}
+              {template === 'classic' && <Check className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />}
             </button>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
-          <div className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/50 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 transition-colors">
+          <div className="bg-[#F3EFE9]/75 dark:bg-[#0F172A]/60 border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-xl p-3 transition-colors">
             <button
               type="button"
               onClick={() => toggleAccordion('summary')}
               aria-expanded={openAccordion === 'summary'}
-              className="w-full flex items-center justify-between text-left font-sans font-bold text-xs text-[#5C5751] dark:text-gray-400 uppercase tracking-wider py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md"
+              className="w-full flex items-center justify-between text-left font-mono font-bold text-[10px] sm:text-[11px] text-[#5C5751] dark:text-slate-300 uppercase tracking-widest py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md"
             >
               <span>Executive Summary</span>
               <ChevronDown
                 className={`w-4 h-4 text-[#5C5751] dark:text-slate-400 transition-transform duration-200 ${
-                  openAccordion === 'summary' ? 'rotate-180 text-[#B25B3E]' : ''
+                  openAccordion === 'summary' ? 'rotate-180 text-[#B25B3E] dark:text-[#E07A5F]' : ''
                 }`}
               />
             </button>
@@ -375,17 +375,17 @@ const ResumeBuilder = () => {
                       onChange={(e) => setEditedSummary(e.target.value)}
                       placeholder="Write a concise executive summary..."
                       rows={4}
-                      className="w-full min-h-[110px] resize-y bg-[#FCFAF6] dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 text-xs leading-relaxed text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#5C5751]/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
+                      className="w-full min-h-[110px] resize-y bg-[#FCFAF6] dark:bg-[#0F172A]/80 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 text-xs leading-relaxed text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#8A847C] focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
                     />
-                    <div className="flex items-center justify-between mt-1 px-0.5">
-                      <span className="font-sans text-[11px] text-[#5C5751] dark:text-slate-400">
+                    <div className="flex items-center justify-between mt-1.5 px-0.5">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400">
                         {editedSummary.length} characters
                       </span>
                       {editedSummary !== originalSummary && (
                         <button
                           type="button"
                           onClick={() => setEditedSummary(originalSummary)}
-                          className="font-sans text-[11px] text-[#B25B3E] hover:underline"
+                          className="font-mono text-[10px] uppercase tracking-widest font-bold text-[#B25B3E] dark:text-[#E07A5F] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded"
                         >
                           Revert
                         </button>
@@ -397,21 +397,21 @@ const ResumeBuilder = () => {
             </AnimatePresence>
           </div>
 
-          <div className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/50 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 transition-colors">
+          <div className="bg-[#F3EFE9]/75 dark:bg-[#0F172A]/60 border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-xl p-3 transition-colors">
             <button
               type="button"
               onClick={() => toggleAccordion('highlights')}
               aria-expanded={openAccordion === 'highlights'}
-              className="w-full flex items-center justify-between text-left font-sans font-bold text-xs text-[#5C5751] dark:text-gray-400 uppercase tracking-wider py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md"
+              className="w-full flex items-center justify-between text-left font-mono font-bold text-[10px] sm:text-[11px] text-[#5C5751] dark:text-slate-300 uppercase tracking-widest py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md"
             >
-              <span>Highlights & Skills</span>
+              <span>Highlights &amp; Skills</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-sans font-semibold px-2 py-0.5 rounded-full bg-[#E5E1D8] dark:bg-[#334155] text-[#1D2B3A] dark:text-slate-200">
+                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5E1D8] dark:bg-[#334155] text-[#1D2B3A] dark:text-slate-200">
                   {editedSkills.length}
                 </span>
                 <ChevronDown
                   className={`w-4 h-4 text-[#5C5751] dark:text-slate-400 transition-transform duration-200 ${
-                    openAccordion === 'highlights' ? 'rotate-180 text-[#B25B3E]' : ''
+                    openAccordion === 'highlights' ? 'rotate-180 text-[#B25B3E] dark:text-[#E07A5F]' : ''
                   }`}
                 />
               </div>
@@ -439,13 +439,13 @@ const ResumeBuilder = () => {
                         value={newSkillInput}
                         onChange={(e) => setNewSkillInput(e.target.value)}
                         placeholder="Add skill or highlight..."
-                        className="flex-1 min-w-0 bg-[#FCFAF6] dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-2 text-xs text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#5C5751]/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
+                        className="flex-1 min-w-0 bg-[#FCFAF6] dark:bg-[#0F172A]/80 border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-2 text-xs text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#8A847C] focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
                       />
                       <button
                         type="submit"
                         disabled={!newSkillInput.trim()}
                         aria-label="Add Skill"
-                        className="bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-[#B25B3E] dark:hover:bg-[#9A4E35] disabled:opacity-40 disabled:pointer-events-none p-2 rounded-xl transition-all duration-150 ease-out hover:scale-105 active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                        className="bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-[#B25B3E] dark:hover:bg-[#9E4D32] disabled:opacity-40 disabled:pointer-events-none p-2 rounded-xl transition-all duration-150 ease-out active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -462,14 +462,14 @@ const ResumeBuilder = () => {
                             type="button"
                             onClick={() => handleRemoveSkill(index)}
                             aria-label={`Remove ${skill}`}
-                            className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5"
+                            className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                           >
                             <X className="w-3 h-3" />
                           </button>
                         </span>
                       ))}
                       {editedSkills.length === 0 && (
-                        <p className="text-xs text-[#5C5751] dark:text-slate-400 italic py-1">
+                        <p className="text-xs text-[#8A847C] dark:text-slate-400 italic py-1">
                           No skills added yet. Add some above.
                         </p>
                       )}
@@ -480,12 +480,12 @@ const ResumeBuilder = () => {
             </AnimatePresence>
           </div>
 
-          <div className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/50 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 transition-colors">
+          <div className="bg-[#F3EFE9]/75 dark:bg-[#0F172A]/60 border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-xl p-3 transition-colors">
             <button
               type="button"
               onClick={() => toggleAccordion('palette')}
               aria-expanded={openAccordion === 'palette'}
-              className="w-full flex items-center justify-between text-left font-sans font-bold text-xs text-[#5C5751] dark:text-gray-400 uppercase tracking-wider py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md"
+              className="w-full flex items-center justify-between text-left font-mono font-bold text-[10px] sm:text-[11px] text-[#5C5751] dark:text-slate-300 uppercase tracking-widest py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded-md"
             >
               <span>Accent Palette</span>
               <div className="flex items-center gap-1.5">
@@ -496,7 +496,7 @@ const ResumeBuilder = () => {
                 />
                 <ChevronDown
                   className={`w-4 h-4 text-[#5C5751] dark:text-slate-400 transition-transform duration-200 ${
-                    openAccordion === 'palette' ? 'rotate-180 text-[#B25B3E]' : ''
+                    openAccordion === 'palette' ? 'rotate-180 text-[#B25B3E] dark:text-[#E07A5F]' : ''
                   }`}
                 />
               </div>
@@ -513,7 +513,7 @@ const ResumeBuilder = () => {
                 >
                   <div className="pt-2.5 pb-0.5 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-sans font-medium text-[#5C5751] dark:text-slate-400">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400">
                         Selected Palette
                       </span>
                       <span className="text-xs font-sans font-semibold text-[#1D2B3A] dark:text-slate-200">
@@ -552,22 +552,23 @@ const ResumeBuilder = () => {
 
         <button
           onClick={onDownloadClick}
-          className="bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] dark:hover:bg-gray-100 py-3.5 px-4 rounded-xl font-sans font-semibold text-sm shadow-md transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+          className="bg-[#B25B3E] hover:bg-[#9E4D32] text-white py-3.5 px-4 rounded-xl font-sans font-semibold text-sm shadow-sm hover:shadow-md transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
         >
-          Download PDF
+          <Printer className="w-4 h-4" />
+          <span>Download PDF</span>
         </button>
 
-        <div className="mt-3 bg-[#F3EFE9]/80 dark:bg-[#0F172A]/75 rounded-xl p-3 flex items-start gap-2.5 text-xs text-[#5C5751] dark:text-slate-300 print:hidden border border-[#E5E1D8]/60 dark:border-[#334155]/60">
+        <div className="mt-3 bg-[#F3EFE9]/80 dark:bg-[#0F172A]/75 rounded-xl p-3 flex items-start gap-2.5 text-xs text-[#5C5751] dark:text-slate-300 print:hidden border border-[#E5E1D8] dark:border-[#334155]">
           <Printer className="w-4 h-4 shrink-0 text-[#B25B3E] dark:text-[#E07A5F] mt-0.5" />
           <span className="leading-relaxed">
-            Recommended print setting: Margins: None & Background Graphics: Enabled
+            Recommended print setting: Margins: None &amp; Background Graphics: Enabled
           </span>
         </div>
       </div>
 
-      <div className="flex-1 min-w-0 flex flex-col items-center bg-[#E5E1D8] dark:bg-[#0F172A] p-3 sm:p-6 md:p-8 min-h-0 print:p-0 print:bg-white print:w-full">
+      <div className="flex-1 min-w-0 flex flex-col items-center bg-[#F3EFE9] dark:bg-[#0F172A] bg-[radial-gradient(rgba(29,43,58,0.08)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(148,163,184,0.12)_1px,transparent_1px)] bg-[length:20px_20px] p-3 sm:p-6 md:p-8 min-h-0 print:p-0 print:bg-none print:bg-white print:w-full">
         <div className="w-full flex items-center justify-center gap-2.5 mb-2 sm:mb-4 print:hidden px-2 sm:px-4">
-          <div className="hidden md:inline-flex bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-1 items-center gap-1 shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+          <div className="hidden md:inline-flex bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-1 items-center gap-1 shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             <button
               type="button"
               onClick={() => setZoomMode('fit')}
@@ -606,12 +607,12 @@ const ResumeBuilder = () => {
             </button>
           </div>
 
-          <span className="hidden md:inline-block text-xs font-sans font-semibold text-[#5C5751] dark:text-slate-400 tabular-nums px-2.5 py-1 rounded-lg bg-[#FCFAF6]/80 dark:bg-[#1E293B]/80 border border-[#E5E1D8] dark:border-[#334155] shadow-xs">
+          <span className="hidden md:inline-block font-mono text-[11px] font-bold tracking-wider text-[#5C5751] dark:text-slate-300 tabular-nums px-2.5 py-1.5 rounded-xl bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             {Math.round(activeScale * 100)}%
           </span>
 
           <div className="flex md:hidden items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-1 shadow-xs">
+            <div className="flex items-center gap-1.5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-1 shadow-xs">
               {ACCENT_PALETTES.map((palette) => {
                 const isSelected = accentColor === palette.hex;
                 return (
@@ -637,12 +638,12 @@ const ResumeBuilder = () => {
               type="button"
               onClick={() => setIsEditDrawerOpen(true)}
               aria-label="Edit Resume Content"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-xl text-xs font-sans font-semibold text-[#1D2B3A] dark:text-slate-200 shadow-xs hover:border-[#B25B3E] transition-all min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl text-xs font-sans font-semibold text-[#1D2B3A] dark:text-slate-200 shadow-xs hover:border-[#B25B3E] transition-all min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
             >
-              <Pencil className="w-3.5 h-3.5 text-[#B25B3E]" />
+              <Pencil className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
               <span>Edit</span>
               {hasEdits && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#B25B3E]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B25B3E] dark:bg-[#E07A5F]" />
               )}
             </button>
           </div>
@@ -660,7 +661,7 @@ const ResumeBuilder = () => {
             }}
           >
             <div
-              className="origin-top-left transform-gpu transition-transform duration-200 print:!transform-none shadow-2xl print:shadow-none bg-white text-gray-900"
+              className="origin-top-left transform-gpu transition-transform duration-200 print:!transform-none shadow-[0_24px_60px_-15px_rgba(29,43,58,0.18)] dark:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.65)] ring-1 ring-[#E5E1D8] dark:ring-white/10 print:shadow-none print:ring-0 bg-white text-[#1D2B3A]"
               style={{
                 transform: `scale(${activeScale})`,
                 width: '794px',
@@ -676,32 +677,32 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur border-t border-[#D4CFC4] dark:border-[#334155] flex items-center justify-between gap-3 md:hidden z-40 shadow-lg print:hidden">
+      <div className="fixed bottom-0 left-0 right-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border-t border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] flex items-center justify-between gap-3 md:hidden z-40 shadow-lg print:hidden">
         <div className="flex items-center gap-1.5 bg-[#F3EFE9] dark:bg-[#0F172A] p-1 rounded-xl border border-[#E5E1D8] dark:border-[#334155]">
           <button
             type="button"
             onClick={() => setTemplate('modern')}
             aria-pressed={template === 'modern'}
-            className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-xs font-sans font-medium transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-xs font-sans font-semibold transition-all duration-150 ease-out active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               template === 'modern'
-                ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] ring-2 ring-[#B25B3E]/60 shadow-xs'
-                : 'text-[#5C5751] dark:text-gray-400 hover:text-[#1D2B3A] dark:hover:text-white'
+                ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#B25B3E] dark:text-white ring-1 ring-[#B25B3E]/40 dark:ring-[#E07A5F]/40 shadow-xs'
+                : 'text-[#5C5751] dark:text-slate-400 hover:text-[#1D2B3A] dark:hover:text-white'
             }`}
           >
-            {template === 'modern' && <Check className="w-3.5 h-3.5 text-[#B25B3E] shrink-0" />}
+            {template === 'modern' && <Check className="w-3.5 h-3.5 text-[#B25B3E] dark:text-white shrink-0" />}
             <span>Modern</span>
           </button>
           <button
             type="button"
             onClick={() => setTemplate('classic')}
             aria-pressed={template === 'classic'}
-            className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-xs font-sans font-medium transition-all duration-150 ease-out hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-xs font-sans font-semibold transition-all duration-150 ease-out active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               template === 'classic'
-                ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] ring-2 ring-[#B25B3E]/60 shadow-xs'
-                : 'text-[#5C5751] dark:text-gray-400 hover:text-[#1D2B3A] dark:hover:text-white'
+                ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#B25B3E] dark:text-white ring-1 ring-[#B25B3E]/40 dark:ring-[#E07A5F]/40 shadow-xs'
+                : 'text-[#5C5751] dark:text-slate-400 hover:text-[#1D2B3A] dark:hover:text-white'
             }`}
           >
-            {template === 'classic' && <Check className="w-3.5 h-3.5 text-[#B25B3E] shrink-0" />}
+            {template === 'classic' && <Check className="w-3.5 h-3.5 text-[#B25B3E] dark:text-white shrink-0" />}
             <span>Classic</span>
           </button>
         </div>
@@ -709,9 +710,10 @@ const ResumeBuilder = () => {
         <button
           type="button"
           onClick={onDownloadClick}
-          className="flex-1 bg-[#1D2B3A] hover:bg-[#2A3F55] text-[#FCFAF6] dark:bg-white dark:text-[#0F172A] dark:hover:bg-gray-100 py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-md transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:active:scale-100 flex items-center justify-center gap-2 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+          className="flex-1 bg-[#B25B3E] hover:bg-[#9E4D32] text-white py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
         >
-          Download PDF
+          <Printer className="w-4 h-4" />
+          <span>Download PDF</span>
         </button>
       </div>
 
@@ -732,11 +734,11 @@ const ResumeBuilder = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="relative w-full max-w-md bg-[#FCFAF6] dark:bg-[#1E293B] h-full shadow-2xl flex flex-col z-10 border-l border-[#D4CFC4] dark:border-[#334155]"
+              className="relative w-full max-w-md bg-[#FCFAF6] dark:bg-[#1E293B] h-full shadow-2xl dark:shadow-[inset_1px_0_0_0_rgba(255,255,255,0.06)] flex flex-col z-10 border-l border-[#E5E1D8] dark:border-[#334155]"
             >
               <div className="p-4 sm:p-5 border-b border-[#E5E1D8] dark:border-[#334155] flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Pencil className="w-4 h-4 text-[#B25B3E]" />
+                  <Pencil className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F]" />
                   <h2 className="font-serif font-bold text-lg text-[#1D2B3A] dark:text-white">
                     Quick Edit Resume
                   </h2>
@@ -746,7 +748,7 @@ const ResumeBuilder = () => {
                     <button
                       type="button"
                       onClick={handleResetEdits}
-                      className="inline-flex items-center gap-1 text-xs font-sans font-medium text-[#B25B3E] hover:text-[#9A4E35] dark:text-[#E07A5F] py-1 px-2 rounded-lg hover:bg-[#F3EFE9] dark:hover:bg-[#0F172A] transition-colors"
+                      className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest font-bold text-[#B25B3E] hover:text-[#9E4D32] dark:text-[#E07A5F] py-1 px-2 rounded-lg hover:bg-[#F3EFE9] dark:hover:bg-[#0F172A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Reset</span>
@@ -756,7 +758,7 @@ const ResumeBuilder = () => {
                     type="button"
                     onClick={() => setIsEditDrawerOpen(false)}
                     aria-label="Close edit drawer"
-                    className="p-1.5 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8] dark:hover:bg-[#334155] transition-colors"
+                    className="p-1.5 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8] dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -765,7 +767,7 @@ const ResumeBuilder = () => {
 
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
                 <div>
-                  <label className="block text-xs font-sans font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider mb-2">
+                  <label className="block font-mono text-[10px] sm:text-[11px] font-bold text-[#5C5751] dark:text-slate-300 uppercase tracking-widest mb-2">
                     Executive Summary
                   </label>
                   <textarea
@@ -773,17 +775,17 @@ const ResumeBuilder = () => {
                     onChange={(e) => setEditedSummary(e.target.value)}
                     placeholder="Write a concise executive summary..."
                     rows={5}
-                    className="w-full resize-y bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 text-xs leading-relaxed text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#5C5751]/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
+                    className="w-full resize-y bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3 text-xs leading-relaxed text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#8A847C] focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
                   />
-                  <div className="flex items-center justify-between mt-1 px-1">
-                    <span className="font-sans text-[11px] text-[#5C5751] dark:text-slate-400">
+                  <div className="flex items-center justify-between mt-1.5 px-1">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400">
                       {editedSummary.length} characters
                     </span>
                     {editedSummary !== originalSummary && (
                       <button
                         type="button"
                         onClick={() => setEditedSummary(originalSummary)}
-                        className="font-sans text-[11px] text-[#B25B3E] hover:underline"
+                        className="font-mono text-[10px] uppercase tracking-widest font-bold text-[#B25B3E] dark:text-[#E07A5F] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] rounded"
                       >
                         Revert
                       </button>
@@ -793,10 +795,10 @@ const ResumeBuilder = () => {
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs font-sans font-bold text-[#5C5751] dark:text-gray-400 uppercase tracking-wider">
-                      Key Highlights & Skills
+                    <label className="block font-mono text-[10px] sm:text-[11px] font-bold text-[#5C5751] dark:text-slate-300 uppercase tracking-widest">
+                      Key Highlights &amp; Skills
                     </label>
-                    <span className="text-[11px] font-sans font-semibold px-2 py-0.5 rounded-full bg-[#E5E1D8] dark:bg-[#334155] text-[#1D2B3A] dark:text-slate-200">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5E1D8] dark:bg-[#334155] text-[#1D2B3A] dark:text-slate-200">
                       {editedSkills.length}
                     </span>
                   </div>
@@ -813,13 +815,13 @@ const ResumeBuilder = () => {
                       value={newSkillInput}
                       onChange={(e) => setNewSkillInput(e.target.value)}
                       placeholder="Add skill or highlight..."
-                      className="flex-1 min-w-0 bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-2 text-xs text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#5C5751]/60 focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
+                      className="flex-1 min-w-0 bg-[#F3EFE9]/60 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-2 text-xs text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#8A847C] focus:border-[#B25B3E] focus:ring-2 focus:ring-[#B25B3E]/20 outline-none transition-all font-sans"
                     />
                     <button
                       type="submit"
                       disabled={!newSkillInput.trim()}
                       aria-label="Add Skill"
-                      className="bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-[#B25B3E] dark:hover:bg-[#9A4E35] disabled:opacity-40 disabled:pointer-events-none p-2 rounded-xl transition-all duration-150 ease-out hover:scale-105 active:scale-95 shrink-0"
+                      className="bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-[#B25B3E] dark:hover:bg-[#9E4D32] disabled:opacity-40 disabled:pointer-events-none p-2 rounded-xl transition-all duration-150 ease-out active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -836,14 +838,14 @@ const ResumeBuilder = () => {
                           type="button"
                           onClick={() => handleRemoveSkill(index)}
                           aria-label={`Remove ${skill}`}
-                          className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5"
+                          className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                         >
                           <X className="w-3 h-3" />
                         </button>
                       </span>
                     ))}
                     {editedSkills.length === 0 && (
-                      <p className="text-xs text-[#5C5751] dark:text-slate-400 italic py-1">
+                      <p className="text-xs text-[#8A847C] dark:text-slate-400 italic py-1">
                         No skills added yet. Add some above.
                       </p>
                     )}
@@ -855,9 +857,9 @@ const ResumeBuilder = () => {
                 <button
                   type="button"
                   onClick={() => setIsEditDrawerOpen(false)}
-                  className="w-full bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-white dark:text-[#0F172A] py-3 rounded-xl font-sans font-semibold text-xs shadow-md transition-all active:scale-[0.98]"
+                  className="w-full bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-[#B25B3E] dark:hover:bg-[#9E4D32] py-3 rounded-xl font-sans font-semibold text-xs shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                 >
-                  Apply & View Resume
+                  Apply &amp; View Resume
                 </button>
               </div>
             </motion.div>

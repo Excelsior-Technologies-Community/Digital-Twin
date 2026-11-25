@@ -31,6 +31,34 @@ export default function Navbar() {
     { label: 'About', path: '/about' }
   ];
 
+  const isStudioActive = location.pathname === '/studio' || location.pathname === '/result';
+  const studioButtonStyle = isStudioActive
+    ? 'bg-[#9E4D32] shadow-sm ring-2 ring-[#B25B3E]/35 dark:ring-[#E07A5F]/40 ring-offset-2 ring-offset-[#FCFAF6] dark:ring-offset-[#1E293B]'
+    : 'bg-[#B25B3E] hover:bg-[#9E4D32] shadow-xs';
+
+  const renderStudioButtonContent = (isMobile = false) => (
+    <>
+      {isStudioActive && (
+        <span
+          className={`w-1.5 h-1.5 rounded-full bg-emerald-300 shrink-0 ${
+            shouldReduceMotion ? '' : 'animate-pulse'
+          }`}
+          aria-hidden="true"
+        />
+      )}
+      <span>
+        {isMobile
+          ? isStudioActive
+            ? 'In Ingestion Studio'
+            : 'Launch Ingestion Studio'
+          : isStudioActive
+            ? 'In Studio'
+            : 'Launch Studio'}
+      </span>
+      {!isStudioActive && <ArrowRight className={isMobile ? 'w-4 h-4' : 'w-3.5 h-3.5'} />}
+    </>
+  );
+
   return (
     <div className="sticky top-0 z-40 px-4 sm:px-6 pt-3 sm:pt-4">
       <nav
@@ -74,10 +102,10 @@ export default function Navbar() {
 
           <Link
             to="/studio"
-            className="hidden sm:inline-flex items-center gap-1.5 bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs sm:text-sm font-sans font-semibold px-4 py-2 rounded-xl transition-all active:scale-[0.98] shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+            aria-current={isStudioActive ? 'page' : undefined}
+            className={`hidden sm:inline-flex items-center gap-1.5 text-white text-xs sm:text-sm font-sans font-semibold px-4 py-2 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${studioButtonStyle}`}
           >
-            <span>Launch Studio</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            {renderStudioButtonContent(false)}
           </Link>
 
           <button
@@ -123,10 +151,10 @@ export default function Navbar() {
               <Link
                 to="/studio"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full inline-flex items-center justify-center gap-1.5 bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-sm font-sans font-semibold px-4 py-3 rounded-xl transition-all active:scale-[0.98] shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                aria-current={isStudioActive ? 'page' : undefined}
+                className={`w-full inline-flex items-center justify-center gap-2 text-white text-sm font-sans font-semibold px-4 py-3 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${studioButtonStyle}`}
               >
-                <span>Launch Ingestion Studio</span>
-                <ArrowRight className="w-4 h-4" />
+                {renderStudioButtonContent(true)}
               </Link>
             </div>
           </motion.div>
