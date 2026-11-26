@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { QRCodeCanvas } from 'qrcode.react';
 import api from '../services/api';
 import MarketingLayout from '../components/MarketingLayout';
 import { useToast } from '../context/ToastContext';
@@ -34,7 +35,11 @@ import {
   Briefcase,
   GraduationCap,
   Mail,
-  Phone
+  Phone,
+  QrCode,
+  Download,
+  Search,
+  X
 } from 'lucide-react';
 
 const parseJsonArray = (value) => {
@@ -89,7 +94,21 @@ export default function DigitalTwin() {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [isActivityOpen, setIsActivityOpen] = useState(true);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [activitySearch, setActivitySearch] = useState('');
+  const qrWrapperRef = useRef(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isQrModalOpen) return;
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape') {
+        setIsQrModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => window.removeEventListener('keydown', handleEscapeKey);
+  }, [isQrModalOpen]);
 
   const fetchAnalytics = async (targetId) => {
     const idToUse = targetId || twinProfile?.resumeId || twinProfile?.publicSlug;
@@ -182,6 +201,42 @@ export default function DigitalTwin() {
   };
 
   const resolvedSlug = twinProfile?.publicSlug || twinProfile?.slug;
+
+  const handleDownloadQr = () => {
+    if (!resolvedSlug || !qrWrapperRef.current) return;
+    const canvas = qrWrapperRef.current.querySelector('canvas');
+    if (!canvas) {
+      toast.error('QR code canvas is not ready yet.');
+      return;
+    }
+    try {
+      const pngUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = pngUrl;
+      link.download = `${resolvedSlug}-digital-twin-qr.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('QR code PNG downloaded');
+    } catch {
+      toast.error('Unable to export QR image.');
+    }
+  };
+
+  const filteredChatHistory = useMemo(() => {
+    const query = activitySearch.trim().toLowerCase();
+    if (!query) return chatHistory;
+    return chatHistory.filter((item) => {
+      const visitor = String(item?.visitorName || 'Anonymous Recruiter').toLowerCase();
+      const question = String(item?.question || '').toLowerCase();
+      const aiResponse = String(item?.aiResponse || '').toLowerCase();
+      return (
+        visitor.includes(query) ||
+        question.includes(query) ||
+        aiResponse.includes(query)
+      );
+    });
+  }, [chatHistory, activitySearch]);
 
   const verifiedSkills = useMemo(
     () => parseVerifiedSkills(twinProfile?.skills),
@@ -286,26 +341,17 @@ export default function DigitalTwin() {
                   <span>New Upload</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  aria-label={copied ? 'Share link copied' : 'Copy share link to clipboard'}
-                  className="inline-flex items-center justify-center gap-1.5 min-w-[120px] px-3.5 py-2.5 bg-[#FCFAF6] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 text-xs font-semibold rounded-xl transition-all duration-150 ease-out active:scale-[0.98] border border-[#E5E1D8] dark:border-[#334155] shadow-2xs min-h-[40px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-                >
-                  <span aria-live="polite" className="inline-flex items-center gap-1.5">
-                    {copied ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-[#047857] dark:text-[#10B981]" />
-                        <span className="text-[#047857] dark:text-[#10B981] font-medium">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
-                        <span>Copy Share Link</span>
-                      </>
-                    )}
-                  </span>
-                </button>
+                {resolvedSlug && (
+                  <button
+                    type="button"
+                    onClick={() => setIsQrModalOpen(true)}
+                    aria-label="Open QR share modal"
+                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#FCFAF6] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 text-xs font-semibold rounded-xl transition-all duration-150 ease-out active:scale-[0.98] border border-[#E5E1D8] dark:border-[#334155] shadow-2xs min-h-[40px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                  >
+                    <QrCode className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+                    <span>Share QR</span>
+                  </button>
+                )}
 
                 {resolvedSlug && (
                   <button
@@ -497,49 +543,100 @@ export default function DigitalTwin() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3 max-h-[360px] sm:max-h-[400px] lg:max-h-none">
-                        {chatHistory.map((item, index) => (
-                          <div
-                            key={item.id || index}
-                            className="bg-[#F3EFE9]/65 dark:bg-[#0F172A]/75 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3.5 space-y-2.5 shadow-2xs transition-colors hover:border-[#B25B3E]/40 dark:hover:border-[#E07A5F]/40"
-                          >
-                            <div className="flex items-center justify-between text-xs text-[#5C5751] dark:text-slate-400 gap-2">
-                              <span className="font-semibold text-[#B25B3E] dark:text-[#E07A5F] flex items-center gap-1.5 truncate">
-                                <User className="w-3 h-3 shrink-0" />
-                                <span className="truncate">{item.visitorName || 'Anonymous Recruiter'}</span>
-                              </span>
-                              <span className="flex items-center gap-1 font-mono text-[10px] text-[#8A847C] dark:text-slate-400 shrink-0">
-                                <Clock className="w-3 h-3 text-[#8A847C] dark:text-slate-400" />
-                                {item.createdAt
-                                  ? new Date(item.createdAt).toLocaleString([], {
-                                      dateStyle: 'short',
-                                      timeStyle: 'short'
-                                    })
-                                  : 'Just now'}
-                              </span>
-                            </div>
-
-                            <div className="space-y-1">
-                              <span className="font-mono font-bold text-[10px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 block">
-                                VISITOR ASKED:
-                              </span>
-                              <p className="text-xs font-medium text-[#1D2B3A] dark:text-slate-100 bg-[#FCFAF6] dark:bg-[#1E293B] p-2.5 rounded-lg border border-[#E5E1D8] dark:border-[#334155]">
-                                {item.question}
-                              </p>
-                            </div>
-
-                            <div className="space-y-1 pt-0.5">
-                              <span className="font-mono font-bold text-[10px] uppercase tracking-widest text-[#1D2B3A] dark:text-slate-200 flex items-center gap-1">
-                                <Bot className="w-3 h-3 text-[#B25B3E] dark:text-[#E07A5F]" />
-                                <span>AI ANSWERED:</span>
-                              </span>
-                              <div className="text-[11px] text-[#FCFAF6] dark:text-slate-100 leading-relaxed bg-[#1D2B3A] dark:bg-[#0B1120] p-3 rounded-xl shadow-2xs whitespace-pre-wrap border border-[#1D2B3A] dark:border-[#334155]">
-                                {item.aiResponse}
-                              </div>
-                            </div>
+                      <>
+                        <div className="mb-3 space-y-1.5 shrink-0">
+                          <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-2 flex items-center gap-2 focus-within:border-[#B25B3E] dark:focus-within:border-[#E07A5F] transition-colors">
+                            <Search className="w-3.5 h-3.5 text-[#8A847C] dark:text-slate-400 shrink-0" />
+                            <input
+                              type="text"
+                              value={activitySearch}
+                              onChange={(e) => setActivitySearch(e.target.value)}
+                              aria-label="Search recruiter activity feed"
+                              placeholder="Search recruiter questions, answers, or visitors..."
+                              className="flex-1 min-w-0 bg-transparent border-0 outline-none text-xs text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#8A847C] dark:placeholder:text-slate-400"
+                            />
+                            {activitySearch && (
+                              <button
+                                type="button"
+                                onClick={() => setActivitySearch('')}
+                                aria-label="Clear activity search"
+                                className="p-0.5 rounded text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
                           </div>
-                        ))}
-                      </div>
+
+                          {activitySearch.trim().length > 0 && (
+                            <span className="block font-mono text-[10px] font-bold uppercase tracking-widest text-[#8A847C] dark:text-slate-400 px-1">
+                              {filteredChatHistory.length} OF {chatHistory.length} INQUIRIES
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3 max-h-[360px] sm:max-h-[400px] lg:max-h-none">
+                          {filteredChatHistory.length === 0 ? (
+                            <div className="bg-[#F3EFE9]/75 dark:bg-[#0F172A]/75 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-5 text-center space-y-3">
+                              <p className="text-xs font-serif font-semibold text-[#1D2B3A] dark:text-white">
+                                No matching inquiries found
+                              </p>
+                              <p className="text-[11px] text-[#5C5751] dark:text-slate-400 leading-relaxed">
+                                No recruiter questions, answers, or visitors match your search term.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => setActivitySearch('')}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                              >
+                                <X className="w-3 h-3" />
+                                <span>Clear Search</span>
+                              </button>
+                            </div>
+                          ) : (
+                            filteredChatHistory.map((item, index) => (
+                              <div
+                                key={item.id || index}
+                                className="bg-[#F3EFE9]/65 dark:bg-[#0F172A]/75 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3.5 space-y-2.5 shadow-2xs transition-colors hover:border-[#B25B3E]/40 dark:hover:border-[#E07A5F]/40"
+                              >
+                                <div className="flex items-center justify-between text-xs text-[#5C5751] dark:text-slate-400 gap-2">
+                                  <span className="font-semibold text-[#B25B3E] dark:text-[#E07A5F] flex items-center gap-1.5 truncate">
+                                    <User className="w-3 h-3 shrink-0" />
+                                    <span className="truncate">{item.visitorName || 'Anonymous Recruiter'}</span>
+                                  </span>
+                                  <span className="flex items-center gap-1 font-mono text-[10px] text-[#8A847C] dark:text-slate-400 shrink-0">
+                                    <Clock className="w-3 h-3 text-[#8A847C] dark:text-slate-400" />
+                                    {item.createdAt
+                                      ? new Date(item.createdAt).toLocaleString([], {
+                                          dateStyle: 'short',
+                                          timeStyle: 'short'
+                                        })
+                                      : 'Just now'}
+                                  </span>
+                                </div>
+
+                                <div className="space-y-1">
+                                  <span className="font-mono font-bold text-[10px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 block">
+                                    VISITOR ASKED:
+                                  </span>
+                                  <p className="text-xs font-medium text-[#1D2B3A] dark:text-slate-100 bg-[#FCFAF6] dark:bg-[#1E293B] p-2.5 rounded-lg border border-[#E5E1D8] dark:border-[#334155]">
+                                    {item.question}
+                                  </p>
+                                </div>
+
+                                <div className="space-y-1 pt-0.5">
+                                  <span className="font-mono font-bold text-[10px] uppercase tracking-widest text-[#1D2B3A] dark:text-slate-200 flex items-center gap-1">
+                                    <Bot className="w-3 h-3 text-[#B25B3E] dark:text-[#E07A5F]" />
+                                    <span>AI ANSWERED:</span>
+                                  </span>
+                                  <div className="text-[11px] text-[#FCFAF6] dark:text-slate-100 leading-relaxed bg-[#1D2B3A] dark:bg-[#0B1120] p-3 rounded-xl shadow-2xs whitespace-pre-wrap border border-[#1D2B3A] dark:border-[#334155]">
+                                    {item.aiResponse}
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
@@ -905,6 +1002,115 @@ export default function DigitalTwin() {
           </div>
         )}
       </section>
+
+      <AnimatePresence>
+        {isQrModalOpen && resolvedSlug && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+            onClick={() => setIsQrModalOpen(false)}
+            className="fixed inset-0 z-50 bg-[#1D2B3A]/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="qr-share-modal-title"
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <span className="font-mono uppercase tracking-widest text-[10px] sm:text-[11px] font-bold text-[#B25B3E] dark:text-[#E07A5F] block">
+                    RECRUITER ACCESS PASS
+                  </span>
+                  <h2
+                    id="qr-share-modal-title"
+                    className="font-serif text-xl sm:text-2xl font-bold text-[#1D2B3A] dark:text-white mt-0.5"
+                  >
+                    Scan to Interview Twin
+                  </h2>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsQrModalOpen(false)}
+                  aria-label="Close QR share modal"
+                  className="p-2 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8]/70 dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex justify-center">
+                <div
+                  ref={qrWrapperRef}
+                  className="bg-white p-4 rounded-2xl border border-[#E5E1D8] shadow-sm inline-flex mx-auto"
+                >
+                  <QRCodeCanvas
+                    value={publicLink}
+                    size={208}
+                    bgColor="#FFFFFF"
+                    fgColor="#1D2B3A"
+                    level="M"
+                    includeMargin={false}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3.5 py-2 text-center font-mono text-xs text-[#5C5751] dark:text-slate-300 truncate">
+                {publicLink}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={handleDownloadQr}
+                  className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-sans font-semibold shadow-sm transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download QR PNG</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 border border-[#E5E1D8] dark:border-[#334155] text-xs font-sans font-semibold transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-[#047857] dark:text-[#10B981]" />
+                      <span className="text-[#047857] dark:text-[#10B981]">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+                      <span>Copy Link</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsQrModalOpen(false);
+                    navigate(`/twin/${resolvedSlug}`);
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#FCFAF6] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 border border-[#E5E1D8] dark:border-[#334155] text-xs font-sans font-semibold transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+                  <span>Open Chat</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MarketingLayout>
   );
 }

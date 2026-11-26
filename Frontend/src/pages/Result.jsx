@@ -209,6 +209,11 @@ export default function Result() {
       if (response.data?.success && response.data?.twin) {
         const twinData = response.data.twin;
         localStorage.setItem('activeTwinSlug', twinData.publicSlug || twinData.id);
+        if (response.data?.editToken && twinData.publicSlug) {
+          try {
+            localStorage.setItem(`twinEditToken:${twinData.publicSlug}`, response.data.editToken);
+          } catch {}
+        }
         toast.success('Digital Twin activated successfully');
         navigate('/digital-twin', { state: { resumeData: twinData } });
       } else {

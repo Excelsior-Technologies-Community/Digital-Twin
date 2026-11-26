@@ -43,6 +43,13 @@ const Twin = sequelize.define('Twin', {
     unique: true,
     allowNull: false,
   },
+}, {
+  indexes: [
+    {
+      name: 'idx_twins_resume_id',
+      fields: ['resumeId'],
+    },
+  ],
 });
 
 module.exports = Twin;

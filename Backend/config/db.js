@@ -7,16 +7,19 @@ const sequelize = new Sequelize(
   process.env.DB_PASS || process.env.DB_PASSWORD || '',
   {
     host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 3306,
     dialect: 'mysql',
     logging: false,
     pool: {
-      max: 15,       // Maximum number of connections in pool
-      min: 0,        // Minimum number of connections in pool
-      acquire: 30000, // Maximum time (ms) to try getting a connection before throwing error
-      idle: 10000    // Maximum time (ms) a connection can be idle before being released
+      max: 15,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+      evict: 1000,
     },
     dialectOptions: {
       charset: 'utf8mb4',
+      connectTimeout: 10000,
     },
     define: {
       charset: 'utf8mb4',

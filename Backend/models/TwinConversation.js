@@ -18,11 +18,16 @@ const TwinConversation = sequelize.define('TwinConversation', {
   aiResponse: {
     type: DataTypes.TEXT,
   },
+}, {
+  indexes: [
+    {
+      name: 'idx_twin_conversations_twin_created',
+      fields: ['twinId', 'createdAt'],
+    },
+  ],
 });
 
-// Define relationships
 Twin.hasMany(TwinConversation, { foreignKey: 'twinId' });
 TwinConversation.belongsTo(Twin, { foreignKey: 'twinId' });
 
-TwinConversation.TwinConversation = TwinConversation;
 module.exports = TwinConversation;

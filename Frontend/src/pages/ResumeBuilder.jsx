@@ -2,11 +2,21 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import axios from 'axios';
 import api from '../services/api';
 import ThemeToggle from '../components/ThemeToggle';
 import { useToast } from '../context/ToastContext';
-import { Check, Printer, ChevronDown, RotateCcw, Pencil, Plus, X } from 'lucide-react';
+import {
+  Check,
+  Printer,
+  ChevronDown,
+  RotateCcw,
+  Pencil,
+  Plus,
+  X,
+  CloudUpload,
+  Loader2,
+  AlertCircle
+} from 'lucide-react';
 import ModernTemplate from '../components/templates/ModernTemplate';
 import ClassicTemplate from '../components/templates/ClassicTemplate';
 
@@ -45,6 +55,8 @@ const ResumeBuilder = () => {
   const [editedSummary, setEditedSummary] = useState('');
   const [editedSkills, setEditedSkills] = useState([]);
   const [newSkillInput, setNewSkillInput] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveFeedback, setSaveFeedback] = useState(null);
 
   const [availableWidth, setAvailableWidth] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -64,11 +76,33 @@ const ResumeBuilder = () => {
 
   const stageRef = useRef(null);
   const resumeRef = useRef(null);
+  const saveTimerRef = useRef(null);
+
+  const resolvedSlug = twinData?.publicSlug || slug;
+
+  const editToken = useMemo(() => {
+    if (!resolvedSlug || typeof window === 'undefined') {
+      return null;
+    }
+    try {
+      return localStorage.getItem(`twinEditToken:${resolvedSlug}`) || null;
+    } catch {
+      return null;
+    }
+  }, [resolvedSlug]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const fetchTwinData = async () => {
       try {
-        const response = await api.get(`/twins/${slug}`).catch(() => axios.get(`/api/twins/${slug}`));
+        const response = await api.get(`/twins/${slug}`);
         const data = response.data?.twin || response.data;
         if (data) {
           setTwinData(data);
@@ -125,6 +159,65 @@ const ResumeBuilder = () => {
 
   const handleRemoveSkill = (indexToRemove) => {
     setEditedSkills((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleSaveToTwin = async () => {
+    if (!editToken || !resolvedSlug || isSaving) return;
+
+    const trimmedBio = editedSummary.trim();
+    if (!trimmedBio) {
+      const msg = 'Executive summary cannot be empty.';
+      setSaveFeedback({ type: 'error', message: msg });
+      toast.error(msg);
+      return;
+    }
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    setIsSaving(true);
+    setSaveFeedback(null);
+
+    try {
+      const response = await api.patch(
+        `/twins/${resolvedSlug}`,
+        {
+          bio: trimmedBio,
+          skills: editedSkills,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${editToken}`,
+          },
+        }
+      );
+
+      const updatedTwin = response.data?.twin;
+      if (response.data?.success && updatedTwin) {
+        setTwinData(updatedTwin);
+        const successMsg = 'Changes synced to your Digital Twin & 3D Skill Graph.';
+        setSaveFeedback({ type: 'success', message: successMsg });
+        toast.success(successMsg);
+        saveTimerRef.current = setTimeout(() => {
+          setSaveFeedback(null);
+        }, 4000);
+      } else {
+        throw new Error(response.data?.message || 'Unable to save changes right now. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error saving edits to twin:', err);
+      const status = err?.response?.status;
+      const errorMsg =
+        status === 401 || status === 403
+          ? 'Edit session expired or unauthorized. Local PDF export still works.'
+          : err?.response?.data?.message ||
+            'Unable to save changes right now. Please try again.';
+      setSaveFeedback({ type: 'error', message: errorMsg });
+      toast.error(errorMsg);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const effectiveResumeData = useMemo(() => {
@@ -550,6 +643,42 @@ const ResumeBuilder = () => {
           </div>
         </div>
 
+        {Boolean(editToken) && (
+          <div className="mb-2.5 space-y-2">
+            <button
+              type="button"
+              onClick={handleSaveToTwin}
+              disabled={!hasEdits || isSaving}
+              className="w-full bg-[#1D2B3A] hover:bg-[#15202C] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white py-3 px-4 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all duration-150 ease-out active:scale-[0.98] disabled:opacity-45 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CloudUpload className="w-4 h-4" />
+              )}
+              <span>{isSaving ? 'Saving...' : 'Save Changes to Twin'}</span>
+            </button>
+
+            {saveFeedback && (
+              <div
+                role="status"
+                className={`rounded-xl px-3 py-2 text-xs leading-snug border flex items-start gap-2 ${
+                  saveFeedback.type === 'success'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/60 text-[#047857] dark:text-[#10B981]'
+                    : 'bg-[#B25B3E]/10 dark:bg-[#E07A5F]/15 border-[#B25B3E]/30 dark:border-[#E07A5F]/40 text-[#B25B3E] dark:text-[#E07A5F]'
+                }`}
+              >
+                {saveFeedback.type === 'success' ? (
+                  <Check className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                )}
+                <span>{saveFeedback.message}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <button
           onClick={onDownloadClick}
           className="bg-[#B25B3E] hover:bg-[#9E4D32] text-white py-3.5 px-4 rounded-xl font-sans font-semibold text-sm shadow-sm hover:shadow-md transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
@@ -853,11 +982,45 @@ const ResumeBuilder = () => {
                 </div>
               </div>
 
-              <div className="p-4 border-t border-[#E5E1D8] dark:border-[#334155] bg-[#F3EFE9]/40 dark:bg-[#0F172A]/40 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="p-4 border-t border-[#E5E1D8] dark:border-[#334155] bg-[#F3EFE9]/40 dark:bg-[#0F172A]/40 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-2.5">
+                {Boolean(editToken) && (
+                  <>
+                    {saveFeedback && (
+                      <div
+                        role="status"
+                        className={`rounded-xl px-3 py-2 text-xs leading-snug border flex items-start gap-2 ${
+                          saveFeedback.type === 'success'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/60 text-[#047857] dark:text-[#10B981]'
+                            : 'bg-[#B25B3E]/10 dark:bg-[#E07A5F]/15 border-[#B25B3E]/30 dark:border-[#E07A5F]/40 text-[#B25B3E] dark:text-[#E07A5F]'
+                        }`}
+                      >
+                        {saveFeedback.type === 'success' ? (
+                          <Check className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                        ) : (
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                        )}
+                        <span>{saveFeedback.message}</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleSaveToTwin}
+                      disabled={!hasEdits || isSaving}
+                      className="w-full bg-[#1D2B3A] hover:bg-[#15202C] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white py-3 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all active:scale-[0.98] disabled:opacity-45 disabled:pointer-events-none flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                    >
+                      {isSaving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CloudUpload className="w-4 h-4" />
+                      )}
+                      <span>{isSaving ? 'Saving...' : 'Save Changes to Twin'}</span>
+                    </button>
+                  </>
+                )}
                 <button
                   type="button"
                   onClick={() => setIsEditDrawerOpen(false)}
-                  className="w-full bg-[#1D2B3A] hover:bg-[#2A3F55] text-white dark:bg-[#B25B3E] dark:hover:bg-[#9E4D32] py-3 rounded-xl font-sans font-semibold text-xs shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                  className="w-full bg-[#B25B3E] hover:bg-[#9E4D32] text-white py-3 rounded-xl font-sans font-semibold text-xs shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                 >
                   Apply &amp; View Resume
                 </button>

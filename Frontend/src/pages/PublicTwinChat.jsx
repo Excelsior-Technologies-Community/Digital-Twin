@@ -15,9 +15,82 @@ import {
   ArrowUpRight,
   X,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+
+const DEFAULT_SAMPLE_QUESTIONS = [
+  'Tell me about your background.',
+  'What are your primary technical strengths?',
+  'Describe a challenging engineering project you led.',
+  'What is your preferred architectural philosophy?',
+];
+
+const buildCleanChatHistory = (messageList) => {
+  if (!Array.isArray(messageList) || messageList.length === 0) {
+    return [];
+  }
+
+  const pairs = [];
+  let pendingUser = null;
+
+  for (const msg of messageList) {
+    if (!msg || msg.id === 'msg-welcome') continue;
+
+    if (msg.isError) {
+      pendingUser = null;
+      continue;
+    }
+
+    const text = typeof msg.text === 'string' ? msg.text.trim() : '';
+    if (!text) continue;
+
+    if (msg.sender === 'user') {
+      pendingUser = { role: 'user', text };
+    } else if (msg.sender === 'twin' && pendingUser) {
+      pairs.push(pendingUser, { role: 'model', text });
+      pendingUser = null;
+    }
+  }
+
+  return pairs.slice(-10);
+};
+
+const formatChatError = (err) => {
+  const status = err?.response?.status;
+  const backendMessage = err?.response?.data?.message || err?.response?.data?.error;
+
+  if (status === 429) {
+    const retryAfterRaw = err?.response?.headers?.['retry-after'];
+    const retryAfterNum = Number.parseInt(retryAfterRaw, 10);
+    if (Number.isFinite(retryAfterNum) && retryAfterNum > 0) {
+      return `Rate limit reached. Please wait ${retryAfterNum}s before sending another question.`;
+    }
+    if (typeof backendMessage === 'string' && backendMessage.trim()) {
+      return backendMessage.trim();
+    }
+    return 'Too many messages sent too quickly. Please pause briefly and retry.';
+  }
+
+  if (status === 503) {
+    return 'The AI twin engine is temporarily busy. Please wait a moment and retry.';
+  }
+
+  if (status === 504 || err?.code === 'ECONNABORTED') {
+    return 'The response timed out. Please retry your question.';
+  }
+
+  if (!err?.response) {
+    return 'Unable to reach the server. Check your connection and retry.';
+  }
+
+  if (typeof backendMessage === 'string' && backendMessage.trim()) {
+    return backendMessage.trim();
+  }
+
+  return 'Unable to generate a response right now. Please try again.';
+};
 
 const parseJsonArray = (value) => {
   if (Array.isArray(value)) return value;
@@ -214,27 +287,34 @@ export default function PublicTwinChat() {
     }
   };
 
-  const sendChatMessage = async (messageText) => {
+  const sendChatMessage = async (
+    messageText,
+    { isRetry = false, retryErrorId = null } = {}
+  ) => {
     if (isTyping) return;
     const query = (messageText || '').trim();
     if (!query) return;
 
-    const chatHistory = messages
-      .filter((m) => !m.isError)
-      .map((m) => ({
-        role: m.sender === 'user' ? 'user' : 'model',
-        text: m.text,
-      }));
+    const baseMessages =
+      isRetry && retryErrorId
+        ? messages.filter((m) => m.id !== retryErrorId)
+        : messages;
 
-    const userMsg = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
-      text: query,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
+    const chatHistory = buildCleanChatHistory(baseMessages);
 
-    setMessages((prev) => [...prev, userMsg]);
-    setInputMessage('');
+    if (isRetry && retryErrorId) {
+      setMessages(baseMessages);
+    } else {
+      const userMsg = {
+        id: `user-${Date.now()}`,
+        sender: 'user',
+        text: query,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages([...baseMessages, userMsg]);
+      setInputMessage('');
+    }
+
     setIsTyping(true);
     isNearBottomRef.current = true;
     setShowScrollBottom(false);
@@ -244,7 +324,8 @@ export default function PublicTwinChat() {
         message: query,
         history: chatHistory,
       });
-      const aiReply = response.data?.reply || 'I apologize, I could not generate a response at this moment.';
+      const aiReply =
+        response.data?.reply || 'I apologize, I could not generate a response at this moment.';
 
       const twinMsg = {
         id: `twin-${Date.now()}`,
@@ -256,12 +337,15 @@ export default function PublicTwinChat() {
       setMessages((prev) => [...prev, twinMsg]);
     } catch (err) {
       console.error('Error sending message to twin:', err);
-      toast.error('Failed to reach AI reasoning engine. Please try asking again.');
+      const friendlyError = formatChatError(err);
+      toast.error(friendlyError);
       const errorMsg = {
         id: `err-${Date.now()}`,
         sender: 'twin',
-        text: 'Sorry, I encountered an issue connecting to my reasoning engine. Please try asking again.',
+        text: friendlyError,
         isError: true,
+        failedQuery: query,
+        errorStatus: err?.response?.status || null,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -274,13 +358,6 @@ export default function PublicTwinChat() {
     e?.preventDefault();
     sendChatMessage(inputMessage);
   };
-
-  const sampleQuestions = [
-    'Tell me about your background.',
-    'What are your primary technical strengths?',
-    'Describe a challenging engineering project you led.',
-    'What is your preferred architectural philosophy?',
-  ];
 
   const skillsList = useMemo(
     () => parseVerifiedSkills(twinData?.skills),
@@ -296,6 +373,65 @@ export default function PublicTwinChat() {
     () => parseJsonArray(twinData?.education).filter((item) => item && typeof item === 'object'),
     [twinData?.education]
   );
+
+  const suggestedQuestions = useMemo(() => {
+    const prompts = [];
+    const topSkill = skillsList[0];
+    const secondSkill = skillsList[1];
+    const latestRole = verifiedExperience[0];
+    const primaryEdu = verifiedEducation[0];
+
+    if (latestRole?.role) {
+      const roleTitle = String(latestRole.role).trim();
+      const company = latestRole.company ? String(latestRole.company).trim() : '';
+      if (roleTitle) {
+        prompts.push(
+          company
+            ? `Walk me through your measurable impact as ${roleTitle} at ${company}.`
+            : `Walk me through your measurable impact as ${roleTitle}.`
+        );
+      }
+    }
+
+    if (topSkill && secondSkill) {
+      prompts.push(`How have you applied ${topSkill} and ${secondSkill} in real projects?`);
+    } else if (topSkill) {
+      prompts.push(`How have you applied ${topSkill} in production projects?`);
+    }
+
+    if (verifiedExperience.length >= 2) {
+      prompts.push('How did your responsibilities evolve across your past roles?');
+    } else if (primaryEdu?.degree) {
+      prompts.push(
+        `How has your ${String(primaryEdu.degree).trim()} background shaped your technical approach?`
+      );
+    }
+
+    if (topSkill) {
+      prompts.push(
+        `Tell me about a complex bottleneck you solved using ${topSkill} with STAR metrics.`
+      );
+    }
+
+    const seen = new Set();
+    const combined = [...prompts, ...DEFAULT_SAMPLE_QUESTIONS];
+    const unique = [];
+
+    for (const q of combined) {
+      const key = q.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(q);
+      }
+      if (unique.length === 4) break;
+    }
+
+    return unique;
+  }, [skillsList, verifiedExperience, verifiedEducation]);
+
+  useEffect(() => {
+    handleScroll();
+  }, [suggestedQuestions]);
 
   const getInitials = (fullName) => {
     if (!fullName) return 'DT';
@@ -467,15 +603,28 @@ export default function PublicTwinChat() {
                               {getInitials(twinData?.name)}
                             </div>
                             <div
-                              className={`bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm max-w-[85%] sm:max-w-[75%] ${
-                                msg.isError ? 'border-2 border-[#B25B3E] dark:border-[#E07A5F]' : ''
+                              className={`bg-[#FCFAF6] dark:bg-[#1E293B] border text-[#1D2B3A] dark:text-slate-100 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm max-w-[85%] sm:max-w-[75%] ${
+                                msg.isError
+                                  ? 'border-[#B25B3E]/40 dark:border-[#E07A5F]/40'
+                                  : 'border-[#E5E1D8] dark:border-[#334155]/80'
                               }`}
                             >
                               <div className="flex items-center justify-between gap-3 mb-1.5 pb-1.5 border-b border-[#E5E1D8]/80 dark:border-[#334155]/80">
-                                <span className="flex items-center gap-1.5 font-mono font-bold text-[10px] uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F]">
-                                  <ShieldCheck className="w-3.5 h-3.5" />
-                                  Verified AI Representative
-                                </span>
+                                {msg.isError ? (
+                                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#B25B3E]/10 dark:bg-[#E07A5F]/15 font-mono font-bold text-[10px] uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F]">
+                                    <AlertCircle className="w-3 h-3" />
+                                    {msg.errorStatus === 429
+                                      ? 'Rate Limited'
+                                      : msg.errorStatus === 504
+                                        ? 'Request Timeout'
+                                        : 'Delivery Paused'}
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1.5 font-mono font-bold text-[10px] uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F]">
+                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                    Verified AI Representative
+                                  </span>
+                                )}
                                 <span className="text-[10px] text-[#8A847C] dark:text-slate-400 font-mono">
                                   {msg.timestamp}
                                 </span>
@@ -483,6 +632,24 @@ export default function PublicTwinChat() {
                               <p className="text-sm text-[#1D2B3A] dark:text-slate-100 leading-relaxed whitespace-pre-wrap">
                                 {msg.text}
                               </p>
+                              {msg.isError && msg.failedQuery && (
+                                <div className="mt-3 pt-2.5 border-t border-[#E5E1D8]/80 dark:border-[#334155]/80 flex items-center justify-start">
+                                  <button
+                                    type="button"
+                                    disabled={isTyping}
+                                    onClick={() =>
+                                      sendChatMessage(msg.failedQuery, {
+                                        isRetry: true,
+                                        retryErrorId: msg.id,
+                                      })
+                                    }
+                                    className="bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                                  >
+                                    <RotateCcw className="w-3.5 h-3.5" />
+                                    <span>Retry Question</span>
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </>
                         )}
@@ -604,9 +771,9 @@ export default function PublicTwinChat() {
                       isDragging ? 'cursor-grabbing select-none scroll-auto' : 'cursor-grab'
                     }`}
                   >
-                    {sampleQuestions.map((q, idx) => (
+                    {suggestedQuestions.map((q) => (
                       <button
-                        key={idx}
+                        key={q}
                         type="button"
                         disabled={isTyping}
                         onClick={() => {
