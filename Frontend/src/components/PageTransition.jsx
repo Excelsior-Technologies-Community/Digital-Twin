@@ -5,42 +5,37 @@ export default function PageTransition({ children, className = '' }) {
 
   const variants = prefersReduced
     ? {
-        initial: { opacity: 0 },
+        initial: { opacity: 0, y: 0 },
         animate: {
           opacity: 1,
+          y: 0,
           transition: { duration: 0.15 }
         },
         exit: {
           opacity: 0,
-          transition: { duration: 0.15 }
+          y: 0,
+          transition: { duration: 0.12 }
         }
       }
     : {
         initial: {
           opacity: 0,
-          scale: 0.985,
-          y: 8,
-          filter: 'blur(6px)'
+          y: 8
         },
         animate: {
           opacity: 1,
-          scale: 1,
           y: 0,
-          filter: 'blur(0px)',
           transition: {
-            duration: 0.32,
+            duration: 0.24,
             ease: [0.22, 1, 0.36, 1]
           },
           transitionEnd: {
-            filter: 'none',
             transform: 'none'
           }
         },
         exit: {
           opacity: 0,
-          scale: 0.985,
           y: -6,
-          filter: 'blur(4px)',
           transition: {
             duration: 0.18,
             ease: [0.4, 0, 1, 1]

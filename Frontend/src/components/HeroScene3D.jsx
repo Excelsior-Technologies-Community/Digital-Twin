@@ -2,13 +2,62 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useTheme } from '../context/ThemeContext';
 
+const computeCameraZ = (width, height) => {
+  if (!height || height <= 0) return 10;
+  const aspect = width / height;
+  if (aspect >= 1) return 10;
+  return Math.max(10, Math.min(17.5, 10 / Math.max(aspect * 1.45, 0.57)));
+};
+
+const applyThemeToScene = (isDark, sceneRefs) => {
+  const { dustMaterial, lineMat, nodes } = sceneRefs;
+
+  if (dustMaterial) {
+    dustMaterial.color.set(isDark ? '#CBD5E1' : '#8A847C');
+    dustMaterial.opacity = isDark ? 0.38 : 0.28;
+  }
+
+  if (lineMat) {
+    lineMat.color.set(isDark ? '#94A3B8' : '#5C5751');
+    lineMat.opacity = isDark ? 0.22 : 0.15;
+  }
+
+  if (Array.isArray(nodes)) {
+    nodes.forEach((node) => {
+      const colorHex = node.isTerracotta
+        ? isDark
+          ? '#E07A5F'
+          : '#B25B3E'
+        : node.isEmerald
+          ? isDark
+            ? '#10B981'
+            : '#047857'
+          : isDark
+            ? '#94A3B8'
+            : '#8A847C';
+      node.material.color.set(colorHex);
+      node.material.opacity = isDark ? 0.45 : 0.32;
+    });
+  }
+};
+
 export default function HeroScene3D({ scrollProgressRef }) {
   const containerRef = useRef(null);
   const { isDarkMode } = useTheme();
   const isDarkRef = useRef(isDarkMode);
+  const sceneRefs = useRef({
+    dustMaterial: null,
+    lineMat: null,
+    nodes: [],
+    renderStaticFrame: null
+  });
 
   useEffect(() => {
     isDarkRef.current = isDarkMode;
+    applyThemeToScene(isDarkMode, sceneRefs.current);
+    if (typeof sceneRefs.current.renderStaticFrame === 'function') {
+      sceneRefs.current.renderStaticFrame();
+    }
   }, [isDarkMode]);
 
   useEffect(() => {
@@ -16,13 +65,13 @@ export default function HeroScene3D({ scrollProgressRef }) {
     if (!container) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let isMobile = width < 768;
+    let width = Math.max(1, window.innerWidth);
+    let height = Math.max(1, window.innerHeight);
+    const isMobile = width < 768;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    camera.position.set(0, 0, 10);
+    camera.position.set(0, 0, computeCameraZ(width, height));
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -129,25 +178,37 @@ export default function HeroScene3D({ scrollProgressRef }) {
     const constellationLines = new THREE.LineSegments(lineGeom, lineMat);
     constellationGroup.add(constellationLines);
 
+    sceneRefs.current = {
+      dustMaterial,
+      lineMat,
+      nodes,
+      renderStaticFrame: prefersReduced ? () => renderer.render(scene, camera) : null
+    };
+    applyThemeToScene(isDarkRef.current, sceneRefs.current);
+
     let targetMouseX = 0;
     let targetMouseY = 0;
     let mouseX = 0;
     let mouseY = 0;
 
     const onPointerMove = (e) => {
+      if (e.pointerType === 'touch') return;
       targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
       targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
     window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     const onResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      isMobile = width < 768;
+      width = Math.max(1, window.innerWidth);
+      height = Math.max(1, window.innerHeight);
       camera.aspect = width / height;
+      camera.position.z = computeCameraZ(width, height);
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      if (prefersReduced) {
+        renderer.render(scene, camera);
+      }
     };
     window.addEventListener('resize', onResize);
 
@@ -163,23 +224,6 @@ export default function HeroScene3D({ scrollProgressRef }) {
       animationFrameId = requestAnimationFrame(animate);
       if (!isDocumentVisible) return;
 
-      const isDark = isDarkRef.current;
-      dustMaterial.color.set(isDark ? '#CBD5E1' : '#8A847C');
-      dustMaterial.opacity = isDark ? 0.38 : 0.28;
-
-      lineMat.color.set(isDark ? '#94A3B8' : '#5C5751');
-      lineMat.opacity = isDark ? 0.22 : 0.15;
-
-      nodes.forEach((node) => {
-        const c = node.isTerracotta
-          ? (isDark ? '#E07A5F' : '#B25B3E')
-          : node.isEmerald
-            ? (isDark ? '#10B981' : '#047857')
-            : (isDark ? '#94A3B8' : '#8A847C');
-        node.material.color.set(c);
-        node.material.opacity = isDark ? 0.45 : 0.32;
-      });
-
       mouseX = THREE.MathUtils.lerp(mouseX, targetMouseX, 0.04);
       mouseY = THREE.MathUtils.lerp(mouseY, targetMouseY, 0.04);
 
@@ -191,23 +235,30 @@ export default function HeroScene3D({ scrollProgressRef }) {
       constellationGroup.rotation.y += 0.0008;
       constellationGroup.rotation.z += 0.0004;
 
-      if (!prefersReduced) {
-        rootGroup.rotation.x = mouseY * 0.12;
-        rootGroup.rotation.y = mouseX * 0.15;
-      }
-
+      rootGroup.rotation.x = mouseY * 0.12;
+      rootGroup.rotation.y = mouseX * 0.15;
       rootGroup.position.y = -p * 2.5;
 
       renderer.render(scene, camera);
     };
 
-    animate();
+    if (prefersReduced) {
+      renderer.render(scene, camera);
+    } else {
+      animate();
+    }
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      sceneRefs.current = {
+        dustMaterial: null,
+        lineMat: null,
+        nodes: [],
+        renderStaticFrame: null
+      };
 
       scene.traverse((obj) => {
         if (obj.geometry) obj.geometry.dispose();
@@ -222,7 +273,7 @@ export default function HeroScene3D({ scrollProgressRef }) {
         container.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [scrollProgressRef]);
 
   return (
     <div

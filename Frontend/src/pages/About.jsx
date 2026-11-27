@@ -293,9 +293,9 @@ export default function About() {
                 transition={{ duration: 0.2 }}
                 className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start"
               >
-                <div className="lg:col-span-6 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-[#F3EFE9] dark:bg-[#0F172A] text-[#B25B3E] dark:text-[#E07A5F] border border-[#E5E1D8] dark:border-[#334155]">
-                    <span>{currentStage.badge}</span>
+                <div className="lg:col-span-6 space-y-4 min-w-0">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-[#F3EFE9] dark:bg-[#0F172A] text-[#B25B3E] dark:text-[#E07A5F] border border-[#E5E1D8] dark:border-[#334155] max-w-full flex-wrap">
+                    <span className="break-words">{currentStage.badge}</span>
                   </div>
 
                   <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1D2B3A] dark:text-white">
@@ -323,31 +323,31 @@ export default function About() {
                   </div>
                 </div>
 
-                <div className="lg:col-span-6">
-                  <div className="rounded-xl bg-[#1D2B3A] dark:bg-[#0B1120] text-slate-100 p-4 sm:p-5 font-mono text-xs shadow-inner border border-[#2A3F55] dark:border-white/10">
-                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
-                      <div className="flex items-center gap-1.5">
+                <div className="lg:col-span-6 min-w-0">
+                  <div className="rounded-xl bg-[#1D2B3A] dark:bg-[#0B1120] text-slate-100 p-4 sm:p-5 font-mono text-xs shadow-inner border border-[#2A3F55] dark:border-white/10 min-w-0">
+                    <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-white/10 min-w-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                         <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
                       </div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                        <Terminal className="w-3 h-3 text-[#E07A5F]" />
-                        <span>{currentStage.logHeader}</span>
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 min-w-0">
+                        <Terminal className="w-3 h-3 text-[#E07A5F] shrink-0" />
+                        <span className="truncate">{currentStage.logHeader}</span>
                       </div>
                     </div>
 
-                    <div className="space-y-1.5 text-[11px] leading-relaxed">
+                    <div className="space-y-1.5 text-[11px] leading-relaxed overflow-x-auto">
                       {currentStage.logLines.map((line, i) => (
                         <p
                           key={i}
-                          className={
+                          className={`break-words [overflow-wrap:anywhere] ${
                             line.includes('Status:') || line.includes('passed') || line.includes('Active')
                               ? 'text-emerald-400 font-semibold'
                               : line.includes('Prompt:') || line.includes('Output:')
                                 ? 'text-[#E07A5F]'
                                 : 'text-slate-300'
-                          }
+                          }`}
                         >
                           {line}
                         </p>
@@ -423,9 +423,9 @@ export default function About() {
                   Full-Stack Developer &amp; Creator
                 </p>
 
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-sans font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 mt-3.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-sans font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 mt-3.5 max-w-full">
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
                   </span>
                   <span>Open to Engineering Roles</span>
@@ -488,8 +488,8 @@ export default function About() {
         </section>
 
         <section>
-          <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors">
-            <div className="space-y-1">
+          <div className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors">
+            <div className="space-y-1 min-w-0">
               <span className="text-[10px] font-mono font-bold text-[#B25B3E] dark:text-[#E07A5F] uppercase tracking-wider block">
                 CONTINUE READING
               </span>
@@ -502,10 +502,10 @@ export default function About() {
             </div>
             <Link
               to="/how-it-works"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1D2B3A] dark:bg-white text-white dark:text-[#0F172A] hover:bg-[#2A3F55] dark:hover:bg-slate-100 text-xs font-semibold rounded-xl transition-all active:scale-[0.98] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1D2B3A] dark:bg-white text-white dark:text-[#0F172A] hover:bg-[#2A3F55] dark:hover:bg-slate-100 text-xs font-semibold rounded-xl transition-all active:scale-[0.98] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
             >
               <span>Explore the Workflow</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </Link>
           </div>
         </section>

@@ -49,21 +49,21 @@ const ClassicTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
           WebkitPrintColorAdjust: 'exact',
         }}
       >
-        <h1 className="text-4xl font-bold tracking-tight text-[#1D2B3A] uppercase font-serif">
+        <h1 className="text-4xl font-bold tracking-tight text-[#1D2B3A] uppercase font-serif break-words [overflow-wrap:anywhere]">
           {data.name || 'Candidate Name'}
         </h1>
         <p
-          className="text-base font-sans font-medium tracking-widest uppercase mt-2"
+          className="text-base font-sans font-medium tracking-widest uppercase mt-2 break-words [overflow-wrap:anywhere]"
           style={{ color: accentColor }}
         >
           {data.title || 'Professional Title'}
         </p>
         <div className="flex justify-center flex-wrap items-center gap-3 mt-4 text-xs font-sans text-gray-600">
-          {data.email && <span>Email: {data.email}</span>}
+          {data.email && <span className="break-words [overflow-wrap:anywhere]">Email: {data.email}</span>}
           {data.email && data.phone && <span>&bull;</span>}
-          {data.phone && <span>Phone: {data.phone}</span>}
+          {data.phone && <span className="break-words [overflow-wrap:anywhere]">Phone: {data.phone}</span>}
           {(data.email || data.phone) && data.location && <span>&bull;</span>}
-          {data.location && <span>{data.location}</span>}
+          {data.location && <span className="break-words [overflow-wrap:anywhere]">{data.location}</span>}
         </div>
       </div>
 
@@ -81,7 +81,7 @@ const ClassicTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             >
               Professional Summary
             </h2>
-            <p className="text-sm font-sans text-gray-700 leading-relaxed whitespace-pre-wrap">
+            <p className="text-sm font-sans text-gray-700 leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
               {data.bio}
             </p>
           </section>
@@ -103,16 +103,16 @@ const ClassicTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             {Array.isArray(experienceList) ? (
               experienceList.map((exp, i) => (
                 <div key={i} className="mb-4 break-inside-avoid">
-                  <div className="flex justify-between items-baseline">
-                    <h3 className="font-bold font-sans text-sm text-[#1D2B3A]">{exp.role || exp.title}</h3>
-                    {exp.duration && <span className="text-xs font-sans text-gray-500">{exp.duration}</span>}
+                  <div className="flex justify-between items-baseline gap-3">
+                    <h3 className="font-bold font-sans text-sm text-[#1D2B3A] min-w-0 break-words [overflow-wrap:anywhere]">{exp.role || exp.title}</h3>
+                    {exp.duration && <span className="text-xs font-sans text-gray-500 shrink-0">{exp.duration}</span>}
                   </div>
-                  <p className="text-xs font-sans font-medium mb-1.5" style={{ color: accentColor }}>{exp.company}</p>
-                  <p className="text-sm font-sans text-gray-700 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
+                  <p className="text-xs font-sans font-medium mb-1.5 break-words [overflow-wrap:anywhere]" style={{ color: accentColor }}>{exp.company}</p>
+                  <p className="text-sm font-sans text-gray-700 leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{exp.description}</p>
                 </div>
               ))
             ) : (
-              <p className="text-sm font-sans text-gray-700 whitespace-pre-wrap">{experienceList}</p>
+              <p className="text-sm font-sans text-gray-700 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{experienceList}</p>
             )}
           </section>
         )}
@@ -133,15 +133,15 @@ const ClassicTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             {Array.isArray(educationList) ? (
               educationList.map((edu, i) => (
                 <div key={i} className="mb-3 break-inside-avoid">
-                  <div className="flex justify-between items-baseline">
-                    <h3 className="font-bold font-sans text-sm text-[#1D2B3A]">{edu.degree}</h3>
-                    {edu.year && <span className="text-xs font-sans text-gray-500">{edu.year}</span>}
+                  <div className="flex justify-between items-baseline gap-3">
+                    <h3 className="font-bold font-sans text-sm text-[#1D2B3A] min-w-0 break-words [overflow-wrap:anywhere]">{edu.degree}</h3>
+                    {edu.year && <span className="text-xs font-sans text-gray-500 shrink-0">{edu.year}</span>}
                   </div>
-                  <p className="text-sm font-sans text-gray-700">{edu.institution}</p>
+                  <p className="text-sm font-sans text-gray-700 break-words [overflow-wrap:anywhere]">{edu.institution}</p>
                 </div>
               ))
             ) : (
-              <p className="text-sm font-sans text-gray-700 whitespace-pre-wrap">{educationList}</p>
+              <p className="text-sm font-sans text-gray-700 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{educationList}</p>
             )}
           </section>
         )}
@@ -163,7 +163,7 @@ const ClassicTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
               {skillsList.map((skill, i) => (
                 <span
                   key={i}
-                  className="bg-[#F3EFE9] border border-[#E5E1D8] text-[#1D2B3A] px-3 py-1 rounded text-xs font-medium"
+                  className="bg-[#F3EFE9] border border-[#E5E1D8] text-[#1D2B3A] px-3 py-1 rounded text-xs font-medium break-words [overflow-wrap:anywhere] max-w-full"
                 >
                   {skill}
                 </span>

@@ -447,9 +447,9 @@ export default function PublicTwinChat() {
 
   return (
     <div className="min-h-[100dvh] h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-slate-100 font-sans flex flex-col selection:bg-[#B25B3E] selection:text-[#FCFAF6] overflow-hidden transition-colors">
-      <header className="flex-none border-b border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6]/85 dark:bg-[#1E293B]/85 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-6 py-3 sm:py-3.5 transition-colors">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+      <header className="flex-none border-b border-[#E5E1D8] dark:border-[#334155] bg-[#FCFAF6]/85 dark:bg-[#1E293B]/85 backdrop-blur-md sticky top-0 z-50 px-3 sm:px-6 py-3 sm:py-3.5 transition-colors">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1">
             {canGoBackInternally && (
               <button
                 type="button"
@@ -462,11 +462,11 @@ export default function PublicTwinChat() {
               </button>
             )}
 
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#1D2B3A] dark:bg-[#B25B3E] text-white flex items-center justify-center font-serif font-semibold text-xs sm:text-sm shadow-xs select-none shrink-0">
                 {getInitials(twinData?.name)}
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <h1 className="font-serif font-bold text-base sm:text-lg text-[#1D2B3A] dark:text-white tracking-tight flex items-center gap-1.5 sm:gap-2 truncate">
                   {isLoadingTwin ? (
                     'Connecting...'
@@ -478,13 +478,13 @@ export default function PublicTwinChat() {
                   )}
                 </h1>
                 <p className="text-[11px] sm:text-xs text-[#5C5751] dark:text-slate-400 flex items-center gap-1.5 sm:gap-2 truncate">
-                  <span className="inline-block w-2 h-2 rounded-full bg-[#047857] dark:bg-[#10B981] animate-pulse shrink-0" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#047857] dark:bg-[#10B981] animate-pulse motion-reduce:animate-none shrink-0" />
                   {twinData?.title ? (
                     <span className="font-medium text-[#1D2B3A] dark:text-slate-200 truncate">
                       {twinData.title}
                     </span>
                   ) : (
-                    <span>Active Persona</span>
+                    <span className="truncate">Active Persona</span>
                   )}
                   <span className="text-[#E5E1D8] dark:text-[#334155] hidden sm:inline shrink-0">&bull;</span>
                   <span className="hidden sm:inline font-mono text-[10px] uppercase tracking-widest shrink-0">
@@ -500,13 +500,15 @@ export default function PublicTwinChat() {
               type="button"
               onClick={() => setIsCredentialsOpen(true)}
               aria-label="View Verified Credentials"
-              className="bg-[#F3EFE9] hover:bg-[#E5E1D8] dark:bg-[#0F172A]/90 dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 rounded-full px-3 py-1.5 text-xs font-sans font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] flex items-center gap-1.5 shadow-2xs border border-[#E5E1D8] dark:border-[#334155]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] cursor-pointer"
+              className="shrink-0 min-w-[44px] min-h-[44px] md:min-h-[36px] px-2.5 min-[400px]:px-3 sm:px-3.5 sm:py-1.5 bg-[#F3EFE9] hover:bg-[#E5E1D8] dark:bg-[#0F172A]/90 dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 rounded-full text-xs font-sans font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] flex items-center justify-center gap-1.5 shadow-2xs border border-[#E5E1D8] dark:border-[#334155]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] cursor-pointer"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
+              <ShieldCheck className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
+              <span className="hidden min-[400px]:inline sm:hidden">Docs</span>
               <span className="hidden sm:inline">View Verified Credentials</span>
-              <span className="inline sm:hidden">Credentials</span>
             </button>
-            <ThemeToggle />
+            <div className="shrink-0">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -587,8 +589,8 @@ export default function PublicTwinChat() {
                         }`}
                       >
                         {isUser && (
-                          <div className="bg-[#B25B3E] text-white rounded-2xl rounded-br-sm px-4 py-3 shadow-sm max-w-[85%] sm:max-w-[75%]">
-                            <p className="text-sm text-white leading-relaxed whitespace-pre-wrap">
+                          <div className="bg-[#B25B3E] text-white rounded-2xl rounded-br-sm px-4 py-3 shadow-sm max-w-[85%] sm:max-w-[75%] min-w-0">
+                            <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                               {msg.text}
                             </p>
                             <span className="text-[10px] text-white/75 font-mono block mt-1.5 text-right">
@@ -603,16 +605,16 @@ export default function PublicTwinChat() {
                               {getInitials(twinData?.name)}
                             </div>
                             <div
-                              className={`bg-[#FCFAF6] dark:bg-[#1E293B] border text-[#1D2B3A] dark:text-slate-100 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm max-w-[85%] sm:max-w-[75%] ${
+                              className={`bg-[#FCFAF6] dark:bg-[#1E293B] border text-[#1D2B3A] dark:text-slate-100 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm max-w-[85%] sm:max-w-[75%] min-w-0 ${
                                 msg.isError
                                   ? 'border-[#B25B3E]/40 dark:border-[#E07A5F]/40'
                                   : 'border-[#E5E1D8] dark:border-[#334155]/80'
                               }`}
                             >
-                              <div className="flex items-center justify-between gap-3 mb-1.5 pb-1.5 border-b border-[#E5E1D8]/80 dark:border-[#334155]/80">
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 pb-1.5 border-b border-[#E5E1D8]/80 dark:border-[#334155]/80">
                                 {msg.isError ? (
                                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#B25B3E]/10 dark:bg-[#E07A5F]/15 font-mono font-bold text-[10px] uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F]">
-                                    <AlertCircle className="w-3 h-3" />
+                                    <AlertCircle className="w-3 h-3 shrink-0" />
                                     {msg.errorStatus === 429
                                       ? 'Rate Limited'
                                       : msg.errorStatus === 504
@@ -621,15 +623,15 @@ export default function PublicTwinChat() {
                                   </span>
                                 ) : (
                                   <span className="flex items-center gap-1.5 font-mono font-bold text-[10px] uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F]">
-                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                                     Verified AI Representative
                                   </span>
                                 )}
-                                <span className="text-[10px] text-[#8A847C] dark:text-slate-400 font-mono">
+                                <span className="text-[10px] text-[#8A847C] dark:text-slate-400 font-mono shrink-0">
                                   {msg.timestamp}
                                 </span>
                               </div>
-                              <p className="text-sm text-[#1D2B3A] dark:text-slate-100 leading-relaxed whitespace-pre-wrap">
+                              <p className="text-sm text-[#1D2B3A] dark:text-slate-100 leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                                 {msg.text}
                               </p>
                               {msg.isError && msg.failedQuery && (
@@ -643,9 +645,9 @@ export default function PublicTwinChat() {
                                         retryErrorId: msg.id,
                                       })
                                     }
-                                    className="bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                                    className="bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-medium min-h-[44px] sm:min-h-[36px] px-3.5 py-2 rounded-lg inline-flex items-center gap-1.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                                   >
-                                    <RotateCcw className="w-3.5 h-3.5" />
+                                    <RotateCcw className="w-3.5 h-3.5 shrink-0" />
                                     <span>Retry Question</span>
                                   </button>
                                 </div>
@@ -738,7 +740,7 @@ export default function PublicTwinChat() {
                     exit={{ opacity: 0, scale: 0.8, y: 10 }}
                     transition={{ duration: 0.2 }}
                     aria-label="Scroll to latest messages"
-                    className="absolute right-4 sm:right-6 bottom-4 z-20 w-9 h-9 rounded-full bg-[#FCFAF6] dark:bg-[#1E293B] text-[#B25B3E] dark:text-[#E07A5F] border border-[#E5E1D8] dark:border-[#334155] shadow-md flex items-center justify-center hover:bg-[#F3EFE9] dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] cursor-pointer"
+                    className="absolute right-4 sm:right-6 bottom-4 z-20 w-11 h-11 rounded-full bg-[#FCFAF6] dark:bg-[#1E293B] text-[#B25B3E] dark:text-[#E07A5F] border border-[#E5E1D8] dark:border-[#334155] shadow-md flex items-center justify-center hover:bg-[#F3EFE9] dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] cursor-pointer"
                   >
                     <ArrowDown className="w-4 h-4" />
                   </motion.button>
@@ -775,14 +777,15 @@ export default function PublicTwinChat() {
                       <button
                         key={q}
                         type="button"
+                        title={q}
                         disabled={isTyping}
                         onClick={() => {
                           if (hasDraggedRef.current || isTyping) return;
                           sendChatMessage(q);
                         }}
-                        className="group shrink-0 snap-start whitespace-nowrap inline-flex items-center gap-1.5 bg-[#FCFAF6] dark:bg-[#1E293B] text-[#1D2B3A] dark:text-slate-200 hover:bg-[#1D2B3A] dark:hover:bg-[#334155] hover:text-[#FCFAF6] dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed border border-[#E5E1D8] dark:border-[#334155]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs active:scale-95 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                        className="group shrink-0 snap-start whitespace-nowrap inline-flex items-center gap-1.5 min-h-[40px] sm:min-h-[36px] max-w-[260px] min-[400px]:max-w-[300px] sm:max-w-none bg-[#FCFAF6] dark:bg-[#1E293B] text-[#1D2B3A] dark:text-slate-200 hover:bg-[#1D2B3A] dark:hover:bg-[#334155] hover:text-[#FCFAF6] dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed border border-[#E5E1D8] dark:border-[#334155]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] transition-all rounded-full px-3.5 py-1.5 text-xs shadow-xs active:scale-95 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                       >
-                        <span>{q}</span>
+                        <span className="block truncate min-w-0">{q}</span>
                         <ArrowUpRight className="w-3.5 h-3.5 shrink-0 text-[#B25B3E]/70 dark:text-[#E07A5F]/80 group-hover:text-[#B25B3E] dark:group-hover:text-[#E07A5F] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-150" />
                       </button>
                     ))}
@@ -852,7 +855,7 @@ export default function PublicTwinChat() {
                   ? { duration: 0.15 }
                   : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }
               }
-              className="fixed top-0 right-0 z-50 h-[100dvh] w-full max-w-md bg-[#FCFAF6] dark:bg-[#1E293B] border-l border-[#E5E1D8] dark:border-[#334155] shadow-2xl dark:shadow-[inset_1px_0_0_0_rgba(255,255,255,0.06)] flex flex-col"
+              className="fixed top-0 right-0 z-50 h-[100dvh] w-full max-w-[92vw] sm:max-w-md bg-[#FCFAF6] dark:bg-[#1E293B] border-l border-[#E5E1D8] dark:border-[#334155] shadow-2xl dark:shadow-[inset_1px_0_0_0_rgba(255,255,255,0.06)] flex flex-col"
             >
               <div className="px-5 py-4 border-b border-[#E5E1D8] dark:border-[#334155] flex items-center justify-between gap-3 bg-[#FCFAF6] dark:bg-[#1E293B]">
                 <div className="flex items-center gap-3 min-w-0">
@@ -875,7 +878,7 @@ export default function PublicTwinChat() {
                   type="button"
                   onClick={() => setIsCredentialsOpen(false)}
                   aria-label="Close credentials drawer"
-                  className="min-w-[36px] min-h-[36px] p-2 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8]/60 dark:hover:bg-[#334155] transition-all duration-150 active:scale-95 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8]/60 dark:hover:bg-[#334155] transition-all duration-150 active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -885,7 +888,7 @@ export default function PublicTwinChat() {
                   <span className="font-mono font-bold text-[10px] sm:text-[11px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 block mb-2">
                     Executive Persona Bio
                   </span>
-                  <div className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155]/80 rounded-xl p-4 text-sm leading-relaxed text-[#1D2B3A] dark:text-slate-200 whitespace-pre-wrap">
+                  <div className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155]/80 rounded-xl p-4 text-sm leading-relaxed text-[#1D2B3A] dark:text-slate-200 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                     {twinData?.bio || 'No candidate bio information has been provided for this persona.'}
                   </div>
                 </div>
@@ -894,7 +897,7 @@ export default function PublicTwinChat() {
                     <span className="font-mono font-bold text-[10px] sm:text-[11px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 block mb-2">
                       Professional Title
                     </span>
-                    <span className="inline-block bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 text-xs font-sans font-medium px-3 py-1.5 rounded-full">
+                    <span className="inline-block max-w-full bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 text-xs font-sans font-medium px-3 py-1.5 rounded-full break-words [overflow-wrap:anywhere]">
                       {twinData.title}
                     </span>
                   </div>
@@ -904,7 +907,7 @@ export default function PublicTwinChat() {
                     <span className="font-mono font-bold text-[10px] sm:text-[11px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 block mb-2">
                       Persona Speaking Tone
                     </span>
-                    <span className="inline-block bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 text-xs font-sans font-medium px-3 py-1.5 rounded-full">
+                    <span className="inline-block max-w-full bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 text-xs font-sans font-medium px-3 py-1.5 rounded-full break-words [overflow-wrap:anywhere]">
                       {twinData.tone} Tone
                     </span>
                   </div>
@@ -918,7 +921,7 @@ export default function PublicTwinChat() {
                       {skillsList.map((skill, index) => (
                         <span
                           key={index}
-                          className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 text-xs font-sans px-2.5 py-1 rounded-lg"
+                          className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155]/80 text-[#1D2B3A] dark:text-slate-100 text-xs font-sans px-2.5 py-1 rounded-lg max-w-full break-words [overflow-wrap:anywhere]"
                         >
                           {skill}
                         </span>
@@ -929,18 +932,18 @@ export default function PublicTwinChat() {
                 {verifiedExperience.length > 0 && (
                   <div>
                     <span className="font-mono font-bold text-[10px] sm:text-[11px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 flex items-center gap-1.5 mb-3">
-                      <Briefcase className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+                      <Briefcase className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
                       <span>Experience ({verifiedExperience.length})</span>
                     </span>
                     <div className="pl-4 border-l border-[#E5E1D8] dark:border-[#334155] space-y-4">
                       {verifiedExperience.map((exp, idx) => (
-                        <div key={`${exp.role || exp.title || 'exp'}-${idx}`} className="relative">
+                        <div key={`${exp.role || exp.title || 'exp'}-${idx}`} className="relative min-w-0">
                           <span
                             aria-hidden="true"
                             className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-[#B25B3E] dark:bg-[#E07A5F] ring-4 ring-[#FCFAF6] dark:ring-[#1E293B]"
                           />
-                          <div className="flex flex-wrap items-center justify-between gap-1.5">
-                            <p className="font-semibold text-xs sm:text-sm text-[#1D2B3A] dark:text-white leading-snug">
+                          <div className="flex flex-wrap items-center justify-between gap-1.5 min-w-0">
+                            <p className="font-semibold text-xs sm:text-sm text-[#1D2B3A] dark:text-white leading-snug min-w-0 break-words [overflow-wrap:anywhere]">
                               {exp.role || exp.title || 'Experience Role'}
                             </p>
                             {exp.duration && (
@@ -950,12 +953,12 @@ export default function PublicTwinChat() {
                             )}
                           </div>
                           {exp.company && (
-                            <p className="text-xs font-medium text-[#B25B3E] dark:text-[#E07A5F] mt-0.5">
+                            <p className="text-xs font-medium text-[#B25B3E] dark:text-[#E07A5F] mt-0.5 break-words [overflow-wrap:anywhere]">
                               {exp.company}
                             </p>
                           )}
                           {exp.description && (
-                            <p className="text-xs leading-relaxed text-[#5C5751] dark:text-slate-300 mt-1.5 whitespace-pre-wrap">
+                            <p className="text-xs leading-relaxed text-[#5C5751] dark:text-slate-300 mt-1.5 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                               {exp.description}
                             </p>
                           )}
@@ -967,20 +970,20 @@ export default function PublicTwinChat() {
                 {verifiedEducation.length > 0 && (
                   <div>
                     <span className="font-mono font-bold text-[10px] sm:text-[11px] uppercase tracking-widest text-[#8A847C] dark:text-slate-400 flex items-center gap-1.5 mb-2.5">
-                      <GraduationCap className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+                      <GraduationCap className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
                       <span>Education ({verifiedEducation.length})</span>
                     </span>
                     <div className="space-y-2.5">
                       {verifiedEducation.map((edu, idx) => (
                         <div
                           key={`${edu.degree || 'edu'}-${idx}`}
-                          className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3.5"
+                          className="bg-[#F3EFE9]/70 dark:bg-[#0F172A]/70 border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3.5 min-w-0"
                         >
-                          <p className="font-serif font-bold text-xs sm:text-sm text-[#1D2B3A] dark:text-white leading-snug">
+                          <p className="font-serif font-bold text-xs sm:text-sm text-[#1D2B3A] dark:text-white leading-snug break-words [overflow-wrap:anywhere]">
                             {edu.degree || 'Academic Credential'}
                           </p>
                           {edu.institution && (
-                            <p className="text-xs text-[#5C5751] dark:text-slate-300 mt-0.5">
+                            <p className="text-xs text-[#5C5751] dark:text-slate-300 mt-0.5 break-words [overflow-wrap:anywhere]">
                               {edu.institution}
                             </p>
                           )}
@@ -995,13 +998,13 @@ export default function PublicTwinChat() {
                   </div>
                 )}
               </div>
-              <div className="px-5 py-3.5 border-t border-[#E5E1D8] dark:border-[#334155]/70 bg-[#FCFAF6] dark:bg-[#1E293B] flex items-center justify-between text-xs text-[#5C5751] dark:text-slate-400">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F]" />
-                  <span>Grounded in Verified Candidate Resume</span>
+              <div className="px-5 py-3.5 border-t border-[#E5E1D8] dark:border-[#334155]/70 bg-[#FCFAF6] dark:bg-[#1E293B] flex flex-wrap items-center justify-between gap-2 text-xs text-[#5C5751] dark:text-slate-400">
+                <div className="flex items-center gap-2 min-w-0">
+                  <ShieldCheck className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
+                  <span className="truncate">Grounded in Verified Candidate Resume</span>
                 </div>
                 {twinData?.publicSlug && (
-                  <span className="font-mono text-[10px] text-[#B25B3E] dark:text-[#E07A5F]">
+                  <span className="font-mono text-[10px] text-[#B25B3E] dark:text-[#E07A5F] break-all min-w-0">
                     {twinData.publicSlug}
                   </span>
                 )}

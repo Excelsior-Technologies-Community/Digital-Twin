@@ -257,8 +257,8 @@ export default function Result() {
       <HeroScene3D scrollProgressRef={staticScrollRef} />
 
       <section className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 font-sans">
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start lg:items-stretch">
-          <div className="lg:col-span-7 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-6 md:p-8 rounded-2xl relative overflow-hidden flex flex-col h-full">
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto lg:max-w-none grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start lg:items-stretch">
+          <div className="lg:col-span-7 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-6 lg:p-7 xl:p-8 rounded-2xl relative overflow-hidden flex flex-col h-full min-w-0">
             <div className="shrink-0">
               <div className="inline-flex items-center gap-2 bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] px-3.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest text-[#B25B3E] dark:text-[#E07A5F] mb-3 self-start">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -446,7 +446,7 @@ export default function Result() {
                                 <CheckCircle2 className="w-3 h-3 shrink-0" />
                                 <span>PDF BUFFER VERIFIED</span>
                               </span>
-                              <h4 className="text-sm sm:text-base font-serif font-bold text-[#1D2B3A] dark:text-white truncate">
+                              <h4 className="text-sm sm:text-base font-serif font-bold text-[#1D2B3A] dark:text-white break-words">
                                 {file.name}
                               </h4>
                               <p className="text-xs font-mono text-[#5C5751] dark:text-slate-400">
@@ -548,19 +548,19 @@ export default function Result() {
               </AnimatePresence>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-[#E5E1D8] dark:border-[#334155] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-0 text-xs text-[#5C5751] dark:text-slate-400 shrink-0">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F]" />
+            <div className="mt-auto pt-4 border-t border-[#E5E1D8] dark:border-[#334155] flex flex-wrap items-center justify-between gap-2.5 text-xs text-[#5C5751] dark:text-slate-400 shrink-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <ShieldCheck className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
                 <span>AI-Grounded Executive Synthesis</span>
               </div>
-              <div className="flex items-center gap-1.5 font-mono font-medium text-[11px] text-[#047857] dark:text-[#10B981]">
-                <span className="w-2 h-2 rounded-full bg-[#047857] dark:bg-[#10B981] animate-pulse" />
+              <div className="flex items-center gap-1.5 font-mono font-medium text-[11px] text-[#047857] dark:text-[#10B981] shrink-0">
+                <span className="w-2 h-2 rounded-full bg-[#047857] dark:bg-[#10B981] animate-pulse motion-reduce:animate-none shrink-0" />
                 <span>Semantic Extraction Ready</span>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-6 md:p-7 rounded-2xl relative overflow-hidden flex flex-col h-full">
+          <div className="lg:col-span-5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] p-5 sm:p-6 lg:p-7 rounded-2xl relative overflow-hidden flex flex-col h-full min-w-0">
             <StudioPersonaCard3D
               name={formData.name}
               tone={formData.tone}
@@ -602,7 +602,7 @@ export default function Result() {
                   <Sliders className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
                   <span>Speaking Persona Tone</span>
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2.5">
                   {toneOptions.map((tone) => {
                     const isSelected = formData.tone === tone.label;
                     return (
@@ -615,14 +615,14 @@ export default function Result() {
                           setPreviewTone(tone.label);
                         }}
                         aria-pressed={isSelected}
-                        className={`text-left p-3 rounded-xl border transition-all duration-200 text-xs h-full flex flex-col justify-between min-h-[72px] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+                        className={`min-w-0 text-left p-3 rounded-xl border transition-all duration-200 text-xs h-full flex flex-col justify-between min-h-[72px] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
                           isSelected
                             ? 'bg-[#1D2B3A] dark:bg-[#0F172A] text-[#FCFAF6] dark:text-white border-[#B25B3E] dark:border-[#E07A5F] ring-1 ring-[#B25B3E]/30 dark:ring-[#E07A5F]/30 shadow-sm'
                             : 'bg-[#F3EFE9]/80 dark:bg-[#0F172A]/50 text-[#1D2B3A] dark:text-slate-100 border-[#E5E1D8] dark:border-[#334155] hover:border-[#B25B3E]/40 dark:hover:border-[#E07A5F]/40 hover:-translate-y-0.5'
                         }`}
                       >
-                        <div className="font-serif font-bold text-xs sm:text-sm mb-1 flex items-center justify-between gap-2">
-                          <span>{tone.label}</span>
+                        <div className="font-serif font-bold text-xs sm:text-sm mb-1 flex items-center justify-between gap-2 w-full min-w-0">
+                          <span className="min-w-0 break-words">{tone.label}</span>
                           {isSelected ? (
                             <span
                               aria-hidden="true"
@@ -694,7 +694,7 @@ export default function Result() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
               {toneOptions.map((tone) => {
                 const isPreviewActive = previewTone === tone.label;
                 return (
@@ -703,7 +703,7 @@ export default function Result() {
                     type="button"
                     onClick={() => setPreviewTone(tone.label)}
                     aria-pressed={isPreviewActive}
-                    className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
+                    className={`shrink-0 min-h-[44px] inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-sans font-semibold border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
                       isPreviewActive
                         ? 'bg-[#B25B3E] text-white border-[#B25B3E] shadow-xs'
                         : 'bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 text-[#5C5751] dark:text-slate-300 border-[#E5E1D8] dark:border-[#334155] hover:text-[#1D2B3A] dark:hover:text-white hover:border-[#B25B3E]/40 dark:hover:border-[#E07A5F]/40'
@@ -715,7 +715,7 @@ export default function Result() {
               })}
             </div>
 
-            <div className="bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-5">
+            <div className="bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-5 sm:p-6 lg:p-8 shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#E5E1D8] dark:border-[#334155]">
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] flex items-center justify-center shrink-0 mt-0.5">
@@ -743,10 +743,10 @@ export default function Result() {
                       setFormData((prev) => ({ ...prev, tone: previewTone }));
                       toast.success(`Speaking tone set to ${previewTone}`);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest bg-[#B25B3E] hover:bg-[#9E4D32] text-white shadow-xs transition-all active:scale-[0.98] shrink-0 self-start sm:self-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                    className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest bg-[#B25B3E] hover:bg-[#9E4D32] text-white shadow-xs transition-all active:scale-[0.98] shrink-0 self-start sm:self-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                   >
                     <span>Apply to Workbench</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3 shrink-0" />
                   </button>
                 )}
               </div>
@@ -796,13 +796,15 @@ export default function Result() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {INGESTION_SPECS.map((spec) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {INGESTION_SPECS.map((spec, idx) => {
                 const Icon = spec.icon;
                 return (
                   <div
                     key={spec.title}
-                    className="bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl p-6 shadow-xs flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5"
+                    className={`bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 ${
+                      idx === 2 ? 'md:col-span-2 lg:col-span-1' : ''
+                    }`}
                   >
                     <div>
                       <div className="w-10 h-10 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] text-[#B25B3E] dark:text-[#E07A5F] flex items-center justify-center border border-[#E5E1D8] dark:border-[#334155] mb-4">
@@ -832,11 +834,11 @@ export default function Result() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.15 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-2xl bg-[#1D2B3A] dark:bg-[#1E293B] text-white border border-[#1D2B3A] dark:border-[#334155] p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-xl"
+            className="rounded-2xl bg-[#1D2B3A] dark:bg-[#1E293B] text-white border border-[#1D2B3A] dark:border-[#334155] p-5 sm:p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-xl"
           >
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-2 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse motion-reduce:animate-none shrink-0" />
                 <span>PRIVACY &amp; GROUNDING GUARANTEE</span>
               </div>
               <h2 className="font-serif font-bold text-xl sm:text-2xl text-white tracking-tight">
@@ -850,9 +852,9 @@ export default function Result() {
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' })}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs sm:text-sm font-sans font-semibold transition-all active:scale-[0.98] shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E07A5F]"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs sm:text-sm font-sans font-semibold transition-all active:scale-[0.98] shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E07A5F]"
             >
-              <ArrowUp className="w-4 h-4 text-[#E07A5F]" />
+              <ArrowUp className="w-4 h-4 text-[#E07A5F] shrink-0" />
               <span>Back to Upload Workbench</span>
             </button>
           </motion.div>

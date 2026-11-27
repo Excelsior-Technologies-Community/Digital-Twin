@@ -367,12 +367,18 @@ const disposeSpriteCache = (cache) => {
   cache.clear();
 };
 
+const getDefaultCameraZ = (width) => {
+  if (!width || width >= 500) return 240;
+  return Math.min(310, Math.max(290, Math.round(240 * (460 / width))));
+};
+
 function SkillGraph3D({ resumeData }) {
   const { isDarkMode } = useTheme();
   const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef(null);
   const fgRef = useRef();
   const spriteCacheRef = useRef(new Map());
+  const hasAppliedInitialCameraRef = useRef(false);
 
   const [dimensions, setDimensions] = useState(() => ({
     width: 0,
@@ -455,6 +461,20 @@ function SkillGraph3D({ resumeData }) {
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [selectedNode]);
+
+  useEffect(() => {
+    if (dimensions.width <= 0 || hasAppliedInitialCameraRef.current || !fgRef.current) return;
+    hasAppliedInitialCameraRef.current = true;
+    if (dimensions.width < 500 && typeof fgRef.current.cameraPosition === 'function') {
+      const targetZ = getDefaultCameraZ(dimensions.width);
+      const frameId = requestAnimationFrame(() => {
+        if (fgRef.current && typeof fgRef.current.cameraPosition === 'function') {
+          fgRef.current.cameraPosition({ x: 0, y: 0, z: targetZ }, { x: 0, y: 0, z: 0 }, 0);
+        }
+      });
+      return () => cancelAnimationFrame(frameId);
+    }
+  }, [dimensions.width]);
 
   const candidateDisplayName = resumeData?.name?.trim() || 'Candidate';
 
@@ -575,7 +595,8 @@ function SkillGraph3D({ resumeData }) {
     setSelectedNode(null);
     setSelectedCategory('All');
     if (fgRef.current && typeof fgRef.current.cameraPosition === 'function') {
-      fgRef.current.cameraPosition({ x: 0, y: 0, z: 240 }, { x: 0, y: 0, z: 0 }, 1000);
+      const resetZ = getDefaultCameraZ(dimensions.width);
+      fgRef.current.cameraPosition({ x: 0, y: 0, z: resetZ }, { x: 0, y: 0, z: 0 }, 1000);
     }
   };
 
@@ -720,7 +741,7 @@ function SkillGraph3D({ resumeData }) {
               return isDarkMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(29, 43, 58, 0.15)';
             }}
             nodeVal={(node) => node.val}
-            nodeResolution={24}
+            nodeResolution={dimensions.width > 0 && dimensions.width < 500 ? 14 : 24}
             linkColor={(link) => {
               if (activeCategory === 'All') {
                 return isDarkMode ? '#334155' : '#E5E1D8';
@@ -806,50 +827,56 @@ function SkillGraph3D({ resumeData }) {
         </motion.div>
       )}
 
-      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10 flex items-center gap-1.5 flex-wrap max-w-[calc(100%-140px)] sm:max-w-md pointer-events-auto">
-        {categories.map((cat) => {
-          const isActive = activeCategory === cat;
-          return (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => {
-                setSelectedCategory(cat);
-                setSelectedNode(null);
-              }}
-              aria-pressed={isActive}
-              className={`px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-sans font-medium transition-all duration-150 border select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
-                isActive
-                  ? 'bg-[#B25B3E] text-white border-[#B25B3E] shadow-sm'
-                  : 'bg-[#FCFAF6]/90 dark:bg-[#0F172A]/85 text-[#5C5751] dark:text-slate-300 hover:text-[#1D2B3A] dark:hover:text-white border-[#E5E1D8] dark:border-[#334155] backdrop-blur-sm'
-              }`}
-            >
-              {cat}
-            </button>
-          );
-        })}
-      </div>
+      <div className="absolute top-3 inset-x-3 sm:inset-x-4 z-10 flex items-start justify-between gap-2 pointer-events-none">
+        <div className="flex-1 min-w-0 pointer-events-auto">
+          <div className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+            {categories.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    setSelectedNode(null);
+                  }}
+                  aria-pressed={isActive}
+                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-sans font-medium transition-all duration-150 border select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
+                    isActive
+                      ? 'bg-[#B25B3E] text-white border-[#B25B3E] shadow-sm'
+                      : 'bg-[#FCFAF6]/90 dark:bg-[#0F172A]/85 text-[#5C5751] dark:text-slate-300 hover:text-[#1D2B3A] dark:hover:text-white border-[#E5E1D8] dark:border-[#334155] backdrop-blur-sm'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-      <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-2 z-10 pointer-events-auto">
-        {isTouchInteractive && (
+        <div className="shrink-0 flex items-center gap-1.5 pointer-events-auto">
+          {isTouchInteractive && (
+            <button
+              type="button"
+              onClick={() => setIsTouchInteractive(false)}
+              aria-label="Lock 3D canvas and restore page scrolling"
+              className="lg:hidden min-h-[34px] sm:min-h-[32px] px-2.5 py-1.5 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-white border border-[#E5E1D8] dark:border-[#334155] shadow-xs transition-colors flex items-center gap-1.5 text-xs font-sans font-medium shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+            >
+              <Lock className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+              <span>Lock Scroll</span>
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => setIsTouchInteractive(false)}
-            aria-label="Lock 3D canvas and restore page scrolling"
-            className="lg:hidden min-h-[38px] px-3 py-2 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-white border border-[#E5E1D8] dark:border-[#334155] shadow-xs transition-colors flex items-center gap-1.5 text-xs font-sans font-medium shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+            onClick={handleResetCamera}
+            className="min-w-[34px] min-h-[34px] sm:min-h-[32px] p-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-white border border-[#E5E1D8] dark:border-[#334155] shadow-xs transition-colors flex items-center justify-center gap-1.5 text-xs font-sans font-medium shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+            title="Reset Camera View"
+            aria-label="Reset camera view"
           >
-            <Lock className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
-            <span>Lock Scroll</span>
+            <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+            <span className="hidden sm:inline">Reset View</span>
           </button>
-        )}
-        <button
-          onClick={handleResetCamera}
-          className="min-w-[38px] min-h-[38px] p-2 sm:px-3 sm:py-2 rounded-lg bg-[#FCFAF6] dark:bg-[#1E293B] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-white border border-[#E5E1D8] dark:border-[#334155] shadow-xs transition-colors flex items-center justify-center gap-1.5 text-xs font-sans font-medium shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
-          title="Reset Camera View"
-        >
-          <RotateCcw className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
-          <span className="hidden sm:inline">Reset View</span>
-        </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -859,7 +886,7 @@ function SkillGraph3D({ resumeData }) {
             animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute top-14 right-3 sm:right-4 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-4 shadow-xl dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] w-72 max-w-[calc(100%-2rem)] z-20 pointer-events-auto"
+            className="absolute inset-x-3 bottom-3 top-auto w-auto max-h-[54%] overflow-y-auto sm:top-14 sm:bottom-auto sm:left-auto sm:right-4 sm:w-72 sm:max-h-[calc(100%-5rem)] bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-3.5 sm:p-4 shadow-xl dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] z-20 pointer-events-auto"
           >
             <div className="flex items-start justify-between gap-2 mb-2.5">
               <div className="min-w-0">
@@ -874,7 +901,7 @@ function SkillGraph3D({ resumeData }) {
                 type="button"
                 onClick={() => setSelectedNode(null)}
                 aria-label="Close skill inspector"
-                className="p-1 rounded-md text-[#5C5751] hover:text-[#1D2B3A] dark:text-gray-400 dark:hover:text-white hover:bg-[#E5E1D8]/60 dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                className="min-w-[32px] min-h-[32px] flex items-center justify-center shrink-0 rounded-md text-[#5C5751] hover:text-[#1D2B3A] dark:text-gray-400 dark:hover:text-white hover:bg-[#E5E1D8]/60 dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -913,15 +940,17 @@ function SkillGraph3D({ resumeData }) {
       </AnimatePresence>
 
       <div className="absolute bottom-3 left-3 sm:left-4 right-3 sm:right-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pointer-events-none text-[10px] sm:text-[11px] font-sans">
-        <div className="flex items-center gap-2.5 sm:gap-3 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/95 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#E5E1D8] dark:border-transparent shadow-2xs pointer-events-auto">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#B25B3E]"></span>
-            <span className="text-[#1D2B3A] dark:text-white font-semibold">{candidateDisplayName}</span>
+        <div className="flex items-center gap-2.5 sm:gap-3 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/95 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#E5E1D8] dark:border-transparent shadow-2xs pointer-events-auto min-w-0 max-w-full">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#B25B3E] shrink-0"></span>
+            <span className="text-[#1D2B3A] dark:text-white font-semibold truncate max-w-[120px] sm:max-w-[200px] lg:max-w-none">
+              {candidateDisplayName}
+            </span>
           </div>
-          <span className="text-[#E5E1D8] dark:text-[#334155]">&bull;</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1D2B3A] dark:bg-[#38BDF8]"></span>
-            <span className="text-[#5C5751] dark:text-gray-300">Skills & Systems ({graphData.nodes.length - 1})</span>
+          <span className="text-[#E5E1D8] dark:text-[#334155] shrink-0">&bull;</span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#1D2B3A] dark:bg-[#38BDF8] shrink-0"></span>
+            <span className="text-[#5C5751] dark:text-gray-300">Skills &amp; Systems ({graphData.nodes.length - 1})</span>
           </div>
         </div>
 

@@ -22,7 +22,7 @@ export default function ToastContainer() {
   return (
     <aside
       aria-label="Notifications"
-      className="fixed top-20 right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 max-w-sm w-[calc(100vw-2rem)] sm:w-full pointer-events-none"
+      className="fixed top-20 inset-x-4 sm:inset-x-auto sm:right-6 z-50 flex flex-col items-stretch sm:items-end gap-2.5 max-w-[calc(100vw-2rem)] sm:max-w-sm sm:w-full pointer-events-none"
     >
       <AnimatePresence mode="popLayout">
         {toasts.map((item) => (
@@ -46,7 +46,7 @@ export default function ToastContainer() {
               type="button"
               onClick={() => dismissToast(item.id)}
               aria-label="Dismiss notification"
-              className="p-1 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-gray-400 dark:hover:text-white hover:bg-[#E5E1D8]/60 dark:hover:bg-[#334155] transition-colors shrink-0 -mr-1 -mt-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+              className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-gray-400 dark:hover:text-white hover:bg-[#E5E1D8]/60 dark:hover:bg-[#334155] transition-colors shrink-0 -mr-1.5 -mt-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
             >
               <X className="w-3.5 h-3.5" />
             </button>

@@ -49,11 +49,11 @@ const ModernTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
           WebkitPrintColorAdjust: 'exact',
         }}
       >
-        <h1 className="text-4xl font-bold uppercase tracking-wide">{data.name || 'Candidate Name'}</h1>
-        <p className="text-lg mt-2 opacity-90">{data.title || 'Professional Title'}</p>
+        <h1 className="text-4xl font-bold uppercase tracking-wide break-words [overflow-wrap:anywhere]">{data.name || 'Candidate Name'}</h1>
+        <p className="text-lg mt-2 opacity-90 break-words [overflow-wrap:anywhere]">{data.title || 'Professional Title'}</p>
         <div className="flex flex-wrap gap-4 mt-4 text-sm opacity-80">
-          {data.email && <span>Email: {data.email}</span>}
-          {data.phone && <span>Phone: {data.phone}</span>}
+          {data.email && <span className="break-words [overflow-wrap:anywhere]">Email: {data.email}</span>}
+          {data.phone && <span className="break-words [overflow-wrap:anywhere]">Phone: {data.phone}</span>}
         </div>
       </div>
 
@@ -71,7 +71,7 @@ const ModernTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             >
               Professional Summary
             </h2>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{data.bio}</p>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{data.bio}</p>
           </section>
         )}
 
@@ -91,13 +91,13 @@ const ModernTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             {Array.isArray(experienceList) ? (
               experienceList.map((exp, i) => (
                 <div key={i} className="mb-4 break-inside-avoid">
-                  <h3 className="font-bold text-base">{exp.role || exp.title}</h3>
-                  <p className="text-xs text-gray-500 font-semibold mb-2">{exp.company} {exp.duration ? `| ${exp.duration}` : ''}</p>
-                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
+                  <h3 className="font-bold text-base break-words [overflow-wrap:anywhere]">{exp.role || exp.title}</h3>
+                  <p className="text-xs text-gray-500 font-semibold mb-2 break-words [overflow-wrap:anywhere]">{exp.company} {exp.duration ? `| ${exp.duration}` : ''}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{exp.description}</p>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{experienceList}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{experienceList}</p>
             )}
           </section>
         )}
@@ -118,12 +118,12 @@ const ModernTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             {Array.isArray(educationList) ? (
               educationList.map((edu, i) => (
                 <div key={i} className="mb-3 break-inside-avoid">
-                  <h3 className="font-bold text-base">{edu.degree}</h3>
-                  <p className="text-sm text-gray-700">{edu.institution} {edu.year ? `| ${edu.year}` : ''}</p>
+                  <h3 className="font-bold text-base break-words [overflow-wrap:anywhere]">{edu.degree}</h3>
+                  <p className="text-sm text-gray-700 break-words [overflow-wrap:anywhere]">{edu.institution} {edu.year ? `| ${edu.year}` : ''}</p>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{educationList}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{educationList}</p>
             )}
           </section>
         )}
@@ -143,7 +143,7 @@ const ModernTemplate = forwardRef(({ data, accentColor = '#1D2B3A' }, ref) => {
             </h2>
             <div className="flex flex-wrap gap-2">
               {skillsList.map((skill, i) => (
-                <span key={i} className="bg-[#FCFAF6] border border-[#E5E1D8] text-[#1D2B3A] px-3 py-1.5 rounded-md text-sm font-medium">
+                <span key={i} className="bg-[#FCFAF6] border border-[#E5E1D8] text-[#1D2B3A] px-3 py-1.5 rounded-md text-sm font-medium break-words [overflow-wrap:anywhere] max-w-full">
                   {skill}
                 </span>
               ))}

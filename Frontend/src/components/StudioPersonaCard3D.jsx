@@ -123,9 +123,9 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
             )}
           </AnimatePresence>
 
-          <div className="relative z-20 space-y-3.5" style={{ transformStyle: 'preserve-3d' }}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0" style={{ transformStyle: 'preserve-3d' }}>
+          <div className="relative z-20 space-y-3.5 min-w-0" style={{ transformStyle: 'preserve-3d' }}>
+            <div className="flex flex-wrap sm:flex-nowrap items-start justify-between gap-2.5 sm:gap-3 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1" style={{ transformStyle: 'preserve-3d' }}>
                 <div
                   className="w-10 h-10 rounded-xl bg-[#1D2B3A] dark:bg-[#B25B3E] text-white flex items-center justify-center font-serif font-bold text-sm shadow-sm shrink-0"
                   style={{ transform: 'translateZ(20px)' }}
@@ -133,9 +133,9 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
                   {initials}
                 </div>
 
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p
-                    className={`font-serif font-bold text-base leading-tight truncate ${
+                    className={`font-serif font-bold text-base leading-tight break-words ${
                       isIdentityReady
                         ? 'text-[#1D2B3A] dark:text-white'
                         : 'text-[#8A847C] dark:text-slate-400'
@@ -143,7 +143,7 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
                   >
                     {isIdentityReady ? trimmedName : 'Candidate Name'}
                   </p>
-                  <p className="font-mono text-[11px] text-[#B25B3E] dark:text-[#E07A5F] truncate mt-0.5">
+                  <p className="font-mono text-[11px] text-[#B25B3E] dark:text-[#E07A5F] break-all mt-0.5">
                     {slugPreview}
                   </p>
                 </div>
@@ -151,9 +151,9 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
 
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-mono text-[9px] font-bold uppercase tracking-widest bg-[#F3EFE9] dark:bg-[#0F172A] text-[#5C5751] dark:text-slate-300 border border-[#E5E1D8] dark:border-[#334155] shrink-0">
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                     isSubmitting
-                      ? 'bg-[#B25B3E] dark:bg-[#E07A5F] animate-pulse'
+                      ? 'bg-[#B25B3E] dark:bg-[#E07A5F] animate-pulse motion-reduce:animate-none'
                       : isPdfReady && isIdentityReady
                         ? 'bg-[#047857] dark:bg-[#10B981]'
                         : 'bg-[#8A847C] dark:bg-slate-500'
@@ -163,13 +163,13 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
               </span>
             </div>
 
-            <div className="rounded-xl bg-[#F3EFE9]/75 dark:bg-[#0F172A]/75 border border-[#E5E1D8] dark:border-[#334155]/80 p-2.5 sm:p-3">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-widest text-[#8A847C] dark:text-slate-400">
-                  <Sparkles className="w-2.5 h-2.5 text-[#B25B3E] dark:text-[#E07A5F]" />
+            <div className="rounded-xl bg-[#F3EFE9]/75 dark:bg-[#0F172A]/75 border border-[#E5E1D8] dark:border-[#334155]/80 p-2.5 sm:p-3 min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 min-w-0">
+                <span className="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-widest text-[#8A847C] dark:text-slate-400 shrink-0">
+                  <Sparkles className="w-2.5 h-2.5 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
                   <span>Voice Calibration</span>
                 </span>
-                <span className="font-mono text-[10px] font-semibold text-[#1D2B3A] dark:text-slate-200 px-2 py-0.5 rounded-md bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155]">
+                <span className="font-mono text-[10px] font-semibold text-[#1D2B3A] dark:text-slate-200 px-2 py-0.5 rounded-md bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] break-words max-w-full">
                   {tone}
                 </span>
               </div>
@@ -181,18 +181,18 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
                   animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                   exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -3 }}
                   transition={{ duration: 0.16, ease: 'easeOut' }}
-                  className="text-[11px] text-[#5C5751] dark:text-slate-300 leading-snug"
+                  className="text-[11px] text-[#5C5751] dark:text-slate-300 leading-snug break-words"
                 >
                   {toneTagline}
                 </motion.p>
               </AnimatePresence>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
               {chipConfig.map((chip) => (
                 <div
                   key={chip.key}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-[10px] uppercase tracking-widest border transition-colors ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-[10px] uppercase tracking-widest border transition-colors max-w-full min-w-0 ${
                     chip.ready
                       ? 'bg-emerald-50/90 dark:bg-emerald-950/50 text-[#047857] dark:text-[#10B981] border-emerald-200 dark:border-emerald-800/60'
                       : 'bg-[#F3EFE9]/80 dark:bg-[#0F172A]/70 text-[#8A847C] dark:text-slate-400 border-[#E5E1D8] dark:border-[#334155]'
@@ -205,9 +205,9 @@ export default function StudioPersonaCard3D({ name = '', tone = 'Professional', 
                         : 'bg-[#8A847C]/60 dark:bg-slate-500'
                     }`}
                   />
-                  <span className="font-bold">{chip.label}</span>
-                  <span className="opacity-50">&middot;</span>
-                  <span className="truncate max-w-[160px]">{chip.text}</span>
+                  <span className="font-bold shrink-0">{chip.label}</span>
+                  <span className="opacity-50 shrink-0">&middot;</span>
+                  <span className="min-w-0 break-words">{chip.text}</span>
                 </div>
               ))}
             </div>

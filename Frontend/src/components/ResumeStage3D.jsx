@@ -73,7 +73,7 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
       >
         <div
           ref={resumeAssemblyRef}
-          className="relative w-[310px] sm:w-[370px] lg:w-[410px] aspect-[1/1.38] will-change-transform"
+          className="relative w-[260px] min-[400px]:w-[285px] sm:w-[325px] lg:w-[380px] xl:w-[410px] aspect-[1/1.38] will-change-transform"
           style={{
             transformStyle: 'preserve-3d',
             transform: 'rotateY(-16deg) rotateX(7deg) rotateZ(-1.5deg)'
@@ -90,7 +90,7 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
           />
 
           <div
-            className="relative w-full h-full rounded-2xl bg-white dark:bg-[#111827]/95 border border-[#E5E1D8] dark:border-white/15 p-4 sm:p-5 lg:p-6 shadow-[0_30px_70px_-20px_rgba(29,43,58,0.22)] dark:shadow-[0_35px_80px_-15px_rgba(0,0,0,0.65)] flex flex-col justify-between overflow-hidden"
+            className="relative w-full h-full rounded-2xl bg-white dark:bg-[#111827]/95 border border-[#E5E1D8] dark:border-white/15 p-3.5 sm:p-5 lg:p-6 shadow-[0_30px_70px_-20px_rgba(29,43,58,0.22)] dark:shadow-[0_35px_80px_-15px_rgba(0,0,0,0.65)] flex flex-col justify-between overflow-hidden"
             style={{ transform: 'translateZ(0px)', transformStyle: 'preserve-3d' }}
           >
             <div
@@ -107,23 +107,23 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
               <div className="h-14 w-full bg-gradient-to-b from-[#B25B3E]/25 dark:from-[#E07A5F]/30 to-transparent" />
             </div>
 
-            <div className="space-y-3.5 sm:space-y-4">
-              <div className="flex items-start justify-between border-b border-[#E5E1D8] dark:border-white/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#1D2B3A] dark:bg-[#B25B3E] text-white flex items-center justify-center font-serif font-bold text-xs shadow-xs">
+            <div className="space-y-2.5 sm:space-y-4">
+              <div className="flex items-start justify-between gap-2 border-b border-[#E5E1D8] dark:border-white/10 pb-2.5 sm:pb-3">
+                <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#1D2B3A] dark:bg-[#B25B3E] text-white flex items-center justify-center font-serif font-bold text-[10px] sm:text-xs shadow-xs shrink-0">
                     MP
                   </div>
-                  <div>
-                    <h3 className="font-serif font-bold text-base sm:text-lg text-[#1D2B3A] dark:text-white leading-tight">
+                  <div className="min-w-0">
+                    <h3 className="font-serif font-bold text-sm sm:text-base lg:text-lg text-[#1D2B3A] dark:text-white leading-tight truncate">
                       Manav Patel
                     </h3>
-                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#B25B3E] dark:text-[#E07A5F]">
+                    <p className="text-[9px] sm:text-[10px] lg:text-xs font-semibold uppercase tracking-wider text-[#B25B3E] dark:text-[#E07A5F] truncate">
                       Principal Full-Stack Architect
                     </p>
                   </div>
                 </div>
-                <div className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="text-[8px] sm:text-[9px] font-mono px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none" />
                   <span>VERIFIED PDF</span>
                 </div>
               </div>
@@ -211,16 +211,16 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
 
           <div
             ref={card1Ref}
-            className="absolute -top-3 -right-5 sm:-right-8 w-44 sm:w-52 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-emerald-300 dark:border-emerald-600/50 rounded-xl shadow-xl p-2.5 sm:p-3 pointer-events-none will-change-transform z-40 opacity-0"
+            className="absolute -top-2 sm:-top-3 -right-2 sm:-right-6 lg:-right-8 w-36 sm:w-48 lg:w-52 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-emerald-300 dark:border-emerald-600/50 rounded-xl shadow-xl p-2 sm:p-2.5 lg:p-3 pointer-events-none will-change-transform z-40 opacity-0"
             style={{ transform: 'translateZ(0px) scale(0.92)' }}
           >
             <div className="flex items-center gap-1.5 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none" />
               <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                 Verified Proxy
               </span>
             </div>
-            <p className="font-mono text-[11px] font-bold text-[#1D2B3A] dark:text-white truncate">
+            <p className="font-mono text-[10px] sm:text-[11px] font-bold text-[#1D2B3A] dark:text-white truncate">
               /twin/manav-patel
             </p>
             <div className="flex items-center justify-between text-[9px] text-[#5C5751] dark:text-slate-300 mt-1">
@@ -232,7 +232,7 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
 
           <div
             ref={card2Ref}
-            className="absolute top-[28%] -left-5 sm:-left-10 w-48 sm:w-56 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#B25B3E]/50 dark:border-[#E07A5F]/50 rounded-xl shadow-xl p-2.5 sm:p-3 pointer-events-none will-change-transform z-40 opacity-0"
+            className="absolute top-[28%] -left-2 sm:-left-6 lg:-left-10 w-40 sm:w-52 lg:w-56 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#B25B3E]/50 dark:border-[#E07A5F]/50 rounded-xl shadow-xl p-2 sm:p-2.5 lg:p-3 pointer-events-none will-change-transform z-40 opacity-0"
             style={{ transform: 'translateZ(0px) scale(0.92)' }}
           >
             <div className="flex items-center gap-1.5 mb-1">
@@ -241,10 +241,10 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
                 STAR Metric Impact
               </span>
             </div>
-            <p className="font-serif font-bold text-sm sm:text-base text-[#1D2B3A] dark:text-white">
+            <p className="font-serif font-bold text-xs sm:text-sm lg:text-base text-[#1D2B3A] dark:text-white">
               64% Latency Cut
             </p>
-            <p className="text-[9px] text-[#5C5751] dark:text-slate-300 mt-0.5">
+            <p className="text-[9px] sm:text-[10px] text-[#5C5751] dark:text-slate-300 mt-0.5">
               Deterministic PDF Vector Grounding
             </p>
             <div className="absolute -bottom-3 right-6 w-[1.5px] h-3 bg-gradient-to-b from-[#B25B3E] dark:from-[#E07A5F] to-transparent" />
@@ -252,7 +252,7 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
 
           <div
             ref={card3Ref}
-            className="absolute top-[52%] -right-5 sm:-right-10 w-48 sm:w-56 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#E5E1D8] dark:border-white/15 rounded-xl shadow-xl p-2.5 sm:p-3 pointer-events-none will-change-transform z-40 opacity-0"
+            className="absolute top-[52%] -right-2 sm:-right-6 lg:-right-10 w-40 sm:w-52 lg:w-56 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-[#E5E1D8] dark:border-white/15 rounded-xl shadow-xl p-2 sm:p-2.5 lg:p-3 pointer-events-none will-change-transform z-40 opacity-0"
             style={{ transform: 'translateZ(0px) scale(0.92)' }}
           >
             <div className="flex items-center gap-1.5 mb-1">
@@ -261,7 +261,7 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
                 3D Skill Topology
               </span>
             </div>
-            <p className="text-[11px] font-semibold text-[#1D2B3A] dark:text-white">
+            <p className="text-[10px] sm:text-[11px] font-semibold text-[#1D2B3A] dark:text-white">
               18 Skills &middot; 4 Clusters
             </p>
             <div className="flex items-center gap-1 mt-1.5">
@@ -276,7 +276,7 @@ const ResumeStage3D = forwardRef(function ResumeStage3D(props, ref) {
 
           <div
             ref={card4Ref}
-            className="absolute -bottom-4 -left-4 sm:-left-8 w-52 sm:w-60 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-emerald-300 dark:border-emerald-600/50 rounded-xl shadow-xl p-2.5 sm:p-3 pointer-events-none will-change-transform z-40 opacity-0"
+            className="absolute -bottom-2 sm:-bottom-4 -left-2 sm:-left-6 lg:-left-8 w-44 sm:w-56 lg:w-60 bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border border-emerald-300 dark:border-emerald-600/50 rounded-xl shadow-xl p-2 sm:p-2.5 lg:p-3 pointer-events-none will-change-transform z-40 opacity-0"
             style={{ transform: 'translateZ(0px) scale(0.92)' }}
           >
             <div className="flex items-center justify-between mb-1">

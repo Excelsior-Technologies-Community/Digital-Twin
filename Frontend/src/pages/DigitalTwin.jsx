@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -101,13 +102,21 @@ export default function DigitalTwin() {
 
   useEffect(() => {
     if (!isQrModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleEscapeKey = (e) => {
       if (e.key === 'Escape') {
         setIsQrModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleEscapeKey);
-    return () => window.removeEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEscapeKey);
+    };
   }, [isQrModalOpen]);
 
   const fetchAnalytics = async (targetId) => {
@@ -448,7 +457,7 @@ export default function DigitalTwin() {
                       onClick={() => fetchAnalytics(twinProfile?.resumeId || resolvedSlug)}
                       disabled={isLoadingHistory}
                       aria-label="Refresh activity feed"
-                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 text-[11px] font-medium rounded-lg border border-[#E5E1D8] dark:border-[#334155] transition-colors disabled:opacity-50 shadow-2xs shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                      className="inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 text-[11px] font-medium rounded-lg border border-[#E5E1D8] dark:border-[#334155] transition-colors disabled:opacity-50 shadow-2xs shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                       title="Refresh activity feed"
                     >
                       <RefreshCw className={`w-3 h-3 text-[#B25B3E] dark:text-[#E07A5F] ${isLoadingHistory ? 'animate-spin' : ''}`} />
@@ -545,14 +554,14 @@ export default function DigitalTwin() {
                     ) : (
                       <>
                         <div className="mb-3 space-y-1.5 shrink-0">
-                          <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-2 flex items-center gap-2 focus-within:border-[#B25B3E] dark:focus-within:border-[#E07A5F] transition-colors">
+                          <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3 py-1.5 min-h-[44px] flex items-center gap-2 focus-within:border-[#B25B3E] dark:focus-within:border-[#E07A5F] transition-colors">
                             <Search className="w-3.5 h-3.5 text-[#8A847C] dark:text-slate-400 shrink-0" />
                             <input
                               type="text"
                               value={activitySearch}
                               onChange={(e) => setActivitySearch(e.target.value)}
                               aria-label="Search recruiter activity feed"
-                              placeholder="Search recruiter questions, answers, or visitors..."
+                              placeholder="Search questions, replies, visitors..."
                               className="flex-1 min-w-0 bg-transparent border-0 outline-none text-xs text-[#1D2B3A] dark:text-slate-100 placeholder:text-[#8A847C] dark:placeholder:text-slate-400"
                             />
                             {activitySearch && (
@@ -560,7 +569,7 @@ export default function DigitalTwin() {
                                 type="button"
                                 onClick={() => setActivitySearch('')}
                                 aria-label="Clear activity search"
-                                className="p-0.5 rounded text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                                className="min-w-[36px] min-h-[36px] -mr-1.5 flex items-center justify-center rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -646,7 +655,7 @@ export default function DigitalTwin() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               <div className="lg:col-span-7 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl p-5 sm:p-6 shadow-sm h-full flex flex-col justify-between">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-3 border-b border-[#E5E1D8] dark:border-[#334155] pb-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 border-b border-[#E5E1D8] dark:border-[#334155] pb-4">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-xl bg-[#1D2B3A] dark:bg-[#B25B3E] text-white flex items-center justify-center font-serif font-bold text-sm shadow-xs shrink-0 select-none">
                         {getInitials(twinProfile?.name)}
@@ -708,34 +717,34 @@ export default function DigitalTwin() {
                   </h3>
 
                   <div className="space-y-3.5">
-                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
-                      <span className="text-[#5C5751] dark:text-slate-400">Total Inquiries</span>
-                      <span className="text-[#B25B3E] dark:text-[#E07A5F] font-bold font-mono text-sm">
+                    <div className="flex items-center justify-between gap-3 text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
+                      <span className="text-[#5C5751] dark:text-slate-400 shrink-0">Total Inquiries</span>
+                      <span className="text-[#B25B3E] dark:text-[#E07A5F] font-bold font-mono text-sm text-right min-w-0 break-words">
                         {chatHistory.length}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
-                      <span className="text-[#5C5751] dark:text-slate-400">AI Engine</span>
-                      <span className="text-[#1D2B3A] dark:text-slate-100 font-medium">
+                    <div className="flex items-center justify-between gap-3 text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
+                      <span className="text-[#5C5751] dark:text-slate-400 shrink-0">AI Engine</span>
+                      <span className="text-[#1D2B3A] dark:text-slate-100 font-medium text-right min-w-0 break-words">
                         Google Gemini Generative AI
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
-                      <span className="text-[#5C5751] dark:text-slate-400">Response Protocol</span>
-                      <span className="text-[#1D2B3A] dark:text-slate-100 font-medium">
+                    <div className="flex items-center justify-between gap-3 text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
+                      <span className="text-[#5C5751] dark:text-slate-400 shrink-0">Response Protocol</span>
+                      <span className="text-[#1D2B3A] dark:text-slate-100 font-medium text-right min-w-0 break-words">
                         STAR-Method PDF Grounded
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
-                      <span className="text-[#5C5751] dark:text-slate-400">Data Security</span>
-                      <span className="text-[#1D2B3A] dark:text-slate-100 font-medium">
+                    <div className="flex items-center justify-between gap-3 text-xs pb-3 border-b border-[#E5E1D8] dark:border-[#334155]">
+                      <span className="text-[#5C5751] dark:text-slate-400 shrink-0">Data Security</span>
+                      <span className="text-[#1D2B3A] dark:text-slate-100 font-medium text-right min-w-0 break-words">
                         Encrypted Persona Storage
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#5C5751] dark:text-slate-400">Status</span>
-                      <span className="text-[#047857] dark:text-[#10B981] font-semibold flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#047857] dark:bg-[#10B981] animate-pulse" />
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      <span className="text-[#5C5751] dark:text-slate-400 shrink-0">Status</span>
+                      <span className="text-[#047857] dark:text-[#10B981] font-semibold flex items-center justify-end gap-1.5 text-right min-w-0 break-words">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#047857] dark:bg-[#10B981] animate-pulse shrink-0" />
                         <span>Active &amp; Live</span>
                       </span>
                     </div>
@@ -1003,114 +1012,120 @@ export default function DigitalTwin() {
         )}
       </section>
 
-      <AnimatePresence>
-        {isQrModalOpen && resolvedSlug && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-            onClick={() => setIsQrModalOpen(false)}
-            className="fixed inset-0 z-50 bg-[#1D2B3A]/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
-          >
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="qr-share-modal-title"
-              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
-              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <span className="font-mono uppercase tracking-widest text-[10px] sm:text-[11px] font-bold text-[#B25B3E] dark:text-[#E07A5F] block">
-                    RECRUITER ACCESS PASS
-                  </span>
-                  <h2
-                    id="qr-share-modal-title"
-                    className="font-serif text-xl sm:text-2xl font-bold text-[#1D2B3A] dark:text-white mt-0.5"
-                  >
-                    Scan to Interview Twin
-                  </h2>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setIsQrModalOpen(false)}
-                  aria-label="Close QR share modal"
-                  className="p-2 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8]/70 dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {isQrModalOpen && resolvedSlug && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+                onClick={() => setIsQrModalOpen(false)}
+                className="fixed inset-0 z-[100] bg-[#1D2B3A]/65 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+              >
+                <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="qr-share-modal-title"
+                  initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
+                  animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+                  exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
+                  transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] rounded-2xl w-full max-w-sm sm:max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-4"
                 >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <span className="font-mono uppercase tracking-widest text-[10px] sm:text-[11px] font-bold text-[#B25B3E] dark:text-[#E07A5F] block">
+                        RECRUITER ACCESS PASS
+                      </span>
+                      <h2
+                        id="qr-share-modal-title"
+                        className="font-serif text-xl sm:text-2xl font-bold text-[#1D2B3A] dark:text-white mt-0.5"
+                      >
+                        Scan to Interview Twin
+                      </h2>
+                    </div>
 
-              <div className="flex justify-center">
-                <div
-                  ref={qrWrapperRef}
-                  className="bg-white p-4 rounded-2xl border border-[#E5E1D8] shadow-sm inline-flex mx-auto"
-                >
-                  <QRCodeCanvas
-                    value={publicLink}
-                    size={208}
-                    bgColor="#FFFFFF"
-                    fgColor="#1D2B3A"
-                    level="M"
-                    includeMargin={false}
-                  />
-                </div>
-              </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsQrModalOpen(false)}
+                      aria-label="Close QR share modal"
+                      className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8]/70 dark:hover:bg-[#334155] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
 
-              <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3.5 py-2 text-center font-mono text-xs text-[#5C5751] dark:text-slate-300 truncate">
-                {publicLink}
-              </div>
+                  <div className="flex justify-center">
+                    <div
+                      ref={qrWrapperRef}
+                      className="bg-white p-3 sm:p-4 rounded-2xl border border-[#E5E1D8] shadow-sm inline-flex max-w-full mx-auto [&_canvas]:max-w-full [&_canvas]:h-auto"
+                    >
+                      <QRCodeCanvas
+                        value={publicLink}
+                        size={184}
+                        bgColor="#FFFFFF"
+                        fgColor="#1D2B3A"
+                        level="M"
+                        includeMargin={false}
+                      />
+                    </div>
+                  </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                <button
-                  type="button"
-                  onClick={handleDownloadQr}
-                  className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-sans font-semibold shadow-sm transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download QR PNG</span>
-                </button>
+                  <div className="bg-[#F3EFE9] dark:bg-[#0F172A] border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-3.5 py-2 text-center font-mono text-xs text-[#5C5751] dark:text-slate-300 break-all">
+                    {publicLink}
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 border border-[#E5E1D8] dark:border-[#334155] text-xs font-sans font-semibold transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-[#047857] dark:text-[#10B981]" />
-                      <span className="text-[#047857] dark:text-[#10B981]">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
-                      <span>Copy Link</span>
-                    </>
-                  )}
-                </button>
+                  <div className="flex flex-col gap-2.5 w-full mt-4">
+                    <div className="grid grid-cols-2 gap-2.5 w-full">
+                      <button
+                        type="button"
+                        onClick={handleCopyLink}
+                        className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 border border-[#E5E1D8] dark:border-[#334155] text-sm font-sans font-medium transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-4 h-4 text-[#047857] dark:text-[#10B981] shrink-0" />
+                            <span className="text-[#047857] dark:text-[#10B981]">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
+                            <span>Copy Link</span>
+                          </>
+                        )}
+                      </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsQrModalOpen(false);
-                    navigate(`/twin/${resolvedSlug}`);
-                  }}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#FCFAF6] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 border border-[#E5E1D8] dark:border-[#334155] text-xs font-sans font-semibold transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
-                  <span>Open Chat</span>
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsQrModalOpen(false);
+                          navigate(`/twin/${resolvedSlug}`);
+                        }}
+                        className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#F3EFE9] dark:bg-[#0F172A] hover:bg-[#E5E1D8] dark:hover:bg-[#334155] text-[#1D2B3A] dark:text-slate-100 border border-[#E5E1D8] dark:border-[#334155] text-sm font-sans font-medium transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                      >
+                        <ExternalLink className="w-4 h-4 text-[#B25B3E] dark:text-[#E07A5F] shrink-0" />
+                        <span>Open Chat</span>
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadQr}
+                      className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-sans font-medium bg-[#B25B3E] hover:bg-[#9E4D32] text-white shadow-sm transition-all active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+                    >
+                      <Download className="w-4 h-4 shrink-0" />
+                      <span>Download QR PNG</span>
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </MarketingLayout>
   );
 }

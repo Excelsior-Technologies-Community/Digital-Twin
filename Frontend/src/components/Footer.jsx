@@ -26,8 +26,8 @@ export default function Footer() {
   return (
     <footer className="bg-[#FCFAF6] dark:bg-[#1E293B]/70 border-t border-[#E5E1D8] dark:border-[#334155] transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
-          <div className="lg:col-span-5 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10">
+          <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-[#1D2B3A] dark:bg-[#B25B3E] text-[#FCFAF6] flex items-center justify-center font-serif font-bold text-xs shadow-xs select-none shrink-0">
                 DT
@@ -43,14 +43,14 @@ export default function Footer() {
 
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-sans font-medium bg-[#F3EFE9] dark:bg-[#0F172A] text-[#1D2B3A] dark:text-slate-200 border border-[#E5E1D8] dark:border-[#334155]">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
               </span>
               <span>Powered by Gemini AI &amp; WebGL</span>
             </div>
           </div>
 
-          <div className="lg:col-span-3">
+          <div className="md:col-span-3">
             <span className="text-[11px] font-sans font-semibold text-[#8A847C] dark:text-slate-400 uppercase tracking-widest block mb-3.5">
               Navigation
             </span>
@@ -90,7 +90,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="lg:col-span-4">
+          <div className="md:col-span-4">
             <span className="text-[11px] font-sans font-semibold text-[#8A847C] dark:text-slate-400 uppercase tracking-widest block mb-3.5">
               Architecture &amp; Standards
             </span>

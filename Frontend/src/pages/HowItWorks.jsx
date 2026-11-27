@@ -149,11 +149,11 @@ export default function HowItWorks() {
 
         <section className="space-y-8">
           <div className="flex items-center justify-center">
-            <div className="inline-flex p-1 rounded-2xl bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-xs">
+            <div className="inline-flex flex-wrap sm:flex-nowrap justify-center gap-1 p-1 rounded-2xl bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] shadow-xs max-w-full">
               <button
                 type="button"
                 onClick={() => setActivePerspective('candidates')}
-                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
+                className={`min-h-[44px] px-4 py-2.5 sm:px-5 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
                   activePerspective === 'candidates'
                     ? 'bg-[#1D2B3A] text-white dark:bg-white dark:text-[#0F172A] shadow-xs'
                     : 'text-[#5C5751] dark:text-slate-400 hover:text-[#1D2B3A] dark:hover:text-white'
@@ -164,7 +164,7 @@ export default function HowItWorks() {
               <button
                 type="button"
                 onClick={() => setActivePerspective('recruiters')}
-                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
+                className={`min-h-[44px] px-4 py-2.5 sm:px-5 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E] ${
                   activePerspective === 'recruiters'
                     ? 'bg-[#1D2B3A] text-white dark:bg-white dark:text-[#0F172A] shadow-xs'
                     : 'text-[#5C5751] dark:text-slate-400 hover:text-[#1D2B3A] dark:hover:text-white'
@@ -307,8 +307,8 @@ export default function HowItWorks() {
             })}
           </div>
 
-          <div className="mt-10 pt-8 border-t border-[#E5E1D8]/80 dark:border-[#334155]/80 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-6 shadow-2xs">
-            <div>
+          <div className="mt-10 pt-8 border-t border-[#E5E1D8]/80 dark:border-[#334155]/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCFAF6] dark:bg-[#1E293B] border border-[#E5E1D8] dark:border-[#334155] rounded-2xl p-6 shadow-2xs">
+            <div className="min-w-0">
               <h3 className="font-serif font-bold text-base text-[#1D2B3A] dark:text-white">
                 Ready to see your resume as a living digital proxy?
               </h3>
@@ -318,10 +318,10 @@ export default function HowItWorks() {
             </div>
             <Link
               to="/studio"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-[0.98] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#B25B3E] hover:bg-[#9E4D32] text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-[0.98] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
             >
               <span>Launch Studio</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </Link>
           </div>
         </section>

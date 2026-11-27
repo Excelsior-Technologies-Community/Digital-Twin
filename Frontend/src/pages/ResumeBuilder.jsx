@@ -72,6 +72,7 @@ const ResumeBuilder = () => {
     if (typeof window !== 'undefined') return window.innerWidth;
     return 1200;
   });
+  const [stageTop, setStageTop] = useState(140);
   const [sheetHeight, setSheetHeight] = useState(1123);
 
   const stageRef = useRef(null);
@@ -242,10 +243,22 @@ const ResumeBuilder = () => {
     const stage = stageRef.current;
     if (!stage) return;
 
+    const getContentWidth = (el) => {
+      if (!el) return 0;
+      if (typeof window === 'undefined' || !window.getComputedStyle) return el.clientWidth;
+      const styles = window.getComputedStyle(el);
+      const padLeft = parseFloat(styles.paddingLeft) || 0;
+      const padRight = parseFloat(styles.paddingRight) || 0;
+      return Math.max(0, el.clientWidth - padLeft - padRight);
+    };
+
     const updateMeasurements = () => {
       if (stageRef.current) {
-        const width = stageRef.current.clientWidth;
+        const width = getContentWidth(stageRef.current);
         if (width > 0) setAvailableWidth(width);
+        const rect = stageRef.current.getBoundingClientRect();
+        const scrollTop = typeof window !== 'undefined' ? (window.scrollY || 0) : 0;
+        setStageTop(rect.top + scrollTop);
       }
       if (resumeRef.current) {
         const height = resumeRef.current.offsetHeight || resumeRef.current.scrollHeight;
@@ -264,6 +277,9 @@ const ResumeBuilder = () => {
         if (entry.target === stage) {
           const width = entry.contentRect.width;
           if (width > 0) setAvailableWidth(width);
+          const rect = stage.getBoundingClientRect();
+          const scrollTop = typeof window !== 'undefined' ? (window.scrollY || 0) : 0;
+          setStageTop(rect.top + scrollTop);
         } else if (entry.target === resumeRef.current) {
           const height = resumeRef.current?.offsetHeight || entry.contentRect.height;
           if (height > 0) setSheetHeight(height);
@@ -304,9 +320,6 @@ const ResumeBuilder = () => {
 
   let fitScale;
   if (isDesktopOrTablet) {
-    const stageTop = stageRef.current
-      ? (stageRef.current.getBoundingClientRect().top + (window.scrollY || 0))
-      : 140;
     const availableHeight = Math.max(320, viewportHeight - Math.max(stageTop, 140) - 32);
     const heightScale = availableHeight / (sheetHeight || 1123);
     fitScale = Math.min(1, Math.max(0.35, Math.min(widthScale, heightScale)));
@@ -358,7 +371,7 @@ const ResumeBuilder = () => {
   if (!twinData) return <div className="min-h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] flex items-center justify-center p-10 text-center font-serif text-[#5C5751] dark:text-slate-400">Loading Resume Data...</div>;
 
   return (
-    <div className="min-h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] flex flex-col md:flex-row font-sans text-[#1D2B3A] dark:text-slate-100 overflow-x-hidden pb-28 md:pb-0 relative transition-colors">
+    <div className="min-h-[100dvh] bg-[#F3EFE9] dark:bg-[#0F172A] flex flex-col md:flex-row font-sans text-[#1D2B3A] dark:text-slate-100 overflow-x-clip pb-28 md:pb-0 relative transition-colors">
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border-b border-[#E5E1D8] dark:border-[#334155] sticky top-0 z-30">
         <button
           onClick={() => navigate(-1)}
@@ -375,7 +388,7 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      <div className="hidden md:flex w-full md:w-[320px] lg:w-[360px] bg-[#FCFAF6] dark:bg-[#1E293B] p-5 lg:p-6 border-r border-[#E5E1D8] dark:border-[#334155] shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] flex-col shrink-0 overflow-y-auto max-h-[100dvh]">
+      <div className="hidden md:flex md:sticky md:top-0 md:h-[100dvh] md:overflow-y-auto w-full md:w-[272px] lg:w-[340px] xl:w-[360px] bg-[#FCFAF6] dark:bg-[#1E293B] p-5 lg:p-6 border-r border-[#E5E1D8] dark:border-[#334155] shadow-md dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] flex-col shrink-0">
         <div className="flex items-center justify-between mb-5">
           <button
             onClick={() => navigate(-1)}
@@ -555,7 +568,7 @@ const ResumeBuilder = () => {
                             type="button"
                             onClick={() => handleRemoveSkill(index)}
                             aria-label={`Remove ${skill}`}
-                            className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                            className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors min-w-[28px] min-h-[28px] inline-flex items-center justify-center -mr-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -613,7 +626,7 @@ const ResumeBuilder = () => {
                         {ACCENT_PALETTES.find((p) => p.hex === accentColor)?.name || 'Custom'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 pt-1">
+                    <div className="flex items-center gap-1.5 pt-1">
                       {ACCENT_PALETTES.map((palette) => {
                         const isSelected = accentColor === palette.hex;
                         return (
@@ -624,14 +637,18 @@ const ResumeBuilder = () => {
                             aria-label={palette.name}
                             title={palette.name}
                             aria-pressed={isSelected}
-                            style={{ backgroundColor: palette.hex }}
-                            className={`w-8 h-8 rounded-full transition-all duration-150 ease-out hover:scale-110 active:scale-95 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] relative ${
-                              isSelected
-                                ? 'ring-2 ring-offset-2 ring-[#B25B3E] dark:ring-offset-[#1E293B] shadow-sm'
-                                : 'opacity-90 hover:opacity-100 ring-1 ring-black/10 dark:ring-white/10'
-                            }`}
+                            className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-full transition-transform duration-150 ease-out hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
                           >
-                            {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />}
+                            <span
+                              style={{ backgroundColor: palette.hex }}
+                              className={`w-6 h-6 rounded-full flex items-center justify-center relative ${
+                                isSelected
+                                  ? 'ring-2 ring-offset-2 ring-[#B25B3E] dark:ring-offset-[#1E293B] shadow-sm'
+                                  : 'opacity-90 hover:opacity-100 ring-1 ring-black/10 dark:ring-white/10'
+                              }`}
+                            >
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />}
+                            </span>
                           </button>
                         );
                       })}
@@ -695,7 +712,7 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      <div className="flex-1 min-w-0 flex flex-col items-center bg-[#F3EFE9] dark:bg-[#0F172A] bg-[radial-gradient(rgba(29,43,58,0.08)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(148,163,184,0.12)_1px,transparent_1px)] bg-[length:20px_20px] p-3 sm:p-6 md:p-8 min-h-0 print:p-0 print:bg-none print:bg-white print:w-full">
+      <div className="flex-1 min-w-0 flex flex-col bg-[#F3EFE9] dark:bg-[#0F172A] bg-[radial-gradient(rgba(29,43,58,0.08)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(148,163,184,0.12)_1px,transparent_1px)] bg-[length:20px_20px] p-3 sm:p-6 md:p-8 min-h-0 print:p-0 print:bg-none print:bg-white print:w-full">
         <div className="w-full flex items-center justify-center gap-2.5 mb-2 sm:mb-4 print:hidden px-2 sm:px-4">
           <div className="hidden md:inline-flex bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-1 items-center gap-1 shadow-sm dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             <button
@@ -741,7 +758,7 @@ const ResumeBuilder = () => {
           </span>
 
           <div className="flex md:hidden items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl p-1 shadow-xs">
+            <div className="flex items-center gap-0.5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl px-1 py-0.5 shadow-xs">
               {ACCENT_PALETTES.map((palette) => {
                 const isSelected = accentColor === palette.hex;
                 return (
@@ -752,12 +769,16 @@ const ResumeBuilder = () => {
                     aria-label={palette.name}
                     title={palette.name}
                     aria-pressed={isSelected}
-                    style={{ backgroundColor: palette.hex }}
-                    className={`w-6 h-6 rounded-full transition-all duration-150 ease-out hover:scale-110 active:scale-95 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#B25B3E] ${
-                      isSelected ? 'ring-2 ring-offset-1 ring-[#B25B3E]' : 'opacity-85'
-                    }`}
+                    className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-full transition-transform duration-150 ease-out hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#B25B3E]"
                   >
-                    {isSelected && <Check className="w-3 h-3 text-white stroke-[2.5]" />}
+                    <span
+                      style={{ backgroundColor: palette.hex }}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        isSelected ? 'ring-2 ring-offset-1 ring-[#B25B3E]' : 'opacity-85'
+                      }`}
+                    >
+                      {isSelected && <Check className="w-3 h-3 text-white stroke-[2.5]" />}
+                    </span>
                   </button>
                 );
               })}
@@ -767,7 +788,7 @@ const ResumeBuilder = () => {
               type="button"
               onClick={() => setIsEditDrawerOpen(true)}
               aria-label="Edit Resume Content"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl text-xs font-sans font-semibold text-[#1D2B3A] dark:text-slate-200 shadow-xs hover:border-[#B25B3E] transition-all min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#FCFAF6]/90 dark:bg-[#1E293B]/90 backdrop-blur-md border border-[#E5E1D8] dark:border-[#334155] rounded-xl text-xs font-sans font-semibold text-[#1D2B3A] dark:text-slate-200 shadow-xs hover:border-[#B25B3E] transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
             >
               <Pencil className="w-3.5 h-3.5 text-[#B25B3E] dark:text-[#E07A5F]" />
               <span>Edit</span>
@@ -780,20 +801,24 @@ const ResumeBuilder = () => {
 
         <div
           ref={stageRef}
-          className="w-full min-w-0 overflow-x-auto py-4 sm:py-6 flex justify-center print:p-0 print:overflow-visible"
+          className="w-full min-w-0 overflow-x-auto py-4 sm:py-6 px-4 sm:px-6 print:p-0 print:overflow-visible"
         >
           <div
-            className="relative print:!w-auto print:!h-auto shrink-0 transition-[width,height] duration-200"
+            className="relative mx-auto shrink-0 print:!w-auto print:!h-auto print:!m-0 transition-[width,height] duration-200"
             style={{
               width: `${Math.round(794 * activeScale)}px`,
               height: `${Math.round(sheetHeight * activeScale)}px`,
             }}
           >
             <div
-              className="origin-top-left transform-gpu transition-transform duration-200 print:!transform-none shadow-[0_24px_60px_-15px_rgba(29,43,58,0.18)] dark:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.65)] ring-1 ring-[#E5E1D8] dark:ring-white/10 print:shadow-none print:ring-0 bg-white text-[#1D2B3A]"
+              className="origin-top-left transform-gpu transition-transform duration-200 print:!static print:!transform-none print:!w-auto shadow-[0_24px_60px_-15px_rgba(29,43,58,0.18)] dark:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.65)] ring-1 ring-[#E5E1D8] dark:ring-white/10 print:shadow-none print:ring-0 bg-white text-[#1D2B3A]"
               style={{
-                transform: `scale(${activeScale})`,
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '794px',
+                transform: `scale(${activeScale})`,
+                transformOrigin: 'top left',
               }}
             >
               {template === 'modern' ? (
@@ -806,13 +831,13 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border-t border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] flex items-center justify-between gap-3 md:hidden z-40 shadow-lg print:hidden">
-        <div className="flex items-center gap-1.5 bg-[#F3EFE9] dark:bg-[#0F172A] p-1 rounded-xl border border-[#E5E1D8] dark:border-[#334155]">
+      <div className="fixed bottom-0 left-0 right-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#FCFAF6]/95 dark:bg-[#1E293B]/95 backdrop-blur-md border-t border-[#E5E1D8] dark:border-[#334155] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] flex items-center justify-between gap-2 sm:gap-3 md:hidden z-40 shadow-lg print:hidden">
+        <div className="flex items-center gap-1 bg-[#F3EFE9] dark:bg-[#0F172A] p-1 rounded-xl border border-[#E5E1D8] dark:border-[#334155] shrink-0">
           <button
             type="button"
             onClick={() => setTemplate('modern')}
             aria-pressed={template === 'modern'}
-            className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-xs font-sans font-semibold transition-all duration-150 ease-out active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`min-h-[44px] px-2.5 xs:px-3.5 py-2 rounded-lg text-xs font-sans font-semibold transition-all duration-150 ease-out active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               template === 'modern'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#B25B3E] dark:text-white ring-1 ring-[#B25B3E]/40 dark:ring-[#E07A5F]/40 shadow-xs'
                 : 'text-[#5C5751] dark:text-slate-400 hover:text-[#1D2B3A] dark:hover:text-white'
@@ -825,7 +850,7 @@ const ResumeBuilder = () => {
             type="button"
             onClick={() => setTemplate('classic')}
             aria-pressed={template === 'classic'}
-            className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-xs font-sans font-semibold transition-all duration-150 ease-out active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
+            className={`min-h-[44px] px-2.5 xs:px-3.5 py-2 rounded-lg text-xs font-sans font-semibold transition-all duration-150 ease-out active:scale-95 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E] ${
               template === 'classic'
                 ? 'bg-[#1D2B3A] text-[#FCFAF6] dark:bg-[#B25B3E] dark:text-white ring-1 ring-[#B25B3E]/40 dark:ring-[#E07A5F]/40 shadow-xs'
                 : 'text-[#5C5751] dark:text-slate-400 hover:text-[#1D2B3A] dark:hover:text-white'
@@ -836,13 +861,38 @@ const ResumeBuilder = () => {
           </button>
         </div>
 
+        {Boolean(editToken) && hasEdits && (
+          <button
+            type="button"
+            onClick={handleSaveToTwin}
+            disabled={isSaving}
+            aria-label="Save changes to twin"
+            className="min-h-[44px] px-3 rounded-xl bg-[#1D2B3A] hover:bg-[#15202C] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-medium inline-flex items-center justify-center gap-1.5 shrink-0 shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+          >
+            {isSaving ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+            ) : (
+              <CloudUpload className="w-3.5 h-3.5 shrink-0" />
+            )}
+            <span>{isSaving ? 'Saving' : 'Save'}</span>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={onDownloadClick}
-          className="flex-1 bg-[#B25B3E] hover:bg-[#9E4D32] text-white py-2.5 px-4 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
+          className="flex-1 min-w-0 bg-[#B25B3E] hover:bg-[#9E4D32] text-white py-2.5 px-3 xs:px-4 rounded-xl font-sans font-semibold text-xs shadow-sm transition-all duration-150 ease-out active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#B25B3E]"
         >
-          <Printer className="w-4 h-4" />
-          <span>Download PDF</span>
+          <Printer className="w-4 h-4 shrink-0" />
+          <span className="truncate">
+            {Boolean(editToken) && hasEdits ? (
+              <>
+                <span className="hidden min-[420px]:inline">Download </span>PDF
+              </>
+            ) : (
+              'Download PDF'
+            )}
+          </span>
         </button>
       </div>
 
@@ -887,7 +937,7 @@ const ResumeBuilder = () => {
                     type="button"
                     onClick={() => setIsEditDrawerOpen(false)}
                     aria-label="Close edit drawer"
-                    className="p-1.5 rounded-lg text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8] dark:hover:bg-[#334155] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                    className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-[#5C5751] hover:text-[#1D2B3A] dark:text-slate-400 dark:hover:text-white hover:bg-[#E5E1D8] dark:hover:bg-[#334155] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -967,7 +1017,7 @@ const ResumeBuilder = () => {
                           type="button"
                           onClick={() => handleRemoveSkill(index)}
                           aria-label={`Remove ${skill}`}
-                          className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
+                          className="text-[#5C5751] hover:text-[#B25B3E] dark:text-slate-400 dark:hover:text-[#E07A5F] transition-colors min-w-[28px] min-h-[28px] inline-flex items-center justify-center -mr-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B25B3E]"
                         >
                           <X className="w-3 h-3" />
                         </button>
